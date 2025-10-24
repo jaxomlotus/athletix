@@ -32,9 +32,9 @@ async function main() {
   // Create Leagues
   const mlb = await prisma.league.create({
     data: {
-      name: 'Major League Baseball',
+      name: 'College Baseball League',
       sportId: baseball.id,
-      description: 'Professional baseball league in North America',
+      description: 'Competitive college baseball league',
     },
   })
 
@@ -59,21 +59,21 @@ async function main() {
   // Create Teams
   const blueJays = await prisma.team.create({
     data: {
-      title: 'Toronto Blue Jays',
+      title: 'Stanford Cardinals',
       sportId: baseball.id,
       leagueId: mlb.id,
-      description: 'Canadian MLB team based in Toronto',
-      logo: 'https://www.mlbstatic.com/team-logos/141.svg',
+      description: 'Elite college baseball program from Stanford University',
+      logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Stanford_Cardinal_logo.svg/200px-Stanford_Cardinal_logo.svg.png',
     },
   })
 
   const yankees = await prisma.team.create({
     data: {
-      title: 'New York Yankees',
+      title: 'UCLA Bruins',
       sportId: baseball.id,
       leagueId: mlb.id,
-      description: 'Historic MLB team based in New York',
-      logo: 'https://www.mlbstatic.com/team-logos/147.svg',
+      description: 'Prestigious college baseball team from UCLA',
+      logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/UCLA_Bruins_logo.svg/200px-UCLA_Bruins_logo.svg.png',
     },
   })
 
@@ -169,6 +169,260 @@ async function main() {
     },
   })
 
+  // Toronto Blue Jays Players
+  const blueJay2 = await prisma.user.create({
+    data: {
+      name: 'Kevin Park',
+      email: 'kevin.park@example.com',
+      displayName: 'K-Park',
+      avatar: 'https://i.pravatar.cc/300?img=13',
+      bannerImage: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
+      bio: 'Solid defensive catcher with a cannon for an arm.',
+      socialLinks: { twitter: '@kpark_mlb', instagram: '@kevinpark' },
+      followerCount: 8900,
+      followingCount: 156,
+    },
+  })
+
+  const blueJay3 = await prisma.user.create({
+    data: {
+      name: 'Diego Martinez',
+      email: 'diego.martinez@example.com',
+      displayName: 'El Fuego',
+      avatar: 'https://i.pravatar.cc/300?img=14',
+      bannerImage: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
+      bio: 'Fireballer with a 98 mph fastball. Closing games since 2020.',
+      socialLinks: { twitter: '@elfuego99', instagram: '@diego_martinez' },
+      followerCount: 12300,
+      followingCount: 98,
+    },
+  })
+
+  const blueJay4 = await prisma.user.create({
+    data: {
+      name: 'Ryan Mitchell',
+      email: 'ryan.mitchell@example.com',
+      displayName: 'The Glove',
+      avatar: 'https://i.pravatar.cc/300?img=51',
+      bannerImage: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
+      bio: 'Gold Glove shortstop with elite defensive skills.',
+      socialLinks: { twitter: '@ryantheglove', instagram: '@ryanmitchell' },
+      followerCount: 11500,
+      followingCount: 203,
+    },
+  })
+
+  const blueJay5 = await prisma.user.create({
+    data: {
+      name: 'Alex Thompson',
+      email: 'alex.thompson@example.com',
+      displayName: 'AT3',
+      avatar: 'https://i.pravatar.cc/300?img=52',
+      bannerImage: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
+      bio: 'Third baseman with power. 25+ home runs every season.',
+      socialLinks: { twitter: '@at3_baseball', instagram: '@alexthompson' },
+      followerCount: 14200,
+      followingCount: 178,
+    },
+  })
+
+  const blueJay6 = await prisma.user.create({
+    data: {
+      name: 'Jordan Lee',
+      email: 'jordan.lee@example.com',
+      displayName: 'J-Lee',
+      avatar: 'https://i.pravatar.cc/300?img=53',
+      bannerImage: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
+      bio: 'Speedster on the bases. League leader in stolen bases.',
+      socialLinks: { twitter: '@jlee_speed', instagram: '@jordanlee' },
+      followerCount: 9800,
+      followingCount: 142,
+    },
+  })
+
+  const blueJay7 = await prisma.user.create({
+    data: {
+      name: 'Chris Davidson',
+      email: 'chris.davidson@example.com',
+      displayName: 'Davo',
+      avatar: 'https://i.pravatar.cc/300?img=54',
+      bannerImage: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
+      bio: 'Veteran first baseman. Team leader and mentor.',
+      socialLinks: { twitter: '@davo_baseball', instagram: '@chrisdavidson' },
+      followerCount: 18700,
+      followingCount: 267,
+    },
+  })
+
+  const blueJay8 = await prisma.user.create({
+    data: {
+      name: 'Tyler Watson',
+      email: 'tyler.watson@example.com',
+      displayName: 'T-Wat',
+      avatar: 'https://i.pravatar.cc/300?img=55',
+      bannerImage: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
+      bio: 'Left-handed pitcher with nasty changeup.',
+      socialLinks: { twitter: '@twat_pitcher', instagram: '@tylerwatson' },
+      followerCount: 7200,
+      followingCount: 89,
+    },
+  })
+
+  const blueJay9 = await prisma.user.create({
+    data: {
+      name: 'Brandon Scott',
+      email: 'brandon.scott@example.com',
+      displayName: 'B-Scott',
+      avatar: 'https://i.pravatar.cc/300?img=56',
+      bannerImage: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
+      bio: 'Utility player who can play anywhere on the field.',
+      socialLinks: { twitter: '@bscott_baseball', instagram: '@brandonscott' },
+      followerCount: 6800,
+      followingCount: 112,
+    },
+  })
+
+  const blueJay10 = await prisma.user.create({
+    data: {
+      name: 'Michael Chang',
+      email: 'michael.chang@example.com',
+      displayName: 'M-Chang',
+      avatar: 'https://i.pravatar.cc/300?img=57',
+      bannerImage: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
+      bio: 'Solid defensive second baseman with good bat control.',
+      socialLinks: { twitter: '@mchang_mlb', instagram: '@michaelchang' },
+      followerCount: 8100,
+      followingCount: 134,
+    },
+  })
+
+  // New York Yankees Players
+  const yankee2 = await prisma.user.create({
+    data: {
+      name: 'Jake Anderson',
+      email: 'jake.anderson@example.com',
+      displayName: 'Jakey',
+      avatar: 'https://i.pravatar.cc/300?img=58',
+      bannerImage: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
+      bio: 'Power-hitting designated hitter. 40+ home runs per season.',
+      socialLinks: { twitter: '@jakey_bombs', instagram: '@jakeanderson' },
+      followerCount: 32400,
+      followingCount: 289,
+    },
+  })
+
+  const yankee3 = await prisma.user.create({
+    data: {
+      name: 'Luis Hernandez',
+      email: 'luis.hernandez@example.com',
+      displayName: 'El Capitan',
+      avatar: 'https://i.pravatar.cc/300?img=59',
+      bannerImage: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
+      bio: 'Team captain and shortstop. Leader on and off the field.',
+      socialLinks: { twitter: '@el_capitan', instagram: '@luishernandez' },
+      followerCount: 41200,
+      followingCount: 312,
+    },
+  })
+
+  const yankee4 = await prisma.user.create({
+    data: {
+      name: 'Derek Stone',
+      email: 'derek.stone@example.com',
+      displayName: 'Stoney',
+      avatar: 'https://i.pravatar.cc/300?img=60',
+      bannerImage: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
+      bio: 'Elite closer. Saving games since 2019.',
+      socialLinks: { twitter: '@stoney_closes', instagram: '@derekstone' },
+      followerCount: 19800,
+      followingCount: 156,
+    },
+  })
+
+  const yankee5 = await prisma.user.create({
+    data: {
+      name: 'Marcus Johnson',
+      email: 'marcus.johnson@example.com',
+      displayName: 'MJ',
+      avatar: 'https://i.pravatar.cc/300?img=61',
+      bannerImage: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
+      bio: 'Athletic center fielder with incredible range.',
+      socialLinks: { twitter: '@mj_baseball', instagram: '@marcusjohnson' },
+      followerCount: 16900,
+      followingCount: 201,
+    },
+  })
+
+  const yankee6 = await prisma.user.create({
+    data: {
+      name: 'Anthony Romano',
+      email: 'anthony.romano@example.com',
+      displayName: 'Tony R',
+      avatar: 'https://i.pravatar.cc/300?img=62',
+      bannerImage: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
+      bio: 'Veteran catcher and team leader. 15 years in the majors.',
+      socialLinks: { twitter: '@tonyr_yankees', instagram: '@anthonyromano' },
+      followerCount: 28300,
+      followingCount: 234,
+    },
+  })
+
+  const yankee7 = await prisma.user.create({
+    data: {
+      name: 'Carlos Ramirez',
+      email: 'carlos.ramirez@example.com',
+      displayName: 'Los',
+      avatar: 'https://i.pravatar.cc/300?img=63',
+      bannerImage: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
+      bio: 'Hard-hitting third baseman. Clutch performer.',
+      socialLinks: { twitter: '@los_ramirez', instagram: '@carlosramirez' },
+      followerCount: 21700,
+      followingCount: 178,
+    },
+  })
+
+  const yankee8 = await prisma.user.create({
+    data: {
+      name: 'Trevor Mills',
+      email: 'trevor.mills@example.com',
+      displayName: 'T-Mills',
+      avatar: 'https://i.pravatar.cc/300?img=64',
+      bannerImage: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
+      bio: 'Starting pitcher with a devastating slider.',
+      socialLinks: { twitter: '@tmills_pitcher', instagram: '@trevormills' },
+      followerCount: 14500,
+      followingCount: 123,
+    },
+  })
+
+  const yankee9 = await prisma.user.create({
+    data: {
+      name: 'James Cooper',
+      email: 'james.cooper@example.com',
+      displayName: 'Coop',
+      avatar: 'https://i.pravatar.cc/300?img=65',
+      bannerImage: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
+      bio: 'Speedy left fielder with great instincts.',
+      socialLinks: { twitter: '@coop_baseball', instagram: '@jamescooper' },
+      followerCount: 11200,
+      followingCount: 145,
+    },
+  })
+
+  const yankee10 = await prisma.user.create({
+    data: {
+      name: 'Robert Taylor',
+      email: 'robert.taylor@example.com',
+      displayName: 'Bobby T',
+      avatar: 'https://i.pravatar.cc/300?img=66',
+      bannerImage: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
+      bio: 'Solid second baseman with excellent bat-to-ball skills.',
+      socialLinks: { twitter: '@bobbyt_yankees', instagram: '@roberttaylor' },
+      followerCount: 13800,
+      followingCount: 167,
+    },
+  })
+
   console.log('✓ Created players')
 
   // Connect Players to Teams
@@ -209,6 +463,188 @@ async function main() {
       role: 'Player',
       position: 'Quarterback',
       jerseyNumber: 12,
+    },
+  })
+
+  // Connect Blue Jays players
+  await prisma.teamUser.create({
+    data: {
+      userId: blueJay2.id,
+      teamId: blueJays.id,
+      role: 'Player',
+      position: 'Catcher',
+      jerseyNumber: 7,
+    },
+  })
+
+  await prisma.teamUser.create({
+    data: {
+      userId: blueJay3.id,
+      teamId: blueJays.id,
+      role: 'Player',
+      position: 'Relief Pitcher',
+      jerseyNumber: 31,
+    },
+  })
+
+  await prisma.teamUser.create({
+    data: {
+      userId: blueJay4.id,
+      teamId: blueJays.id,
+      role: 'Player',
+      position: 'Shortstop',
+      jerseyNumber: 2,
+    },
+  })
+
+  await prisma.teamUser.create({
+    data: {
+      userId: blueJay5.id,
+      teamId: blueJays.id,
+      role: 'Player',
+      position: 'Third Base',
+      jerseyNumber: 15,
+    },
+  })
+
+  await prisma.teamUser.create({
+    data: {
+      userId: blueJay6.id,
+      teamId: blueJays.id,
+      role: 'Player',
+      position: 'Center Field',
+      jerseyNumber: 11,
+    },
+  })
+
+  await prisma.teamUser.create({
+    data: {
+      userId: blueJay7.id,
+      teamId: blueJays.id,
+      role: 'Player',
+      position: 'First Base',
+      jerseyNumber: 28,
+    },
+  })
+
+  await prisma.teamUser.create({
+    data: {
+      userId: blueJay8.id,
+      teamId: blueJays.id,
+      role: 'Player',
+      position: 'Starting Pitcher',
+      jerseyNumber: 42,
+    },
+  })
+
+  await prisma.teamUser.create({
+    data: {
+      userId: blueJay9.id,
+      teamId: blueJays.id,
+      role: 'Player',
+      position: 'Utility',
+      jerseyNumber: 19,
+    },
+  })
+
+  await prisma.teamUser.create({
+    data: {
+      userId: blueJay10.id,
+      teamId: blueJays.id,
+      role: 'Player',
+      position: 'Second Base',
+      jerseyNumber: 4,
+    },
+  })
+
+  // Connect Yankees players
+  await prisma.teamUser.create({
+    data: {
+      userId: yankee2.id,
+      teamId: yankees.id,
+      role: 'Player',
+      position: 'Designated Hitter',
+      jerseyNumber: 44,
+    },
+  })
+
+  await prisma.teamUser.create({
+    data: {
+      userId: yankee3.id,
+      teamId: yankees.id,
+      role: 'Player',
+      position: 'Shortstop',
+      jerseyNumber: 2,
+    },
+  })
+
+  await prisma.teamUser.create({
+    data: {
+      userId: yankee4.id,
+      teamId: yankees.id,
+      role: 'Player',
+      position: 'Closer',
+      jerseyNumber: 57,
+    },
+  })
+
+  await prisma.teamUser.create({
+    data: {
+      userId: yankee5.id,
+      teamId: yankees.id,
+      role: 'Player',
+      position: 'Center Field',
+      jerseyNumber: 99,
+    },
+  })
+
+  await prisma.teamUser.create({
+    data: {
+      userId: yankee6.id,
+      teamId: yankees.id,
+      role: 'Player',
+      position: 'Catcher',
+      jerseyNumber: 24,
+    },
+  })
+
+  await prisma.teamUser.create({
+    data: {
+      userId: yankee7.id,
+      teamId: yankees.id,
+      role: 'Player',
+      position: 'Third Base',
+      jerseyNumber: 13,
+    },
+  })
+
+  await prisma.teamUser.create({
+    data: {
+      userId: yankee8.id,
+      teamId: yankees.id,
+      role: 'Player',
+      position: 'Starting Pitcher',
+      jerseyNumber: 22,
+    },
+  })
+
+  await prisma.teamUser.create({
+    data: {
+      userId: yankee9.id,
+      teamId: yankees.id,
+      role: 'Player',
+      position: 'Left Field',
+      jerseyNumber: 8,
+    },
+  })
+
+  await prisma.teamUser.create({
+    data: {
+      userId: yankee10.id,
+      teamId: yankees.id,
+      role: 'Player',
+      position: 'Second Base',
+      jerseyNumber: 18,
     },
   })
 
@@ -267,6 +703,59 @@ async function main() {
 
   console.log('✓ Created clips')
 
+  // Create more clips for new players
+  const clip6 = await prisma.clip.create({
+    data: {
+      url: 'https://www.youtube.com/watch?v=hHW1oY26kxQ',
+      title: 'Laser Throw from Catcher to Second Base',
+      description: 'K-Park guns down base stealer with perfect throw',
+      thumbnail: 'https://img.youtube.com/vi/hHW1oY26kxQ/maxresdefault.jpg',
+      platform: 'youtube',
+    },
+  })
+
+  const clip7 = await prisma.clip.create({
+    data: {
+      url: 'https://www.youtube.com/watch?v=oHg5SJYRHA0',
+      title: '98 MPH Fastball for the Strikeout',
+      description: 'El Fuego blows it past the batter for strike three',
+      thumbnail: 'https://img.youtube.com/vi/oHg5SJYRHA0/maxresdefault.jpg',
+      platform: 'youtube',
+    },
+  })
+
+  const clip8 = await prisma.clip.create({
+    data: {
+      url: 'https://www.youtube.com/watch?v=RBumgq5yVrA',
+      title: 'Gold Glove Diving Stop at Short',
+      description: 'The Glove makes an incredible diving stop',
+      thumbnail: 'https://img.youtube.com/vi/RBumgq5yVrA/maxresdefault.jpg',
+      platform: 'youtube',
+    },
+  })
+
+  const clip9 = await prisma.clip.create({
+    data: {
+      url: 'https://www.youtube.com/watch?v=ZZ5LpwO-An4',
+      title: 'Monster Home Run to Right Field',
+      description: 'Jakey crushes a 450-foot bomb',
+      thumbnail: 'https://img.youtube.com/vi/ZZ5LpwO-An4/maxresdefault.jpg',
+      platform: 'youtube',
+    },
+  })
+
+  const clip10 = await prisma.clip.create({
+    data: {
+      url: 'https://www.youtube.com/watch?v=GaoLU6zKaws',
+      title: 'Walk-Off Single in the 9th',
+      description: 'El Capitan delivers the game-winning hit',
+      thumbnail: 'https://img.youtube.com/vi/GaoLU6zKaws/maxresdefault.jpg',
+      platform: 'youtube',
+    },
+  })
+
+  console.log('✓ Created additional clips')
+
   // Link Clips to Users
   await prisma.userClip.createMany({
     data: [
@@ -275,6 +764,11 @@ async function main() {
       { userId: player2.id, clipId: clip2.id, order: 1 },
       { userId: player3.id, clipId: clip3.id, order: 1 },
       { userId: player4.id, clipId: clip4.id, order: 1 },
+      { userId: blueJay2.id, clipId: clip6.id, order: 1 },
+      { userId: blueJay3.id, clipId: clip7.id, order: 1 },
+      { userId: blueJay4.id, clipId: clip8.id, order: 1 },
+      { userId: yankee2.id, clipId: clip9.id, order: 1 },
+      { userId: yankee3.id, clipId: clip10.id, order: 1 },
     ],
   })
 
