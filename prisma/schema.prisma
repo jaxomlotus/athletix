@@ -31,7 +31,7 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
-  @@map("accounts")
+  @@map("Accounts")
 }
 
 model Session {
@@ -41,19 +41,32 @@ model Session {
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("sessions")
+  @@map("Sessions")
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
+  id             String    @id @default(cuid())
+  name           String?
+  email          String?   @unique
+  emailVerified  DateTime?
+  image          String?
 
-  @@map("users")
+  // Profile fields
+  avatar         String?   @db.VarChar(256)
+  bannerImage    String?   @db.VarChar(256)
+  displayName    String?   @db.VarChar(256)
+  bio            String?   @db.Text
+  socialLinks    Json?
+  followerCount  Int       @default(0)
+  followingCount Int       @default(0)
+
+  // Relations
+  accounts       Account[]
+  sessions       Session[]
+  teamUsers      TeamUser[]
+  userClips      UserClip[]
+
+  @@map("Users")
 }
 
 model VerificationToken {
@@ -62,5 +75,95 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
-  @@map("verification_tokens")
+  @@map("VerificationTokens")
+}
+
+// Sports and Teams
+model Sport {
+  id          String   @id @default(cuid())
+  name        String
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  leagues     League[]
+  teams       Team[]
+
+  @@map("Sports")
+}
+
+model League {
+  id          String   @id @default(cuid())
+  name        String
+  sportId     String
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  sport       Sport    @relation(fields: [sportId], references: [id], onDelete: Cascade)
+  teams       Team[]
+
+  @@map("Leagues")
+}
+
+model Team {
+  id          String   @id @default(cuid())
+  title       String
+  sportId     String
+  leagueId    String
+  description String?  @db.Text
+  logo        String?  @db.VarChar(256)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  sport       Sport      @relation(fields: [sportId], references: [id], onDelete: Cascade)
+  league      League     @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+  teamUsers   TeamUser[]
+
+  @@map("Teams")
+}
+
+model TeamUser {
+  id        String   @id @default(cuid())
+  userId    String
+  teamId    String
+  role      String?  @db.VarChar(100) // e.g., "Player", "Coach", "Manager"
+  jerseyNumber Int?
+  position  String?  @db.VarChar(100)
+  joinedAt  DateTime @default(now())
+  leftAt    DateTime?
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@map("TeamUsers")
+}
+
+// Clips
+model Clip {
+  id          String   @id @default(cuid())
+  url         String   @db.VarChar(512)
+  title       String   @db.VarChar(256)
+  description String?  @db.Text
+  thumbnail   String?  @db.VarChar(512)
+  platform    String?  @db.VarChar(50) // e.g., "youtube", "vimeo"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userClips   UserClip[]
+
+  @@map("Clips")
+}
+
+model UserClip {
+  id        String   @id @default(cuid())
+  userId    String
+  clipId    String
+  order     Int      @default(0)
+  addedAt   DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clip      Clip     @relation(fields: [clipId], references: [id], onDelete: Cascade)
+
+  @@map("UserClips")
 }

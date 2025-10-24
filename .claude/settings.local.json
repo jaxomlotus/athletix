@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(yarn prisma migrate reset:*)",
+      "Bash(yarn seed)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
