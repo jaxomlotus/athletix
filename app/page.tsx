@@ -7,12 +7,15 @@ import Footer from "@/components/Footer";
 
 async function getHomeData() {
   try {
-    // Fetch all leagues
-    const leagues = await prisma.league.findMany({
+    // Fetch all sports with league counts
+    const sports = await prisma.sport.findMany({
       include: {
-        sport: true,
-        teams: {
-          take: 3, // Preview of teams
+        leagues: {
+          include: {
+            _count: {
+              select: { teams: true },
+            },
+          },
         },
       },
     });
@@ -40,22 +43,22 @@ async function getHomeData() {
       take: 20,
     });
 
-    return { leagues, allClips };
+    return { sports, allClips };
   } catch (error) {
     console.error("Error fetching home data:", error);
-    return { leagues: [], allClips: [] };
+    return { sports: [], allClips: [] };
   }
 }
 
-function createLeagueSlug(leagueName: string): string {
-  return leagueName
+function createSportSlug(sportName: string): string {
+  return sportName
     .toLowerCase()
     .replace(/\s+/g, "-")
     .replace(/[^a-z0-9-]/g, "");
 }
 
 export default async function HomePage() {
-  const { leagues, allClips } = await getHomeData();
+  const { sports, allClips } = await getHomeData();
 
   // Prepare clips for ClipsSection
   const formattedClips = allClips
@@ -131,26 +134,30 @@ export default async function HomePage() {
         <div className="lg:grid lg:grid-cols-12 lg:gap-8">
           {/* Left Column - Main Content */}
           <div className="lg:col-span-8">
-            {/* Leagues Section */}
+            {/* Sports Section */}
             <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
-                Browse by League
+                Browse by Sport
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {leagues.map((league) => {
-                  const leagueSlug = createLeagueSlug(league.name);
+                {sports.map((sport) => {
+                  const sportSlug = createSportSlug(sport.name);
+                  const totalTeams = sport.leagues.reduce(
+                    (sum, league) => sum + league._count.teams,
+                    0
+                  );
                   return (
                     <a
-                      key={league.id}
-                      href={`/league/${leagueSlug}`}
+                      key={sport.id}
+                      href={`/sport/${sportSlug}`}
                       className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all"
                     >
                       <div className="flex-1">
                         <h3 className="font-semibold text-gray-900 text-base sm:text-lg">
-                          {league.name}
+                          {sport.name}
                         </h3>
                         <p className="text-sm text-gray-500 mt-1">
-                          {league.sport.name} • {league.teams.length} teams
+                          {sport.leagues.length} {sport.leagues.length === 1 ? 'league' : 'leagues'} • {totalTeams} {totalTeams === 1 ? 'team' : 'teams'}
                         </p>
                       </div>
                     </a>

@@ -96,6 +96,13 @@ function createTeamSlug(teamName: string): string {
     .replace(/[^a-z0-9-]/g, "");
 }
 
+function createSportSlug(sportName: string): string {
+  return sportName
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "");
+}
+
 export default async function LeaguePage({
   params,
 }: {
@@ -109,6 +116,7 @@ export default async function LeaguePage({
   }
 
   const defaultLogo = "https://via.placeholder.com/200";
+  const sportSlug = createSportSlug(league.sport.name);
 
   // Aggregate all clips from all teams in the league
   const allClips = league.teams.flatMap((team) =>
@@ -162,11 +170,10 @@ export default async function LeaguePage({
 
       <PageHeader
         title={league.name}
-        subtitle={league.sport.name}
-        description={league.description || undefined}
+        subtitle={league.description || undefined}
         breadcrumbs={[
           { label: "Home", href: "/" },
-          { label: league.name },
+          { label: league.sport.name, href: `/sport/${sportSlug}` },
         ]}
       />
 

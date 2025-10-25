@@ -60,6 +60,27 @@ export default function PageHeader({
 
             {/* Content */}
             <div className={logo ? "flex-1" : "w-full text-center sm:text-left"}>
+              {/* Breadcrumb Trail */}
+              <div className="flex items-center text-sm mb-2 opacity-80">
+                {breadcrumbs.map((crumb, index) => (
+                  <div key={index} className="flex items-center">
+                    {index > 0 && (
+                      <span className="mx-2">\</span>
+                    )}
+                    {crumb.href ? (
+                      <Link
+                        href={crumb.href}
+                        className="hover:opacity-100 transition-opacity"
+                      >
+                        {crumb.label}
+                      </Link>
+                    ) : (
+                      <span>{crumb.label}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2">
                 {title}
               </h1>
