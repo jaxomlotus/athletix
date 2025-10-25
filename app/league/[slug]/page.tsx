@@ -6,6 +6,8 @@ import ClipsSection from "@/components/ClipsSection";
 import Leaderboard from "@/components/Leaderboard";
 import Footer from "@/components/Footer";
 
+export const dynamic = 'force-dynamic';
+
 interface LeagueData {
   id: string;
   name: string;

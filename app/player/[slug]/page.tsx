@@ -13,6 +13,8 @@ import {
   FaLinkedin,
 } from "react-icons/fa";
 
+export const dynamic = 'force-dynamic';
+
 interface PlayerData {
   id: string;
   name: string | null;
