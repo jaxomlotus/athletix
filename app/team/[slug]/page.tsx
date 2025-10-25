@@ -168,7 +168,7 @@ export default async function TeamProfile({
       <NavigationHeader />
 
       {/* Header with Team Info */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+      <div className="bg-linear-to-r from-blue-600 to-purple-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-8">
             {/* Team Logo */}
