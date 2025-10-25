@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import prisma from "@/lib/prisma";
 import NavigationHeader from "@/components/NavigationHeader";
+import PageHeader from "@/components/PageHeader";
 import ClipsSection from "@/components/ClipsSection";
 import Leaderboard from "@/components/Leaderboard";
 import Footer from "@/components/Footer";
@@ -164,44 +165,29 @@ export default async function TeamProfile({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navigation Header */}
       <NavigationHeader />
 
-      {/* Header with Team Info */}
-      <div className="bg-linear-to-r from-blue-600 to-purple-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16">
-          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-8">
-            {/* Team Logo */}
-            <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-lg overflow-hidden bg-white p-3 sm:p-4 shrink-0">
-              <Image
-                src={team.logo || defaultLogo}
-                alt={team.title}
-                fill
-                className="object-contain"
-              />
-            </div>
-
-            {/* Team Info */}
-            <div className="text-center sm:text-left">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2">{team.title}</h1>
-              <p className="text-base sm:text-lg lg:text-xl opacity-90">
-                {team.sport.name} •{" "}
-                <a
-                  href={`/league/${leagueSlug}`}
-                  className="hover:underline hover:opacity-100 transition-opacity"
-                >
-                  {team.league.name}
-                </a>
-              </p>
-              {team.description && (
-                <p className="mt-3 sm:mt-4 text-sm sm:text-base lg:text-lg opacity-80 max-w-2xl">
-                  {team.description}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title={team.title}
+        subtitle={
+          <>
+            {team.sport.name} •{" "}
+            <a
+              href={`/league/${leagueSlug}`}
+              className="hover:underline transition-all"
+            >
+              {team.league.name}
+            </a>
+          </>
+        }
+        description={team.description || undefined}
+        logo={team.logo || defaultLogo}
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: team.league.name, href: `/league/${leagueSlug}` },
+          { label: team.title },
+        ]}
+      />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">

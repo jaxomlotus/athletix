@@ -22,7 +22,7 @@ export default function Leaderboard({
   const defaultThumbnail = "https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg";
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 sticky top-20">
+    <div className="bg-white rounded-lg shadow-sm p-4 sticky top-28">
       <h2 className="text-xl font-bold text-gray-900 mb-4">{title}</h2>
       <div className="space-y-3">
         {clips.map((clip) => {

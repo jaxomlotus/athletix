@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import prisma from "@/lib/prisma";
 import NavigationHeader from "@/components/NavigationHeader";
+import PageHeader from "@/components/PageHeader";
 import ClipsSection from "@/components/ClipsSection";
 import Leaderboard from "@/components/Leaderboard";
 import Footer from "@/components/Footer";
@@ -159,24 +160,15 @@ export default async function LeaguePage({
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <NavigationHeader />
 
-      {/* Header with League Info */}
-      <div className="bg-linear-to-r from-blue-600 to-purple-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16">
-          <div className="text-center sm:text-left">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2">
-              {league.name}
-            </h1>
-            <p className="text-base sm:text-lg lg:text-xl opacity-90">
-              {league.sport.name}
-            </p>
-            {league.description && (
-              <p className="mt-3 sm:mt-4 text-sm sm:text-base lg:text-lg opacity-80 max-w-2xl">
-                {league.description}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title={league.name}
+        subtitle={league.sport.name}
+        description={league.description || undefined}
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: league.name },
+        ]}
+      />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
