@@ -1,4 +1,5 @@
 import { FaSearch } from "react-icons/fa";
+import { FaRegUserCircle } from "react-icons/fa";
 
 export default function NavigationHeader() {
   return (
@@ -29,7 +30,8 @@ export default function NavigationHeader() {
 
           {/* Register Button */}
           <div className="flex items-center">
-            <button className="px-3 sm:px-6 py-1.5 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-xs sm:text-base">
+            <button className="flex items-center gap-2 px-3 sm:px-6 py-1.5 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-xs sm:text-base">
+              <FaRegUserCircle className="w-4 h-4 sm:w-5 sm:h-5" />
               Register
             </button>
           </div>
