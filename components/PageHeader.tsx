@@ -17,6 +17,10 @@ interface PageHeaderProps {
   breadcrumbs: Breadcrumb[];
 }
 
+function getAllBreadcrumbs(breadcrumbs: Breadcrumb[], currentTitle: string): Breadcrumb[] {
+  return [...breadcrumbs, { label: currentTitle }];
+}
+
 export default function PageHeader({
   title,
   subtitle,
@@ -25,6 +29,7 @@ export default function PageHeader({
   breadcrumbs,
 }: PageHeaderProps) {
   const [isSticky, setIsSticky] = useState(false);
+  const allBreadcrumbs = getAllBreadcrumbs(breadcrumbs, title);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -107,7 +112,7 @@ export default function PageHeader({
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-10 text-sm text-white">
-            {breadcrumbs.map((crumb, index) => (
+            {allBreadcrumbs.map((crumb, index) => (
               <div key={index} className="flex items-center">
                 {index > 0 && (
                   <span className="mx-2 opacity-60">\</span>

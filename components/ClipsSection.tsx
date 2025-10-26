@@ -1,10 +1,18 @@
 import Image from "next/image";
-import { FaThumbsUp, FaArrowUp, FaArrowDown } from "react-icons/fa";
+import Link from "next/link";
+import { FaThumbsUp } from "react-icons/fa";
+import RankBadge from "./RankBadge";
 
 interface PlayerTag {
   name: string;
   id: string;
   avatar: string | null;
+}
+
+interface TeamTag {
+  name: string;
+  id: string;
+  logo: string | null;
 }
 
 interface ClipData {
@@ -21,6 +29,7 @@ interface ClipData {
   playerId: string;
   playerAvatar: string | null;
   playerTags?: PlayerTag[];
+  teamTags?: TeamTag[];
 }
 
 interface ClipsSectionProps {
@@ -57,15 +66,6 @@ function getRelativeTime(date: Date): string {
   return `${Math.floor(seconds / 31536000)}y ago`;
 }
 
-function getOrdinalSuffix(num: number): string {
-  const j = num % 10;
-  const k = num % 100;
-  if (j === 1 && k !== 11) return num + "st";
-  if (j === 2 && k !== 12) return num + "nd";
-  if (j === 3 && k !== 13) return num + "rd";
-  return num + "th";
-}
-
 function createPlayerSlug(
   userId: string,
   displayName: string | null,
@@ -76,6 +76,13 @@ function createPlayerSlug(
     .replace(/\s+/g, "-")
     .replace(/[^a-zA-Z0-9-]/g, "");
   return `${userId}-${slugName}`;
+}
+
+function createTeamSlug(teamName: string): string {
+  return teamName
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "");
 }
 
 export default function ClipsSection({ clips, title = "Highlight Clips" }: ClipsSectionProps) {
@@ -89,7 +96,7 @@ export default function ClipsSection({ clips, title = "Highlight Clips" }: Clips
         {title}
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-        {clips.map(({ clip, playerName, playerId, playerAvatar, playerTags }, index) => {
+        {clips.map(({ clip, playerName, playerId, playerAvatar, playerTags, teamTags }, index) => {
           const embedUrl = getYouTubeEmbedUrl(clip.url);
           const rank = index + 1;
           const rankChange = Math.floor(Math.random() * 7) - 3; // -3 to +3
@@ -150,18 +157,7 @@ export default function ClipsSection({ clips, title = "Highlight Clips" }: Clips
 
                 {/* Rank + Vote - Right */}
                 <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1.5 px-2 sm:px-3 py-1 bg-gray-900 text-white font-bold rounded-full text-xs sm:text-sm">
-                    {rankChange !== 0 && (
-                      <>
-                        {isRising ? (
-                          <FaArrowUp className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-green-500" />
-                        ) : (
-                          <FaArrowDown className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-red-500" />
-                        )}
-                      </>
-                    )}
-                    {getOrdinalSuffix(rank)}
-                  </span>
+                  <RankBadge rank={rank} rankChange={rankChange} variant="clip" />
                   <button
                     className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-full transition-colors shrink-0"
                     title="Vote for this clip"
@@ -186,27 +182,57 @@ export default function ClipsSection({ clips, title = "Highlight Clips" }: Clips
                 )}
               </div>
 
-              {/* Player Tags - Full width */}
-              {playerTags && playerTags.length > 0 && (
+              {/* Tags - Full width */}
+              {((playerTags && playerTags.length > 0) || (teamTags && teamTags.length > 0)) && (
                 <div className="flex flex-wrap gap-2">
-                  {playerTags.map((player) => (
-                    <div
-                      key={player.id}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 rounded-full cursor-pointer hover:bg-gray-200 transition-colors"
-                    >
-                      <div className="relative w-5 h-5 rounded-full overflow-hidden bg-gray-200 shrink-0">
-                        <Image
-                          src={player.avatar || defaultAvatar}
-                          alt={player.name}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <span className="text-xs font-medium text-gray-700">
-                        {player.name}
-                      </span>
-                    </div>
-                  ))}
+                  {/* Team Tags */}
+                  {teamTags?.map((team) => {
+                    const tagSlug = createTeamSlug(team.name);
+                    return (
+                      <Link
+                        key={team.id}
+                        href={`/team/${tagSlug}`}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 rounded-full hover:bg-blue-100 transition-colors"
+                      >
+                        {team.logo && (
+                          <div className="relative w-5 h-5 rounded-full overflow-hidden bg-white shrink-0">
+                            <Image
+                              src={team.logo}
+                              alt={team.name}
+                              fill
+                              className="object-contain p-0.5"
+                            />
+                          </div>
+                        )}
+                        <span className="text-xs font-medium text-blue-700">
+                          {team.name}
+                        </span>
+                      </Link>
+                    );
+                  })}
+                  {/* Player Tags */}
+                  {playerTags?.map((player) => {
+                    const tagSlug = createPlayerSlug(player.id, player.name, player.name);
+                    return (
+                      <Link
+                        key={player.id}
+                        href={`/player/${tagSlug}`}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+                      >
+                        <div className="relative w-5 h-5 rounded-full overflow-hidden bg-gray-200 shrink-0">
+                          <Image
+                            src={player.avatar || defaultAvatar}
+                            alt={player.name}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <span className="text-xs font-medium text-gray-700">
+                          {player.name}
+                        </span>
+                      </Link>
+                    );
+                  })}
                 </div>
               )}
             </div>

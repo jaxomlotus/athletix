@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { FaArrowUp, FaArrowDown } from "react-icons/fa";
+import RankBadge from "./RankBadge";
 
 interface LeaderboardClip {
   id: string;
@@ -36,24 +36,8 @@ export default function Leaderboard({
               className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors"
             >
               {/* Rank */}
-              <div className="flex flex-col items-center gap-1 shrink-0 w-12">
-                <span className="text-lg font-bold text-gray-900">
-                  {clip.rank}
-                </span>
-                {hasChange && (
-                  <span
-                    className={`inline-flex items-center gap-0.5 text-xs font-semibold ${
-                      isRising ? "text-green-600" : "text-red-600"
-                    }`}
-                  >
-                    {isRising ? (
-                      <FaArrowUp className="w-2.5 h-2.5" />
-                    ) : (
-                      <FaArrowDown className="w-2.5 h-2.5" />
-                    )}
-                    {Math.abs(clip.rankChange)}
-                  </span>
-                )}
+              <div className="shrink-0 w-12">
+                <RankBadge rank={clip.rank} rankChange={clip.rankChange} variant="leaderboard" />
               </div>
 
               {/* Thumbnail */}

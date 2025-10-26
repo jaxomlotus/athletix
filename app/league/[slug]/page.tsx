@@ -149,6 +149,13 @@ export default async function LeaguePage({
           playerId: teamUser.user.id,
           playerAvatar: teamUser.user.avatar,
           playerTags,
+          teamTags: [
+            {
+              name: team.title,
+              id: team.id,
+              logo: team.logo,
+            },
+          ],
         };
       })
     )
@@ -161,7 +168,7 @@ export default async function LeaguePage({
     thumbnail: clip.clip.thumbnail,
     url: clip.clip.url,
     rank: index + 1,
-    rankChange: 0, // Static for now to avoid hydration issues
+    rankChange: Math.floor(Math.random() * 7) - 3, // -3 to +3
   }));
 
   return (
