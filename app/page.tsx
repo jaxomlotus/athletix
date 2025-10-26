@@ -172,7 +172,7 @@ export default async function HomePage() {
 
           {/* Right Column - Leaderboard (Hidden on mobile) */}
           <div className="hidden lg:block lg:col-span-4">
-            <Leaderboard clips={leaderboardClips} title="Trending Now" />
+            <Leaderboard clips={leaderboardClips} title="Trending Now" stickyTop="top-20" />
           </div>
         </div>
       </div>

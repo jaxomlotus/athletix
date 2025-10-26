@@ -3,6 +3,7 @@
 import { useEffect, useState, ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { FaHome } from "react-icons/fa";
 
 interface Breadcrumb {
   label: string;
@@ -77,13 +78,25 @@ export default function PageHeader({
                         href={crumb.href}
                         className="hover:opacity-100 transition-opacity"
                       >
-                        {crumb.label}
+                        {crumb.label === "Home" ? (
+                          <FaHome className="w-4 h-4" />
+                        ) : (
+                          crumb.label
+                        )}
                       </Link>
                     ) : (
-                      <span>{crumb.label}</span>
+                      <span>
+                        {crumb.label === "Home" ? (
+                          <FaHome className="w-4 h-4" />
+                        ) : (
+                          crumb.label
+                        )}
+                      </span>
                     )}
                   </div>
                 ))}
+                {/* Trailing slash */}
+                <span className="mx-2">\</span>
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2">
@@ -106,13 +119,15 @@ export default function PageHeader({
 
       {/* Sticky Breadcrumb Header */}
       <div
-        className={`sticky top-14 sm:top-16 bg-linear-to-r from-blue-600 to-purple-600 shadow-sm z-40 transition-opacity duration-200 ${
+        className={`sticky top-14 sm:top-16 bg-linear-to-r from-blue-600 to-purple-600 shadow-lg z-40 transition-opacity duration-200 ${
           isSticky ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
+        style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)' }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center h-10 text-sm text-white">
-            {allBreadcrumbs.map((crumb, index) => (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          {/* Breadcrumb Trail (without last item) */}
+          <div className="flex items-center text-sm text-white mb-2">
+            {allBreadcrumbs.slice(0, -1).map((crumb, index) => (
               <div key={index} className="flex items-center">
                 {index > 0 && (
                   <span className="mx-2 opacity-60">\</span>
@@ -122,15 +137,42 @@ export default function PageHeader({
                     href={crumb.href}
                     className="hover:opacity-80 transition-opacity"
                   >
-                    {crumb.label}
+                    {index === 0 && crumb.label === "Home" ? (
+                      <FaHome className="w-4 h-4" />
+                    ) : (
+                      crumb.label
+                    )}
                   </Link>
                 ) : (
-                  <span className="font-medium">
-                    {crumb.label}
+                  <span>
+                    {index === 0 && crumb.label === "Home" ? (
+                      <FaHome className="w-4 h-4" />
+                    ) : (
+                      crumb.label
+                    )}
                   </span>
                 )}
               </div>
             ))}
+            {/* Trailing slash */}
+            <span className="mx-2 opacity-60">\</span>
+          </div>
+
+          {/* Current Page Title with Logo */}
+          <div className="flex items-center gap-2">
+            {logo && (
+              <div className="relative w-7 h-7 rounded overflow-hidden bg-white p-1 shrink-0">
+                <Image
+                  src={logo}
+                  alt={title}
+                  fill
+                  className="object-contain"
+                />
+              </div>
+            )}
+            <div className="text-white text-xl font-bold">
+              {allBreadcrumbs[allBreadcrumbs.length - 1].label}
+            </div>
           </div>
         </div>
       </div>

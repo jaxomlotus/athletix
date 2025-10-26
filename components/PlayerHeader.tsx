@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { FaHome, FaPlusCircle } from "react-icons/fa";
 
 interface Breadcrumb {
   label: string;
@@ -16,6 +17,7 @@ interface Team {
   position: string | null;
   league: string;
   slug: string;
+  leagueSlug: string;
 }
 
 interface PlayerHeaderProps {
@@ -64,7 +66,7 @@ export default function PlayerHeader({
 
       {/* Profile Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative -mt-20 sm:mt-0 sm:pt-8 mb-6 sm:mb-8">
+        <div className="relative -mt-20 sm:mt-0 sm:pt-8">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
             {/* Avatar */}
             <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-white shadow-xl overflow-hidden bg-white shrink-0">
@@ -82,33 +84,43 @@ export default function PlayerHeader({
                 {name}
               </h1>
               {team && (
-                <a
-                  href={`/team/${team.slug}`}
-                  className="flex items-center justify-center sm:justify-start gap-3 mb-2 hover:opacity-80 transition-opacity"
-                >
+                <div className="flex items-center justify-center sm:justify-start gap-3 mb-2">
                   {team.logo && (
-                    <Image
-                      src={team.logo}
-                      alt={team.name}
-                      width={32}
-                      height={32}
-                      className="object-contain"
-                    />
+                    <Link href={`/team/${team.slug}`}>
+                      <Image
+                        src={team.logo}
+                        alt={team.name}
+                        width={32}
+                        height={32}
+                        className="object-contain hover:opacity-80 transition-opacity"
+                      />
+                    </Link>
                   )}
                   <div>
-                    <p className="text-lg sm:text-xl font-semibold text-blue-600 hover:text-blue-700">
-                      {team.name}
-                      {team.jerseyNumber && (
-                        <span className="ml-2 text-gray-500">
-                          #{team.jerseyNumber}
-                        </span>
-                      )}
+                    <p className="text-lg sm:text-xl font-semibold">
+                      <Link
+                        href={`/team/${team.slug}`}
+                        className="text-blue-600 hover:text-blue-700"
+                      >
+                        {team.name}
+                        {team.jerseyNumber && (
+                          <span className="ml-2 text-gray-500">
+                            #{team.jerseyNumber}
+                          </span>
+                        )}
+                      </Link>
                     </p>
                     <p className="text-xs sm:text-sm text-gray-500">
-                      {team.position} • {team.league}
+                      {team.position} •{" "}
+                      <Link
+                        href={`/league/${team.leagueSlug}`}
+                        className="hover:text-gray-700 hover:underline"
+                      >
+                        {team.league}
+                      </Link>
                     </p>
                   </div>
-                </a>
+                </div>
               )}
 
               {/* Stats */}
@@ -119,7 +131,8 @@ export default function PlayerHeader({
                   </p>
                   <p className="text-xs sm:text-sm text-gray-500">Followers</p>
                 </div>
-                <button className="px-6 sm:px-8 py-2 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-sm sm:text-base">
+                <button className="flex items-center gap-2 px-6 sm:px-8 py-2 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-sm sm:text-base">
+                  <FaPlusCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                   Follow
                 </button>
               </div>
@@ -130,38 +143,50 @@ export default function PlayerHeader({
 
       {/* Sticky Breadcrumb Header with Avatar and Name */}
       <div
-        className={`sticky top-14 sm:top-16 bg-linear-to-r from-blue-600 to-purple-600 shadow-md z-40 transition-opacity duration-200 ${
+        className={`sticky top-14 sm:top-16 bg-linear-to-r from-blue-600 to-purple-600 shadow-lg z-40 transition-opacity duration-200 ${
           isSticky ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
+        style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)' }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Breadcrumb Trail with Avatar and Name on Same Line */}
-          <div className="flex items-center justify-between h-12 text-sm text-white">
-            <div className="flex items-center">
-              {breadcrumbs.map((crumb, index) => (
-                <div key={index} className="flex items-center">
-                  {index > 0 && (
-                    <span className="mx-2 opacity-60">\</span>
-                  )}
-                  {crumb.href ? (
-                    <Link
-                      href={crumb.href}
-                      className="hover:opacity-80 transition-opacity"
-                    >
-                      {crumb.label}
-                    </Link>
-                  ) : (
-                    <span className="opacity-90">{crumb.label}</span>
-                  )}
-                </div>
-              ))}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <div className="flex items-center justify-between">
+            <div>
+              {/* Breadcrumb Trail */}
+              <div className="flex items-center text-sm text-white mb-2">
+                {breadcrumbs.map((crumb, index) => (
+                  <div key={index} className="flex items-center">
+                    {index > 0 && (
+                      <span className="mx-2 opacity-60">\</span>
+                    )}
+                    {crumb.href ? (
+                      <Link
+                        href={crumb.href}
+                        className="hover:opacity-80 transition-opacity"
+                      >
+                        {index === 0 && crumb.label === "Home" ? (
+                          <FaHome className="w-4 h-4" />
+                        ) : (
+                          crumb.label
+                        )}
+                      </Link>
+                    ) : (
+                      <span className="opacity-90">
+                        {index === 0 && crumb.label === "Home" ? (
+                          <FaHome className="w-4 h-4" />
+                        ) : (
+                          crumb.label
+                        )}
+                      </span>
+                    )}
+                  </div>
+                ))}
+                {/* Trailing slash */}
+                <span className="mx-2 opacity-60">\</span>
+              </div>
 
-              {/* Separator before player */}
-              <span className="mx-2 opacity-60">\</span>
-
-              {/* Avatar and Name */}
+              {/* Player Name with Avatar */}
               <div className="flex items-center gap-2">
-                <div className="relative w-6 h-6 rounded-full overflow-hidden bg-white shrink-0">
+                <div className="relative w-7 h-7 rounded-full overflow-hidden bg-white shrink-0">
                   <Image
                     src={avatar}
                     alt={name}
@@ -169,14 +194,15 @@ export default function PlayerHeader({
                     className="object-cover"
                   />
                 </div>
-                <span className="opacity-90">
+                <span className="text-white text-xl font-bold">
                   {name}
                 </span>
               </div>
             </div>
 
-            {/* Follow Button */}
-            <button className="px-4 py-1.5 bg-white text-blue-600 hover:bg-gray-100 font-semibold rounded-lg transition-colors text-sm">
+            {/* Follow Button - vertically centered */}
+            <button className="flex items-center gap-2 px-4 py-1.5 bg-white text-blue-600 hover:bg-gray-100 font-semibold rounded-lg transition-colors text-sm">
+              <FaPlusCircle className="w-4 h-4" />
               Follow
             </button>
           </div>

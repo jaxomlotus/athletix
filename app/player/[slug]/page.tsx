@@ -118,6 +118,13 @@ function createTeamSlug(teamName: string): string {
     .replace(/[^a-z0-9-]/g, "");
 }
 
+function createLeagueSlug(leagueName: string): string {
+  return leagueName
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "");
+}
+
 export default async function PlayerProfile({
   params,
 }: {
@@ -182,6 +189,7 @@ export default async function PlayerProfile({
                 position: primaryTeam.position,
                 league: primaryTeam.team.league.name,
                 slug: createTeamSlug(primaryTeam.team.title),
+                leagueSlug: createLeagueSlug(primaryTeam.team.league.name),
               }
             : undefined
         }
