@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import prisma from "@/lib/prisma";
 import NavigationHeader from "@/components/NavigationHeader";
+import PlayerHeader from "@/components/PlayerHeader";
 import ClipsSection from "@/components/ClipsSection";
 import Footer from "@/components/Footer";
 import {
@@ -162,85 +163,33 @@ export default async function PlayerProfile({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navigation Header */}
       <NavigationHeader />
 
-      {/* Banner Image */}
-      <div className="relative w-full h-40 bg-linear-to-r from-blue-600 to-purple-600">
-        <Image
-          src={player.bannerImage || defaultBanner}
-          alt={`${displayName} banner`}
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
-      </div>
+      <PlayerHeader
+        name={displayName}
+        avatar={player.avatar || defaultAvatar}
+        banner={player.bannerImage || defaultBanner}
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: "Players" },
+        ]}
+        team={
+          primaryTeam
+            ? {
+                name: primaryTeam.team.title,
+                logo: primaryTeam.team.logo,
+                jerseyNumber: primaryTeam.jerseyNumber,
+                position: primaryTeam.position,
+                league: primaryTeam.team.league.name,
+                slug: createTeamSlug(primaryTeam.team.title),
+              }
+            : undefined
+        }
+        followerCount={player.followerCount}
+      />
 
-      {/* Profile Section */}
+      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative -mt-20 sm:mt-0 sm:pt-8 mb-6 sm:mb-8">
-          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
-            {/* Avatar */}
-            <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-white shadow-xl overflow-hidden bg-white shrink-0">
-              <Image
-                src={player.avatar || defaultAvatar}
-                alt={displayName}
-                fill
-                className="object-cover"
-              />
-            </div>
-
-            {/* Player Info */}
-            <div className="flex-1 text-center sm:text-left">
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-                {displayName}
-              </h1>
-              {primaryTeam && (
-                <a
-                  href={`/team/${createTeamSlug(primaryTeam.team.title)}`}
-                  className="flex items-center justify-center sm:justify-start gap-3 mb-2 hover:opacity-80 transition-opacity"
-                >
-                  {primaryTeam.team.logo && (
-                    <Image
-                      src={primaryTeam.team.logo}
-                      alt={primaryTeam.team.title}
-                      width={32}
-                      height={32}
-                      className="object-contain"
-                    />
-                  )}
-                  <div>
-                    <p className="text-lg sm:text-xl font-semibold text-blue-600 hover:text-blue-700">
-                      {primaryTeam.team.title}
-                      {primaryTeam.jerseyNumber && (
-                        <span className="ml-2 text-gray-500">
-                          #{primaryTeam.jerseyNumber}
-                        </span>
-                      )}
-                    </p>
-                    <p className="text-xs sm:text-sm text-gray-500">
-                      {primaryTeam.position} • {primaryTeam.team.league.name}
-                    </p>
-                  </div>
-                </a>
-              )}
-
-              {/* Stats */}
-              <div className="flex items-center justify-center sm:justify-start gap-4 sm:gap-6 mt-3">
-                <div className="text-center">
-                  <p className="text-xl sm:text-2xl font-bold text-gray-900">
-                    {player.followerCount.toLocaleString()}
-                  </p>
-                  <p className="text-xs sm:text-sm text-gray-500">Followers</p>
-                </div>
-                <button className="px-6 sm:px-8 py-2 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-sm sm:text-base">
-                  Follow
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Bio */}
         {player.bio && (
