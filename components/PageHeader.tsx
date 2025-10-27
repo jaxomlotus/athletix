@@ -45,8 +45,45 @@ export default function PageHeader({
   return (
     <>
       {/* Main Header */}
-      <div className="bg-linear-to-r from-blue-600 to-purple-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16">
+      <div className="bg-linear-to-r from-blue-600 to-purple-600 text-white relative">
+        {/* Breadcrumb Trail - Top Left */}
+        <div className="absolute top-0 left-0 right-0 py-3 z-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center text-sm text-white">
+              {breadcrumbs.map((crumb, index) => (
+                <div key={index} className="flex items-center">
+                  {index > 0 && (
+                    <span className="mx-2 opacity-60">\</span>
+                  )}
+                  {crumb.href ? (
+                    <Link
+                      href={crumb.href}
+                      className="hover:opacity-80 transition-opacity"
+                    >
+                      {crumb.label === "Home" ? (
+                        <FaHome className="w-4 h-4" />
+                      ) : (
+                        crumb.label
+                      )}
+                    </Link>
+                  ) : (
+                    <span className="opacity-90">
+                      {crumb.label === "Home" ? (
+                        <FaHome className="w-4 h-4" />
+                      ) : (
+                        crumb.label
+                      )}
+                    </span>
+                  )}
+                </div>
+              ))}
+              {/* Trailing slash */}
+              <span className="mx-2 opacity-60">\</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16 pt-16">
           <div
             className={`flex ${
               logo ? "flex-col sm:flex-row" : "flex-col"
@@ -66,39 +103,6 @@ export default function PageHeader({
 
             {/* Content */}
             <div className={logo ? "flex-1" : "w-full text-center sm:text-left"}>
-              {/* Breadcrumb Trail */}
-              <div className="flex items-center text-sm mb-2 opacity-80">
-                {breadcrumbs.map((crumb, index) => (
-                  <div key={index} className="flex items-center">
-                    {index > 0 && (
-                      <span className="mx-2">\</span>
-                    )}
-                    {crumb.href ? (
-                      <Link
-                        href={crumb.href}
-                        className="hover:opacity-100 transition-opacity"
-                      >
-                        {crumb.label === "Home" ? (
-                          <FaHome className="w-4 h-4" />
-                        ) : (
-                          crumb.label
-                        )}
-                      </Link>
-                    ) : (
-                      <span>
-                        {crumb.label === "Home" ? (
-                          <FaHome className="w-4 h-4" />
-                        ) : (
-                          crumb.label
-                        )}
-                      </span>
-                    )}
-                  </div>
-                ))}
-                {/* Trailing slash */}
-                <span className="mx-2">\</span>
-              </div>
-
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2">
                 {title}
               </h1>

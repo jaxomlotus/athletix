@@ -62,7 +62,45 @@ export default function PlayerHeader({
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
+        {/* Gradient overlay - dark at top and bottom, transparent in middle */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/50" />
+
+        {/* Breadcrumb Trail */}
+        <div className="absolute top-0 left-0 right-0 py-3">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center text-sm text-white">
+            {breadcrumbs.map((crumb, index) => (
+              <div key={index} className="flex items-center">
+                {index > 0 && (
+                  <span className="mx-2 opacity-80">\</span>
+                )}
+                {crumb.href ? (
+                  <Link
+                    href={crumb.href}
+                    className="hover:opacity-80 transition-opacity"
+                  >
+                    {crumb.label === "Home" ? (
+                      <FaHome className="w-4 h-4" />
+                    ) : (
+                      crumb.label
+                    )}
+                  </Link>
+                ) : (
+                  <span className="opacity-90">
+                    {crumb.label === "Home" ? (
+                      <FaHome className="w-4 h-4" />
+                    ) : (
+                      crumb.label
+                    )}
+                  </span>
+                )}
+              </div>
+            ))}
+              {/* Trailing slash */}
+              <span className="mx-2 opacity-80">\</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Profile Section */}
