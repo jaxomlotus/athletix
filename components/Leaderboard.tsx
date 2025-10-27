@@ -26,7 +26,10 @@ export default function Leaderboard({
   return (
     <div className={`bg-white rounded-lg shadow-sm p-4 sticky ${stickyTop}`}>
       <h2 className="text-xl font-bold text-gray-900 mb-4">{title}</h2>
-      <div className="space-y-3">
+      {!clips || clips.length === 0 ? (
+        <p className="w-full text-center text-gray-400 py-8">Nothing here yet.</p>
+      ) : (
+        <div className="space-y-3">
         {clips.map((clip) => {
           const isRising = clip.rankChange > 0;
           const hasChange = clip.rankChange !== 0;
@@ -61,7 +64,8 @@ export default function Leaderboard({
             </a>
           );
         })}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

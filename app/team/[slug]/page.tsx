@@ -188,64 +188,68 @@ export default async function TeamProfile({
         logo={team.logo || defaultLogo}
         breadcrumbs={[
           { label: "Home", href: "/" },
-          { label: team.sport.name, href: `/sport/${sportSlug}` },
+          { label: team.sport.name, href: `/sports/${sportSlug}` },
           { label: team.league.name, href: `/league/${leagueSlug}` },
         ]}
       />
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="lg:grid lg:grid-cols-12 lg:gap-8">
           {/* Left Column - Main Content */}
           <div className="lg:col-span-8">
             {/* Roster */}
             <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Roster</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                {team.teamUsers.map(({ user, jerseyNumber, position, role }) => {
-                  const playerSlug = createPlayerSlug(
-                    user.id,
-                    user.displayName,
-                    user.name
-                  );
-                  const defaultAvatar = "https://i.pravatar.cc/150";
+              {!team.teamUsers || team.teamUsers.length === 0 ? (
+                <p className="w-full text-center text-gray-400 py-8">Nothing here yet.</p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  {team.teamUsers.map(({ user, jerseyNumber, position, role }) => {
+                    const playerSlug = createPlayerSlug(
+                      user.id,
+                      user.displayName,
+                      user.name
+                    );
+                    const defaultAvatar = "https://i.pravatar.cc/150";
 
-                  return (
-                    <a
-                      key={user.id}
-                      href={`/player/${playerSlug}`}
-                      className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all"
-                    >
-                      <div className="relative w-16 h-16 rounded-full overflow-hidden bg-gray-200 shrink-0">
-                        <Image
-                          src={user.avatar || defaultAvatar}
-                          alt={user.displayName || user.name || "Player"}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          {jerseyNumber && (
-                            <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-600 text-white font-bold text-sm rounded">
-                              {jerseyNumber}
-                            </span>
-                          )}
-                          <h3 className="font-semibold text-gray-900 truncate">
-                            {user.displayName || user.name}
-                          </h3>
+                    return (
+                      <a
+                        key={user.id}
+                        href={`/players/${playerSlug}`}
+                        className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all"
+                      >
+                        <div className="relative w-16 h-16 rounded-full overflow-hidden bg-gray-200 shrink-0">
+                          <Image
+                            src={user.avatar || defaultAvatar}
+                            alt={user.displayName || user.name || "Player"}
+                            fill
+                            className="object-cover"
+                          />
                         </div>
-                        {position && (
-                          <p className="text-sm text-gray-500 mt-1">{position}</p>
-                        )}
-                        {role && role !== "Player" && (
-                          <p className="text-xs text-gray-400 mt-1">{role}</p>
-                        )}
-                      </div>
-                    </a>
-                  );
-                })}
-              </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            {jerseyNumber && (
+                              <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-600 text-white font-bold text-sm rounded">
+                                {jerseyNumber}
+                              </span>
+                            )}
+                            <h3 className="font-semibold text-gray-900 truncate">
+                              {user.displayName || user.name}
+                            </h3>
+                          </div>
+                          {position && (
+                            <p className="text-sm text-gray-500 mt-1">{position}</p>
+                          )}
+                          {role && role !== "Player" && (
+                            <p className="text-xs text-gray-400 mt-1">{role}</p>
+                          )}
+                        </div>
+                      </a>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             {/* Clips Section */}

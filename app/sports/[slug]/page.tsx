@@ -149,7 +149,7 @@ export default async function SportPage({
       />
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="lg:grid lg:grid-cols-12 lg:gap-8">
           {/* Left Column - Main Content */}
           <div className="lg:col-span-8">
@@ -158,27 +158,31 @@ export default async function SportPage({
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
                 Leagues
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {sport.leagues.map((league) => {
-                  const leagueSlug = createLeagueSlug(league.name);
-                  return (
-                    <a
-                      key={league.id}
-                      href={`/league/${leagueSlug}`}
-                      className="flex flex-col gap-2 p-4 rounded-lg border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all"
-                    >
-                      <h3 className="font-semibold text-gray-900 text-base sm:text-lg">
-                        {league.name}
-                      </h3>
-                      {league.description && (
-                        <p className="text-sm text-gray-600 line-clamp-2">
-                          {league.description}
-                        </p>
-                      )}
-                    </a>
-                  );
-                })}
-              </div>
+              {!sport.leagues || sport.leagues.length === 0 ? (
+                <p className="w-full text-center text-gray-400 py-8">Nothing here yet.</p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {sport.leagues.map((league) => {
+                    const leagueSlug = createLeagueSlug(league.name);
+                    return (
+                      <a
+                        key={league.id}
+                        href={`/league/${leagueSlug}`}
+                        className="flex flex-col gap-2 p-4 rounded-lg border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all"
+                      >
+                        <h3 className="font-semibold text-gray-900 text-base sm:text-lg">
+                          {league.name}
+                        </h3>
+                        {league.description && (
+                          <p className="text-sm text-gray-600 line-clamp-2">
+                            {league.description}
+                          </p>
+                        )}
+                      </a>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             {/* Clips Section */}

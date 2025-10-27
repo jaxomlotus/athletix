@@ -86,8 +86,6 @@ function createTeamSlug(teamName: string): string {
 }
 
 export default function ClipsSection({ clips, title = "Highlight Clips" }: ClipsSectionProps) {
-  if (!clips || clips.length === 0) return null;
-
   const defaultAvatar = "https://i.pravatar.cc/150";
 
   return (
@@ -95,7 +93,10 @@ export default function ClipsSection({ clips, title = "Highlight Clips" }: Clips
       <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
         {title}
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+      {!clips || clips.length === 0 ? (
+        <p className="w-full text-center text-gray-400 py-8">Nothing here yet.</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         {clips.map(({ clip, playerName, playerId, playerAvatar, playerTags, teamTags }, index) => {
           const embedUrl = getYouTubeEmbedUrl(clip.url);
           const rank = index + 1;
@@ -135,7 +136,7 @@ export default function ClipsSection({ clips, title = "Highlight Clips" }: Clips
                 {/* Player Info - Left */}
                 <div className="flex items-center gap-2 min-w-0">
                   <a
-                    href={`/player/${playerSlug}`}
+                    href={`/players/${playerSlug}`}
                     className="flex items-center gap-2 text-xs sm:text-sm text-blue-600 hover:text-blue-700 font-semibold shrink-0"
                   >
                     <div className="relative w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden bg-gray-200 shrink-0">
@@ -216,7 +217,7 @@ export default function ClipsSection({ clips, title = "Highlight Clips" }: Clips
                     return (
                       <Link
                         key={player.id}
-                        href={`/player/${tagSlug}`}
+                        href={`/players/${tagSlug}`}
                         className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
                       >
                         <div className="relative w-5 h-5 rounded-full overflow-hidden bg-gray-200 shrink-0">
@@ -238,7 +239,8 @@ export default function ClipsSection({ clips, title = "Highlight Clips" }: Clips
             </div>
           );
         })}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

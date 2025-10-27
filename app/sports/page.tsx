@@ -5,6 +5,8 @@ import ClipsSection from "@/components/ClipsSection";
 import Leaderboard from "@/components/Leaderboard";
 import Footer from "@/components/Footer";
 
+export const dynamic = 'force-dynamic';
+
 async function getHomeData() {
   try {
     // Fetch men's sports
@@ -62,7 +64,7 @@ function createSportSlug(sportName: string): string {
     .replace(/[^a-z0-9-]/g, "");
 }
 
-export default async function HomePage() {
+export default async function SportsPage() {
   const { mensSports, womensSports, coedSports, allClips } = await getHomeData();
 
   // Prepare clips for ClipsSection

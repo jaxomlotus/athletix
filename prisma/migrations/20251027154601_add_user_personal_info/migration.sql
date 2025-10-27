@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE `Users` ADD COLUMN `birthdate` DATETIME(3) NULL,
+    ADD COLUMN `city` VARCHAR(100) NULL,
+    ADD COLUMN `country` VARCHAR(100) NULL,
+    ADD COLUMN `gender` VARCHAR(20) NULL,
+    ADD COLUMN `school` VARCHAR(256) NULL,
+    ADD COLUMN `state` VARCHAR(100) NULL;

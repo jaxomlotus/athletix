@@ -5,7 +5,8 @@
       "Bash(yarn seed)",
       "Bash(yarn prisma migrate:*)",
       "Bash(yarn prisma db push:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

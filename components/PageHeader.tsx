@@ -4,6 +4,7 @@ import { useEffect, useState, ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FaHome } from "react-icons/fa";
+import { FiUserPlus } from "react-icons/fi";
 
 interface Breadcrumb {
   label: string;
@@ -12,10 +13,14 @@ interface Breadcrumb {
 
 interface PageHeaderProps {
   title: string;
+  jerseyNumber?: number;
   subtitle?: string | ReactNode;
   description?: string;
   logo?: string | null;
+  banner?: string | null;
   breadcrumbs: Breadcrumb[];
+  followerCount?: number;
+  showFollowButton?: boolean;
 }
 
 function getAllBreadcrumbs(breadcrumbs: Breadcrumb[], currentTitle: string): Breadcrumb[] {
@@ -24,29 +29,63 @@ function getAllBreadcrumbs(breadcrumbs: Breadcrumb[], currentTitle: string): Bre
 
 export default function PageHeader({
   title,
+  jerseyNumber,
   subtitle,
   description,
   logo,
+  banner,
   breadcrumbs,
+  followerCount,
+  showFollowButton = false,
 }: PageHeaderProps) {
   const [isSticky, setIsSticky] = useState(false);
   const allBreadcrumbs = getAllBreadcrumbs(breadcrumbs, title);
+  const defaultBanner = "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1200&h=400&fit=crop";
 
   useEffect(() => {
     const handleScroll = () => {
-      // Show sticky header when scrolled past 200px
-      setIsSticky(window.scrollY > 200);
+      // Show sticky header - earlier on mobile (45px), later on desktop (176px)
+      const isMobile = window.innerWidth < 640; // sm breakpoint
+      const threshold = isMobile ? 120 : 176;
+      setIsSticky(window.scrollY > threshold);
     };
 
+    handleScroll(); // Check on mount
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    window.addEventListener("resize", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
+  }, [showFollowButton]);
 
   return (
     <>
       {/* Main Header */}
-      <div className="bg-linear-to-r from-blue-600 to-purple-600 text-white relative">
-        {/* Breadcrumb Trail - Top Left */}
+      <div
+        data-page-header
+        className="bg-linear-to-r from-blue-600 to-purple-600 text-white relative"
+        style={{
+          marginBottom: isSticky
+            ? (window.innerWidth < 640 ? '-70px' : '-80px')
+            : '0px'
+        }}
+      >
+        {/* Banner Image (if provided) */}
+        {banner && (
+          <>
+            <Image
+              src={banner}
+              alt={`${title} banner`}
+              fill
+              className="object-cover"
+              priority
+            />
+            {/* Gradient overlay - dark at top and bottom, semi-transparent in middle */}
+            <div className="absolute inset-0 bg-linear-to-b from-black/50 via-black/25 to-black/50" />
+          </>
+        )}
+        {/* Breadcrumb Trail - Top Left (Absolutely Positioned) */}
         <div className="absolute top-0 left-0 right-0 py-3 z-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center text-sm text-white">
@@ -83,38 +122,56 @@ export default function PageHeader({
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16 pt-16">
-          <div
-            className={`flex ${
-              logo ? "flex-col sm:flex-row" : "flex-col"
-            } items-center sm:items-start gap-4 sm:gap-8`}
-          >
-            {/* Logo (if provided) */}
-            {logo && (
-              <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-lg overflow-hidden bg-white p-3 sm:p-4 shrink-0">
-                <Image
-                  src={logo}
-                  alt={title}
-                  fill
-                  className="object-contain"
-                />
-              </div>
-            )}
-
-            {/* Content */}
-            <div className={logo ? "flex-1" : "w-full text-center sm:text-left"}>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2">
-                {title}
-              </h1>
-              {subtitle && (
-                <p className="text-base sm:text-lg lg:text-xl opacity-90">
-                  {subtitle}
-                </p>
+        {/* Profile/Content Section - Inside Header */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className={`relative ${showFollowButton ? 'py-13 sm:py-12' : 'py-13 sm:py-16'}`}>
+            <div className="flex flex-row items-center gap-4 sm:gap-6 w-full sm:justify-between">
+              {/* Logo/Avatar */}
+              {logo && (
+                <div className={`relative ${showFollowButton ? 'w-24 h-24 sm:w-40 sm:h-40 rounded-full border-4 border-white shadow-xl' : 'w-24 h-24 sm:w-32 sm:h-32 rounded-lg'} overflow-hidden bg-white ${!showFollowButton && 'p-3 sm:p-4'} shrink-0`}>
+                  <Image
+                    src={logo}
+                    alt={title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
               )}
-              {description && (
-                <p className="mt-3 sm:mt-4 text-sm sm:text-base lg:text-lg opacity-80 max-w-2xl">
-                  {description}
-                </p>
+
+              {/* Title and Content */}
+              <div className="flex-1 text-left">
+                <h1 className="text-2xl sm:text-4xl font-bold mb-1 sm:mb-2 text-white">
+                  {title}
+                  {jerseyNumber && (
+                    <span className="ml-2 opacity-60">#{jerseyNumber}</span>
+                  )}
+                </h1>
+                {subtitle && (
+                  <div className="text-base sm:text-xl font-semibold mb-1 sm:mb-2 text-white opacity-90">
+                    {subtitle}
+                  </div>
+                )}
+                {description && (
+                  <p className="text-xs sm:text-sm text-white opacity-80">
+                    {description}
+                  </p>
+                )}
+              </div>
+
+              {/* Followers and Follow Button - All screens, in header */}
+              {showFollowButton && followerCount !== undefined && (
+                <div className="absolute bottom-4 right-0 sm:relative sm:bottom-auto sm:right-auto flex flex-row items-center gap-3 sm:gap-6">
+                  <div className="text-right sm:text-center">
+                    <p className="text-lg sm:text-2xl font-bold text-white">
+                      {followerCount.toLocaleString()}
+                    </p>
+                    <p className="text-xs sm:text-sm text-white opacity-80">Followers</p>
+                  </div>
+                  <button className="flex items-center gap-2 px-3 py-2 sm:px-8 sm:py-3 bg-white hover:bg-gray-100 text-blue-600 font-semibold rounded-lg transition-colors text-sm sm:text-base">
+                    <FiUserPlus className="w-5 h-5" />
+                    <span className="hidden sm:inline">Follow</span>
+                  </button>
+                </div>
               )}
             </div>
           </div>
@@ -123,60 +180,88 @@ export default function PageHeader({
 
       {/* Sticky Breadcrumb Header */}
       <div
-        className={`sticky top-14 sm:top-16 bg-linear-to-r from-blue-600 to-purple-600 shadow-lg z-40 transition-opacity duration-200 ${
-          isSticky ? "opacity-100" : "opacity-0 pointer-events-none"
+        className={`sticky top-12 sm:top-16 ${!banner && 'bg-linear-to-r from-blue-600 to-purple-600'} shadow-lg z-40 ${
+          isSticky ? "block" : "hidden"
         }`}
         style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)' }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          {/* Breadcrumb Trail (without last item) */}
-          <div className="flex items-center text-sm text-white mb-2">
-            {allBreadcrumbs.slice(0, -1).map((crumb, index) => (
-              <div key={index} className="flex items-center">
-                {index > 0 && (
-                  <span className="mx-2 opacity-60">\</span>
-                )}
-                {crumb.href ? (
-                  <Link
-                    href={crumb.href}
-                    className="hover:opacity-80 transition-opacity"
-                  >
-                    {index === 0 && crumb.label === "Home" ? (
-                      <FaHome className="w-4 h-4" />
-                    ) : (
-                      crumb.label
+        {/* Banner Image for Sticky (if provided) */}
+        {banner && (
+          <>
+            <Image
+              src={banner}
+              alt={`${title} banner`}
+              fill
+              className="object-cover"
+            />
+            {/* 50% opacity overlay */}
+            <div className="absolute inset-0 bg-black/50" />
+          </>
+        )}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 relative z-10">
+          <div className="flex items-center justify-between">
+            <div>
+              {/* Breadcrumb Trail (without last item) */}
+              <div className="flex items-center text-sm text-white mb-2">
+                {allBreadcrumbs.slice(0, -1).map((crumb, index) => (
+                  <div key={index} className="flex items-center">
+                    {index > 0 && (
+                      <span className="mx-2 opacity-60">\</span>
                     )}
-                  </Link>
-                ) : (
-                  <span>
-                    {index === 0 && crumb.label === "Home" ? (
-                      <FaHome className="w-4 h-4" />
+                    {crumb.href ? (
+                      <Link
+                        href={crumb.href}
+                        className="hover:opacity-80 transition-opacity"
+                      >
+                        {index === 0 && crumb.label === "Home" ? (
+                          <FaHome className="w-4 h-4" />
+                        ) : (
+                          crumb.label
+                        )}
+                      </Link>
                     ) : (
-                      crumb.label
+                      <span>
+                        {index === 0 && crumb.label === "Home" ? (
+                          <FaHome className="w-4 h-4" />
+                        ) : (
+                          crumb.label
+                        )}
+                      </span>
                     )}
-                  </span>
-                )}
+                  </div>
+                ))}
+                {/* Trailing slash */}
+                <span className="mx-2 opacity-60">\</span>
               </div>
-            ))}
-            {/* Trailing slash */}
-            <span className="mx-2 opacity-60">\</span>
-          </div>
 
-          {/* Current Page Title with Logo */}
-          <div className="flex items-center gap-2">
-            {logo && (
-              <div className="relative w-7 h-7 rounded overflow-hidden bg-white p-1 shrink-0">
-                <Image
-                  src={logo}
-                  alt={title}
-                  fill
-                  className="object-contain"
-                />
+              {/* Current Page Title with Logo/Avatar */}
+              <div className="flex items-center gap-2">
+                {logo && (
+                  <div className={`relative ${showFollowButton ? 'w-7 h-7 rounded-full border border-white' : 'w-7 h-7 rounded'} overflow-hidden bg-white ${!showFollowButton && 'p-1'} shrink-0`}>
+                    <Image
+                      src={logo}
+                      alt={title}
+                      fill
+                      className={showFollowButton ? 'object-cover' : 'object-contain'}
+                    />
+                  </div>
+                )}
+                <span className="text-white text-xl font-bold">
+                  {allBreadcrumbs[allBreadcrumbs.length - 1].label}
+                  {jerseyNumber && (
+                    <span className="ml-2 opacity-60">#{jerseyNumber}</span>
+                  )}
+                </span>
               </div>
-            )}
-            <div className="text-white text-xl font-bold">
-              {allBreadcrumbs[allBreadcrumbs.length - 1].label}
             </div>
+
+            {/* Follow Button (for players) */}
+            {showFollowButton && (
+              <button className="flex items-center gap-2 px-3 sm:px-4 py-1.5 bg-white text-blue-600 hover:bg-gray-100 font-semibold rounded-lg transition-colors text-sm">
+                <FiUserPlus className="w-4 h-4" />
+                <span className="hidden sm:inline">Follow</span>
+              </button>
+            )}
           </div>
         </div>
       </div>

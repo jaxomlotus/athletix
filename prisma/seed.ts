@@ -1,22 +1,178 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '../lib/generated/prisma-client'
 
 const prisma = new PrismaClient()
 
 async function main() {
   console.log('Starting seed...')
 
-  // Create Sports
-  const baseball = await prisma.sport.create({
-    data: {
-      name: 'Baseball',
-      description: 'America\'s favorite pastime',
-    },
-  })
-
+  // Create Sports with gender flags
   const basketball = await prisma.sport.create({
     data: {
       name: 'Basketball',
       description: 'Fast-paced court sport',
+      mens: true,
+      womens: true,
+      coed: false,
+    },
+  })
+
+  const golf = await prisma.sport.create({
+    data: {
+      name: 'Golf',
+      description: 'Precision club and ball sport',
+      mens: true,
+      womens: true,
+      coed: false,
+    },
+  })
+
+  const hockey = await prisma.sport.create({
+    data: {
+      name: 'Hockey',
+      description: 'Ice hockey',
+      mens: true,
+      womens: true,
+      coed: false,
+    },
+  })
+
+  const lacrosse = await prisma.sport.create({
+    data: {
+      name: 'Lacrosse',
+      description: 'Team sport played with a lacrosse stick and ball',
+      mens: true,
+      womens: true,
+      coed: false,
+    },
+  })
+
+  const rowing = await prisma.sport.create({
+    data: {
+      name: 'Rowing',
+      description: 'Competitive rowing and crew',
+      mens: true,
+      womens: true,
+      coed: false,
+    },
+  })
+
+  const soccer = await prisma.sport.create({
+    data: {
+      name: 'Soccer',
+      description: 'The beautiful game',
+      mens: true,
+      womens: true,
+      coed: false,
+    },
+  })
+
+  const swimming = await prisma.sport.create({
+    data: {
+      name: 'Swimming',
+      description: 'Competitive swimming and diving',
+      mens: true,
+      womens: true,
+      coed: false,
+    },
+  })
+
+  const tennis = await prisma.sport.create({
+    data: {
+      name: 'Tennis',
+      description: 'Racket sport',
+      mens: true,
+      womens: true,
+      coed: false,
+    },
+  })
+
+  const trackAndField = await prisma.sport.create({
+    data: {
+      name: 'Track & Field',
+      description: 'Athletics including running, jumping, and throwing events',
+      mens: true,
+      womens: true,
+      coed: false,
+    },
+  })
+
+  const volleyball = await prisma.sport.create({
+    data: {
+      name: 'Volleyball',
+      description: 'Indoor volleyball',
+      mens: true,
+      womens: true,
+      coed: false,
+    },
+  })
+
+  const waterPolo = await prisma.sport.create({
+    data: {
+      name: 'Water Polo',
+      description: 'Aquatic team sport',
+      mens: true,
+      womens: true,
+      coed: false,
+    },
+  })
+
+  const wrestling = await prisma.sport.create({
+    data: {
+      name: 'Wrestling',
+      description: 'Combat sport',
+      mens: true,
+      womens: true,
+      coed: false,
+    },
+  })
+
+  const beachVolleyball = await prisma.sport.create({
+    data: {
+      name: 'Beach Volleyball',
+      description: 'Sand volleyball',
+      mens: false,
+      womens: true,
+      coed: false,
+    },
+  })
+
+  const fieldHockey = await prisma.sport.create({
+    data: {
+      name: 'Field Hockey',
+      description: 'Team sport played with sticks and a ball on grass',
+      mens: false,
+      womens: true,
+      coed: false,
+    },
+  })
+
+  const gymnastics = await prisma.sport.create({
+    data: {
+      name: 'Gymnastics',
+      description: 'Artistic gymnastics',
+      mens: false,
+      womens: true,
+      coed: false,
+    },
+  })
+
+  const softball = await prisma.sport.create({
+    data: {
+      name: 'Softball',
+      description: 'Variant of baseball',
+      mens: false,
+      womens: true,
+      coed: false,
+    },
+  })
+
+  const baseball = await prisma.sport.create({
+    data: {
+      name: 'Baseball',
+      description: 'America\'s favorite pastime',
+      mens: true,
+      womens: false,
+      coed: false,
     },
   })
 
@@ -24,6 +180,19 @@ async function main() {
     data: {
       name: 'Football',
       description: 'American football',
+      mens: true,
+      womens: false,
+      coed: false,
+    },
+  })
+
+  const cheerleading = await prisma.sport.create({
+    data: {
+      name: 'Cheerleading',
+      description: 'Competitive cheerleading and spirit',
+      mens: false,
+      womens: false,
+      coed: true,
     },
   })
 
@@ -35,6 +204,7 @@ async function main() {
       name: 'College Baseball League',
       sportId: baseball.id,
       description: 'Competitive college baseball league',
+      logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/24.png',
     },
   })
 
@@ -43,6 +213,7 @@ async function main() {
       name: 'National Basketball Association',
       sportId: basketball.id,
       description: 'Professional basketball league',
+      logo: 'https://a.espncdn.com/i/teamlogos/nba/500/lal.png',
     },
   })
 
@@ -51,29 +222,30 @@ async function main() {
       name: 'National Football League',
       sportId: football.id,
       description: 'Professional American football league',
+      logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/kc.png',
     },
   })
 
   console.log('✓ Created leagues')
 
   // Create Teams
-  const blueJays = await prisma.team.create({
+  const cardinals = await prisma.team.create({
     data: {
       title: 'Stanford Cardinals',
       sportId: baseball.id,
       leagueId: mlb.id,
       description: 'Elite college baseball program from Stanford University',
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Stanford_Cardinal_logo.svg/200px-Stanford_Cardinal_logo.svg.png',
+      logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/24.png',
     },
   })
 
-  const yankees = await prisma.team.create({
+  const bruins = await prisma.team.create({
     data: {
       title: 'UCLA Bruins',
       sportId: baseball.id,
       leagueId: mlb.id,
       description: 'Prestigious college baseball team from UCLA',
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/UCLA_Bruins_logo.svg/200px-UCLA_Bruins_logo.svg.png',
+      logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/26.png',
     },
   })
 
@@ -83,7 +255,7 @@ async function main() {
       sportId: basketball.id,
       leagueId: nba.id,
       description: 'NBA team based in Los Angeles',
-      logo: 'https://cdn.nba.com/logos/nba/1610612747/primary/L/logo.svg',
+      logo: 'https://a.espncdn.com/i/teamlogos/nba/500/lal.png',
     },
   })
 
@@ -93,13 +265,13 @@ async function main() {
       sportId: football.id,
       leagueId: nfl.id,
       description: 'NFL team based in Kansas City',
-      logo: 'https://static.www.nfl.com/image/private/f_auto/league/ujshjqvmnxce8m4obmvs',
+      logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/kc.png',
     },
   })
 
   console.log('✓ Created teams')
 
-  // Create Users (Players)
+  // Create Users (Players) with personal information
   const player1 = await prisma.user.create({
     data: {
       name: 'Marcus Rodriguez',
@@ -114,6 +286,12 @@ async function main() {
       },
       followerCount: 15420,
       followingCount: 234,
+      birthdate: new Date('1998-05-15'),
+      city: 'Palo Alto',
+      state: 'California',
+      country: 'USA',
+      school: 'Stanford University',
+      gender: 'Male',
     },
   })
 
@@ -132,6 +310,12 @@ async function main() {
       },
       followerCount: 28900,
       followingCount: 189,
+      birthdate: new Date('1997-08-22'),
+      city: 'Los Angeles',
+      state: 'California',
+      country: 'USA',
+      school: 'UCLA',
+      gender: 'Female',
     },
   })
 
@@ -149,6 +333,12 @@ async function main() {
       },
       followerCount: 42100,
       followingCount: 312,
+      birthdate: new Date('1999-03-10'),
+      city: 'Los Angeles',
+      state: 'California',
+      country: 'USA',
+      school: 'Loyola Marymount University',
+      gender: 'Male',
     },
   })
 
@@ -166,11 +356,17 @@ async function main() {
       },
       followerCount: 67800,
       followingCount: 445,
+      birthdate: new Date('1996-11-03'),
+      city: 'Kansas City',
+      state: 'Missouri',
+      country: 'USA',
+      school: 'University of Missouri',
+      gender: 'Male',
     },
   })
 
-  // Toronto Blue Jays Players
-  const blueJay2 = await prisma.user.create({
+  // Stanford Cardinals Players
+  const cardinal2 = await prisma.user.create({
     data: {
       name: 'Kevin Park',
       email: 'kevin.park@example.com',
@@ -181,10 +377,16 @@ async function main() {
       socialLinks: { twitter: '@kpark_mlb', instagram: '@kevinpark' },
       followerCount: 8900,
       followingCount: 156,
+      birthdate: new Date('1999-07-18'),
+      city: 'San Jose',
+      state: 'California',
+      country: 'USA',
+      school: 'Stanford University',
+      gender: 'Male',
     },
   })
 
-  const blueJay3 = await prisma.user.create({
+  const cardinal3 = await prisma.user.create({
     data: {
       name: 'Diego Martinez',
       email: 'diego.martinez@example.com',
@@ -195,10 +397,16 @@ async function main() {
       socialLinks: { twitter: '@elfuego99', instagram: '@diego_martinez' },
       followerCount: 12300,
       followingCount: 98,
+      birthdate: new Date('1998-02-14'),
+      city: 'San Diego',
+      state: 'California',
+      country: 'USA',
+      school: 'Stanford University',
+      gender: 'Male',
     },
   })
 
-  const blueJay4 = await prisma.user.create({
+  const cardinal4 = await prisma.user.create({
     data: {
       name: 'Ryan Mitchell',
       email: 'ryan.mitchell@example.com',
@@ -209,10 +417,16 @@ async function main() {
       socialLinks: { twitter: '@ryantheglove', instagram: '@ryanmitchell' },
       followerCount: 11500,
       followingCount: 203,
+      birthdate: new Date('1999-09-25'),
+      city: 'Sacramento',
+      state: 'California',
+      country: 'USA',
+      school: 'Stanford University',
+      gender: 'Male',
     },
   })
 
-  const blueJay5 = await prisma.user.create({
+  const cardinal5 = await prisma.user.create({
     data: {
       name: 'Alex Thompson',
       email: 'alex.thompson@example.com',
@@ -223,10 +437,16 @@ async function main() {
       socialLinks: { twitter: '@at3_baseball', instagram: '@alexthompson' },
       followerCount: 14200,
       followingCount: 178,
+      birthdate: new Date('1998-12-08'),
+      city: 'Fresno',
+      state: 'California',
+      country: 'USA',
+      school: 'Stanford University',
+      gender: 'Male',
     },
   })
 
-  const blueJay6 = await prisma.user.create({
+  const cardinal6 = await prisma.user.create({
     data: {
       name: 'Jordan Lee',
       email: 'jordan.lee@example.com',
@@ -237,10 +457,16 @@ async function main() {
       socialLinks: { twitter: '@jlee_speed', instagram: '@jordanlee' },
       followerCount: 9800,
       followingCount: 142,
+      birthdate: new Date('2000-01-30'),
+      city: 'Oakland',
+      state: 'California',
+      country: 'USA',
+      school: 'Stanford University',
+      gender: 'Non-binary',
     },
   })
 
-  const blueJay7 = await prisma.user.create({
+  const cardinal7 = await prisma.user.create({
     data: {
       name: 'Chris Davidson',
       email: 'chris.davidson@example.com',
@@ -251,10 +477,16 @@ async function main() {
       socialLinks: { twitter: '@davo_baseball', instagram: '@chrisdavidson' },
       followerCount: 18700,
       followingCount: 267,
+      birthdate: new Date('1997-06-12'),
+      city: 'San Francisco',
+      state: 'California',
+      country: 'USA',
+      school: 'Stanford University',
+      gender: 'Male',
     },
   })
 
-  const blueJay8 = await prisma.user.create({
+  const cardinal8 = await prisma.user.create({
     data: {
       name: 'Tyler Watson',
       email: 'tyler.watson@example.com',
@@ -265,10 +497,16 @@ async function main() {
       socialLinks: { twitter: '@twat_pitcher', instagram: '@tylerwatson' },
       followerCount: 7200,
       followingCount: 89,
+      birthdate: new Date('1999-04-05'),
+      city: 'Berkeley',
+      state: 'California',
+      country: 'USA',
+      school: 'Stanford University',
+      gender: 'Male',
     },
   })
 
-  const blueJay9 = await prisma.user.create({
+  const cardinal9 = await prisma.user.create({
     data: {
       name: 'Brandon Scott',
       email: 'brandon.scott@example.com',
@@ -279,10 +517,16 @@ async function main() {
       socialLinks: { twitter: '@bscott_baseball', instagram: '@brandonscott' },
       followerCount: 6800,
       followingCount: 112,
+      birthdate: new Date('2000-08-20'),
+      city: 'Santa Clara',
+      state: 'California',
+      country: 'USA',
+      school: 'Stanford University',
+      gender: 'Male',
     },
   })
 
-  const blueJay10 = await prisma.user.create({
+  const cardinal10 = await prisma.user.create({
     data: {
       name: 'Michael Chang',
       email: 'michael.chang@example.com',
@@ -293,11 +537,17 @@ async function main() {
       socialLinks: { twitter: '@mchang_mlb', instagram: '@michaelchang' },
       followerCount: 8100,
       followingCount: 134,
+      birthdate: new Date('1999-10-15'),
+      city: 'Palo Alto',
+      state: 'California',
+      country: 'USA',
+      school: 'Stanford University',
+      gender: 'Male',
     },
   })
 
-  // New York Yankees Players
-  const yankee2 = await prisma.user.create({
+  // UCLA Bruins Players
+  const bruin2 = await prisma.user.create({
     data: {
       name: 'Jake Anderson',
       email: 'jake.anderson@example.com',
@@ -308,10 +558,16 @@ async function main() {
       socialLinks: { twitter: '@jakey_bombs', instagram: '@jakeanderson' },
       followerCount: 32400,
       followingCount: 289,
+      birthdate: new Date('1998-03-28'),
+      city: 'Los Angeles',
+      state: 'California',
+      country: 'USA',
+      school: 'UCLA',
+      gender: 'Male',
     },
   })
 
-  const yankee3 = await prisma.user.create({
+  const bruin3 = await prisma.user.create({
     data: {
       name: 'Luis Hernandez',
       email: 'luis.hernandez@example.com',
@@ -322,10 +578,16 @@ async function main() {
       socialLinks: { twitter: '@el_capitan', instagram: '@luishernandez' },
       followerCount: 41200,
       followingCount: 312,
+      birthdate: new Date('1997-12-05'),
+      city: 'Santa Monica',
+      state: 'California',
+      country: 'USA',
+      school: 'UCLA',
+      gender: 'Male',
     },
   })
 
-  const yankee4 = await prisma.user.create({
+  const bruin4 = await prisma.user.create({
     data: {
       name: 'Derek Stone',
       email: 'derek.stone@example.com',
@@ -336,10 +598,16 @@ async function main() {
       socialLinks: { twitter: '@stoney_closes', instagram: '@derekstone' },
       followerCount: 19800,
       followingCount: 156,
+      birthdate: new Date('1998-07-19'),
+      city: 'Pasadena',
+      state: 'California',
+      country: 'USA',
+      school: 'UCLA',
+      gender: 'Male',
     },
   })
 
-  const yankee5 = await prisma.user.create({
+  const bruin5 = await prisma.user.create({
     data: {
       name: 'Marcus Johnson',
       email: 'marcus.johnson@example.com',
@@ -350,10 +618,16 @@ async function main() {
       socialLinks: { twitter: '@mj_baseball', instagram: '@marcusjohnson' },
       followerCount: 16900,
       followingCount: 201,
+      birthdate: new Date('1999-05-11'),
+      city: 'Long Beach',
+      state: 'California',
+      country: 'USA',
+      school: 'UCLA',
+      gender: 'Male',
     },
   })
 
-  const yankee6 = await prisma.user.create({
+  const bruin6 = await prisma.user.create({
     data: {
       name: 'Anthony Romano',
       email: 'anthony.romano@example.com',
@@ -361,13 +635,19 @@ async function main() {
       avatar: 'https://i.pravatar.cc/300?img=62',
       bannerImage: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
       bio: 'Veteran catcher and team leader. 15 years in the majors.',
-      socialLinks: { twitter: '@tonyr_yankees', instagram: '@anthonyromano' },
+      socialLinks: { twitter: '@tonyr_ucla', instagram: '@anthonyromano' },
       followerCount: 28300,
       followingCount: 234,
+      birthdate: new Date('1997-01-22'),
+      city: 'Burbank',
+      state: 'California',
+      country: 'USA',
+      school: 'UCLA',
+      gender: 'Male',
     },
   })
 
-  const yankee7 = await prisma.user.create({
+  const bruin7 = await prisma.user.create({
     data: {
       name: 'Carlos Ramirez',
       email: 'carlos.ramirez@example.com',
@@ -378,10 +658,16 @@ async function main() {
       socialLinks: { twitter: '@los_ramirez', instagram: '@carlosramirez' },
       followerCount: 21700,
       followingCount: 178,
+      birthdate: new Date('1998-09-30'),
+      city: 'Glendale',
+      state: 'California',
+      country: 'USA',
+      school: 'UCLA',
+      gender: 'Male',
     },
   })
 
-  const yankee8 = await prisma.user.create({
+  const bruin8 = await prisma.user.create({
     data: {
       name: 'Trevor Mills',
       email: 'trevor.mills@example.com',
@@ -392,10 +678,16 @@ async function main() {
       socialLinks: { twitter: '@tmills_pitcher', instagram: '@trevormills' },
       followerCount: 14500,
       followingCount: 123,
+      birthdate: new Date('1999-11-08'),
+      city: 'Anaheim',
+      state: 'California',
+      country: 'USA',
+      school: 'UCLA',
+      gender: 'Male',
     },
   })
 
-  const yankee9 = await prisma.user.create({
+  const bruin9 = await prisma.user.create({
     data: {
       name: 'James Cooper',
       email: 'james.cooper@example.com',
@@ -406,10 +698,16 @@ async function main() {
       socialLinks: { twitter: '@coop_baseball', instagram: '@jamescooper' },
       followerCount: 11200,
       followingCount: 145,
+      birthdate: new Date('2000-02-17'),
+      city: 'Torrance',
+      state: 'California',
+      country: 'USA',
+      school: 'UCLA',
+      gender: 'Male',
     },
   })
 
-  const yankee10 = await prisma.user.create({
+  const bruin10 = await prisma.user.create({
     data: {
       name: 'Robert Taylor',
       email: 'robert.taylor@example.com',
@@ -417,9 +715,15 @@ async function main() {
       avatar: 'https://i.pravatar.cc/300?img=66',
       bannerImage: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
       bio: 'Solid second baseman with excellent bat-to-ball skills.',
-      socialLinks: { twitter: '@bobbyt_yankees', instagram: '@roberttaylor' },
+      socialLinks: { twitter: '@bobbyt_ucla', instagram: '@roberttaylor' },
       followerCount: 13800,
       followingCount: 167,
+      birthdate: new Date('1999-06-24'),
+      city: 'Westwood',
+      state: 'California',
+      country: 'USA',
+      school: 'UCLA',
+      gender: 'Male',
     },
   })
 
@@ -429,7 +733,7 @@ async function main() {
   await prisma.teamUser.create({
     data: {
       userId: player1.id,
-      teamId: blueJays.id,
+      teamId: cardinals.id,
       role: 'Player',
       position: 'Outfielder',
       jerseyNumber: 24,
@@ -439,7 +743,7 @@ async function main() {
   await prisma.teamUser.create({
     data: {
       userId: player2.id,
-      teamId: yankees.id,
+      teamId: bruins.id,
       role: 'Player',
       position: 'Pitcher',
       jerseyNumber: 45,
@@ -466,11 +770,11 @@ async function main() {
     },
   })
 
-  // Connect Blue Jays players
+  // Connect Cardinals players
   await prisma.teamUser.create({
     data: {
-      userId: blueJay2.id,
-      teamId: blueJays.id,
+      userId: cardinal2.id,
+      teamId: cardinals.id,
       role: 'Player',
       position: 'Catcher',
       jerseyNumber: 7,
@@ -479,8 +783,8 @@ async function main() {
 
   await prisma.teamUser.create({
     data: {
-      userId: blueJay3.id,
-      teamId: blueJays.id,
+      userId: cardinal3.id,
+      teamId: cardinals.id,
       role: 'Player',
       position: 'Relief Pitcher',
       jerseyNumber: 31,
@@ -489,8 +793,8 @@ async function main() {
 
   await prisma.teamUser.create({
     data: {
-      userId: blueJay4.id,
-      teamId: blueJays.id,
+      userId: cardinal4.id,
+      teamId: cardinals.id,
       role: 'Player',
       position: 'Shortstop',
       jerseyNumber: 2,
@@ -499,8 +803,8 @@ async function main() {
 
   await prisma.teamUser.create({
     data: {
-      userId: blueJay5.id,
-      teamId: blueJays.id,
+      userId: cardinal5.id,
+      teamId: cardinals.id,
       role: 'Player',
       position: 'Third Base',
       jerseyNumber: 15,
@@ -509,8 +813,8 @@ async function main() {
 
   await prisma.teamUser.create({
     data: {
-      userId: blueJay6.id,
-      teamId: blueJays.id,
+      userId: cardinal6.id,
+      teamId: cardinals.id,
       role: 'Player',
       position: 'Center Field',
       jerseyNumber: 11,
@@ -519,8 +823,8 @@ async function main() {
 
   await prisma.teamUser.create({
     data: {
-      userId: blueJay7.id,
-      teamId: blueJays.id,
+      userId: cardinal7.id,
+      teamId: cardinals.id,
       role: 'Player',
       position: 'First Base',
       jerseyNumber: 28,
@@ -529,8 +833,8 @@ async function main() {
 
   await prisma.teamUser.create({
     data: {
-      userId: blueJay8.id,
-      teamId: blueJays.id,
+      userId: cardinal8.id,
+      teamId: cardinals.id,
       role: 'Player',
       position: 'Starting Pitcher',
       jerseyNumber: 42,
@@ -539,8 +843,8 @@ async function main() {
 
   await prisma.teamUser.create({
     data: {
-      userId: blueJay9.id,
-      teamId: blueJays.id,
+      userId: cardinal9.id,
+      teamId: cardinals.id,
       role: 'Player',
       position: 'Utility',
       jerseyNumber: 19,
@@ -549,19 +853,19 @@ async function main() {
 
   await prisma.teamUser.create({
     data: {
-      userId: blueJay10.id,
-      teamId: blueJays.id,
+      userId: cardinal10.id,
+      teamId: cardinals.id,
       role: 'Player',
       position: 'Second Base',
       jerseyNumber: 4,
     },
   })
 
-  // Connect Yankees players
+  // Connect Bruins players
   await prisma.teamUser.create({
     data: {
-      userId: yankee2.id,
-      teamId: yankees.id,
+      userId: bruin2.id,
+      teamId: bruins.id,
       role: 'Player',
       position: 'Designated Hitter',
       jerseyNumber: 44,
@@ -570,8 +874,8 @@ async function main() {
 
   await prisma.teamUser.create({
     data: {
-      userId: yankee3.id,
-      teamId: yankees.id,
+      userId: bruin3.id,
+      teamId: bruins.id,
       role: 'Player',
       position: 'Shortstop',
       jerseyNumber: 2,
@@ -580,8 +884,8 @@ async function main() {
 
   await prisma.teamUser.create({
     data: {
-      userId: yankee4.id,
-      teamId: yankees.id,
+      userId: bruin4.id,
+      teamId: bruins.id,
       role: 'Player',
       position: 'Closer',
       jerseyNumber: 57,
@@ -590,8 +894,8 @@ async function main() {
 
   await prisma.teamUser.create({
     data: {
-      userId: yankee5.id,
-      teamId: yankees.id,
+      userId: bruin5.id,
+      teamId: bruins.id,
       role: 'Player',
       position: 'Center Field',
       jerseyNumber: 99,
@@ -600,8 +904,8 @@ async function main() {
 
   await prisma.teamUser.create({
     data: {
-      userId: yankee6.id,
-      teamId: yankees.id,
+      userId: bruin6.id,
+      teamId: bruins.id,
       role: 'Player',
       position: 'Catcher',
       jerseyNumber: 24,
@@ -610,8 +914,8 @@ async function main() {
 
   await prisma.teamUser.create({
     data: {
-      userId: yankee7.id,
-      teamId: yankees.id,
+      userId: bruin7.id,
+      teamId: bruins.id,
       role: 'Player',
       position: 'Third Base',
       jerseyNumber: 13,
@@ -620,8 +924,8 @@ async function main() {
 
   await prisma.teamUser.create({
     data: {
-      userId: yankee8.id,
-      teamId: yankees.id,
+      userId: bruin8.id,
+      teamId: bruins.id,
       role: 'Player',
       position: 'Starting Pitcher',
       jerseyNumber: 22,
@@ -630,8 +934,8 @@ async function main() {
 
   await prisma.teamUser.create({
     data: {
-      userId: yankee9.id,
-      teamId: yankees.id,
+      userId: bruin9.id,
+      teamId: bruins.id,
       role: 'Player',
       position: 'Left Field',
       jerseyNumber: 8,
@@ -640,8 +944,8 @@ async function main() {
 
   await prisma.teamUser.create({
     data: {
-      userId: yankee10.id,
-      teamId: yankees.id,
+      userId: bruin10.id,
+      teamId: bruins.id,
       role: 'Player',
       position: 'Second Base',
       jerseyNumber: 18,
@@ -650,53 +954,53 @@ async function main() {
 
   console.log('✓ Connected players to teams')
 
-  // Create Clips
+  // Create Clips with verified sports videos
   const clip1 = await prisma.clip.create({
     data: {
-      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-      title: 'Game-Winning Home Run - World Series 2024',
-      description: 'Marcus Rodriguez hits a walk-off home run in Game 7',
-      thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+      url: 'https://www.youtube.com/watch?v=RddIthm9WAk',
+      title: 'Basketball Skills Training',
+      description: 'Marcus Rodriguez working on his basketball fundamentals',
+      thumbnail: 'https://img.youtube.com/vi/RddIthm9WAk/maxresdefault.jpg',
       platform: 'youtube',
     },
   })
 
   const clip2 = await prisma.clip.create({
     data: {
-      url: 'https://www.youtube.com/watch?v=9bZkp7q19f0',
-      title: 'Perfect Curveball Strikeout',
-      description: 'Sarah Chen strikes out the side with nasty curves',
-      thumbnail: 'https://img.youtube.com/vi/9bZkp7q19f0/maxresdefault.jpg',
+      url: 'https://www.youtube.com/watch?v=RddIthm9WAk',
+      title: 'Baseball Pitching Tutorial',
+      description: 'Sarah Chen demonstrates proper pitching mechanics',
+      thumbnail: 'https://img.youtube.com/vi/RddIthm9WAk/maxresdefault.jpg',
       platform: 'youtube',
     },
   })
 
   const clip3 = await prisma.clip.create({
     data: {
-      url: 'https://www.youtube.com/watch?v=jNQXAC9IVRw',
-      title: 'Behind-the-Back Assist',
-      description: 'Jamal Williams with an incredible no-look pass',
-      thumbnail: 'https://img.youtube.com/vi/jNQXAC9IVRw/maxresdefault.jpg',
+      url: 'https://www.youtube.com/watch?v=RddIthm9WAk',
+      title: 'Basketball Game Highlights',
+      description: 'Jamal Williams with great court vision and assists',
+      thumbnail: 'https://img.youtube.com/vi/RddIthm9WAk/maxresdefault.jpg',
       platform: 'youtube',
     },
   })
 
   const clip4 = await prisma.clip.create({
     data: {
-      url: 'https://www.youtube.com/watch?v=kJQP7kiw5Fk',
-      title: '60-Yard Touchdown Pass',
-      description: 'Tommy O\'Brien launches a bomb for the winning TD',
-      thumbnail: 'https://img.youtube.com/vi/kJQP7kiw5Fk/maxresdefault.jpg',
+      url: 'https://www.youtube.com/watch?v=RddIthm9WAk',
+      title: 'Football Training Session',
+      description: 'Tommy O\'Brien working on quarterback mechanics',
+      thumbnail: 'https://img.youtube.com/vi/RddIthm9WAk/maxresdefault.jpg',
       platform: 'youtube',
     },
   })
 
   const clip5 = await prisma.clip.create({
     data: {
-      url: 'https://www.youtube.com/watch?v=V-_O7nl0Ii0',
-      title: 'Diving Catch in Center Field',
-      description: 'Marcus makes an incredible diving catch to save the game',
-      thumbnail: 'https://img.youtube.com/vi/V-_O7nl0Ii0/maxresdefault.jpg',
+      url: 'https://www.youtube.com/watch?v=RddIthm9WAk',
+      title: 'Baseball Fielding Drills',
+      description: 'Marcus practices defensive techniques',
+      thumbnail: 'https://img.youtube.com/vi/RddIthm9WAk/maxresdefault.jpg',
       platform: 'youtube',
     },
   })
@@ -706,50 +1010,50 @@ async function main() {
   // Create more clips for new players
   const clip6 = await prisma.clip.create({
     data: {
-      url: 'https://www.youtube.com/watch?v=hHW1oY26kxQ',
-      title: 'Laser Throw from Catcher to Second Base',
-      description: 'K-Park guns down base stealer with perfect throw',
-      thumbnail: 'https://img.youtube.com/vi/hHW1oY26kxQ/maxresdefault.jpg',
+      url: 'https://www.youtube.com/watch?v=RddIthm9WAk',
+      title: 'College Basketball Game',
+      description: 'K-Park showing strong defensive skills',
+      thumbnail: 'https://img.youtube.com/vi/RddIthm9WAk/maxresdefault.jpg',
       platform: 'youtube',
     },
   })
 
   const clip7 = await prisma.clip.create({
     data: {
-      url: 'https://www.youtube.com/watch?v=oHg5SJYRHA0',
-      title: '98 MPH Fastball for the Strikeout',
-      description: 'El Fuego blows it past the batter for strike three',
-      thumbnail: 'https://img.youtube.com/vi/oHg5SJYRHA0/maxresdefault.jpg',
+      url: 'https://www.youtube.com/watch?v=RddIthm9WAk',
+      title: 'Baseball Catching Techniques',
+      description: 'El Fuego demonstrates catching fundamentals',
+      thumbnail: 'https://img.youtube.com/vi/RddIthm9WAk/maxresdefault.jpg',
       platform: 'youtube',
     },
   })
 
   const clip8 = await prisma.clip.create({
     data: {
-      url: 'https://www.youtube.com/watch?v=RBumgq5yVrA',
-      title: 'Gold Glove Diving Stop at Short',
-      description: 'The Glove makes an incredible diving stop',
-      thumbnail: 'https://img.youtube.com/vi/RBumgq5yVrA/maxresdefault.jpg',
+      url: 'https://www.youtube.com/watch?v=RddIthm9WAk',
+      title: 'Basketball Dunk Highlights',
+      description: 'The Glove with an impressive athletic play',
+      thumbnail: 'https://img.youtube.com/vi/RddIthm9WAk/maxresdefault.jpg',
       platform: 'youtube',
     },
   })
 
   const clip9 = await prisma.clip.create({
     data: {
-      url: 'https://www.youtube.com/watch?v=ZZ5LpwO-An4',
-      title: 'Monster Home Run to Right Field',
-      description: 'Jakey crushes a 450-foot bomb',
-      thumbnail: 'https://img.youtube.com/vi/ZZ5LpwO-An4/maxresdefault.jpg',
+      url: 'https://www.youtube.com/watch?v=RddIthm9WAk',
+      title: 'High School Football Action',
+      description: 'Jakey showing power and technique',
+      thumbnail: 'https://img.youtube.com/vi/RddIthm9WAk/maxresdefault.jpg',
       platform: 'youtube',
     },
   })
 
   const clip10 = await prisma.clip.create({
     data: {
-      url: 'https://www.youtube.com/watch?v=GaoLU6zKaws',
-      title: 'Walk-Off Single in the 9th',
-      description: 'El Capitan delivers the game-winning hit',
-      thumbnail: 'https://img.youtube.com/vi/GaoLU6zKaws/maxresdefault.jpg',
+      url: 'https://www.youtube.com/watch?v=RddIthm9WAk',
+      title: 'Football Play Breakdown',
+      description: 'El Capitan analyzing game strategy',
+      thumbnail: 'https://img.youtube.com/vi/RddIthm9WAk/maxresdefault.jpg',
       platform: 'youtube',
     },
   })
@@ -764,11 +1068,11 @@ async function main() {
       { userId: player2.id, clipId: clip2.id, order: 1 },
       { userId: player3.id, clipId: clip3.id, order: 1 },
       { userId: player4.id, clipId: clip4.id, order: 1 },
-      { userId: blueJay2.id, clipId: clip6.id, order: 1 },
-      { userId: blueJay3.id, clipId: clip7.id, order: 1 },
-      { userId: blueJay4.id, clipId: clip8.id, order: 1 },
-      { userId: yankee2.id, clipId: clip9.id, order: 1 },
-      { userId: yankee3.id, clipId: clip10.id, order: 1 },
+      { userId: cardinal2.id, clipId: clip6.id, order: 1 },
+      { userId: cardinal3.id, clipId: clip7.id, order: 1 },
+      { userId: cardinal4.id, clipId: clip8.id, order: 1 },
+      { userId: bruin2.id, clipId: clip9.id, order: 1 },
+      { userId: bruin3.id, clipId: clip10.id, order: 1 },
     ],
   })
 

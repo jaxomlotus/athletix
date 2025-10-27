@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import prisma from "@/lib/prisma";
 import NavigationHeader from "@/components/NavigationHeader";
-import PlayerHeader from "@/components/PlayerHeader";
+import PageHeader from "@/components/PageHeader";
 import ClipsSection from "@/components/ClipsSection";
 import Footer from "@/components/Footer";
 import {
@@ -168,37 +168,41 @@ export default async function PlayerProfile({
     };
   });
 
+  // Format team info for subtitle (just team name, no logo)
+  const teamSubtitle = primaryTeam ? (
+    <a
+      href={`/team/${createTeamSlug(primaryTeam.team.title)}`}
+      className="text-white underline hover:no-underline"
+    >
+      {primaryTeam.team.title}
+    </a>
+  ) : undefined;
+
+  const teamDescription = primaryTeam
+    ? `${primaryTeam.position}`
+    : undefined;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <NavigationHeader />
 
-      <PlayerHeader
-        name={displayName}
-        avatar={player.avatar || defaultAvatar}
+      <PageHeader
+        title={displayName}
+        jerseyNumber={primaryTeam?.jerseyNumber || undefined}
+        subtitle={teamSubtitle}
+        description={teamDescription}
+        logo={player.avatar || defaultAvatar}
         banner={player.bannerImage || defaultBanner}
         breadcrumbs={[
           { label: "Home", href: "/" },
-          { label: "Players" },
+          { label: "Players", href: "/players" },
         ]}
-        team={
-          primaryTeam
-            ? {
-                name: primaryTeam.team.title,
-                logo: primaryTeam.team.logo,
-                jerseyNumber: primaryTeam.jerseyNumber,
-                position: primaryTeam.position,
-                league: primaryTeam.team.league.name,
-                slug: createTeamSlug(primaryTeam.team.title),
-                leagueSlug: createLeagueSlug(primaryTeam.team.league.name),
-              }
-            : undefined
-        }
         followerCount={player.followerCount}
+        showFollowButton={true}
       />
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
         {/* Bio */}
         {player.bio && (
           <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-4 sm:mb-6">

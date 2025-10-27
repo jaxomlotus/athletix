@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE `Sport` ADD COLUMN `banner` TEXT NULL,
+    ADD COLUMN `coed` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `logo` TEXT NULL,
+    ADD COLUMN `mens` BOOLEAN NOT NULL DEFAULT true,
+    ADD COLUMN `womens` BOOLEAN NOT NULL DEFAULT true;

@@ -180,12 +180,12 @@ export default async function LeaguePage({
         subtitle={league.description || undefined}
         breadcrumbs={[
           { label: "Home", href: "/" },
-          { label: league.sport.name, href: `/sport/${sportSlug}` },
+          { label: league.sport.name, href: `/sports/${sportSlug}` },
         ]}
       />
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="lg:grid lg:grid-cols-12 lg:gap-8">
           {/* Left Column - Main Content */}
           <div className="lg:col-span-8">
@@ -194,30 +194,34 @@ export default async function LeaguePage({
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
                 Teams
               </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
-                {league.teams.map((team) => {
-                  const teamSlug = createTeamSlug(team.title);
-                  return (
-                    <a
-                      key={team.id}
-                      href={`/team/${teamSlug}`}
-                      className="flex flex-col items-center gap-3 p-4 rounded-lg border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all"
-                    >
-                      <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-white p-2">
-                        <Image
-                          src={team.logo || defaultLogo}
-                          alt={team.title}
-                          fill
-                          className="object-contain"
-                        />
-                      </div>
-                      <h3 className="font-semibold text-gray-900 text-center text-sm sm:text-base">
-                        {team.title}
-                      </h3>
-                    </a>
-                  );
-                })}
-              </div>
+              {!league.teams || league.teams.length === 0 ? (
+                <p className="w-full text-center text-gray-400 py-8">Nothing here yet.</p>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
+                  {league.teams.map((team) => {
+                    const teamSlug = createTeamSlug(team.title);
+                    return (
+                      <a
+                        key={team.id}
+                        href={`/team/${teamSlug}`}
+                        className="flex flex-col items-center gap-3 p-4 rounded-lg border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all"
+                      >
+                        <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-white p-2">
+                          <Image
+                            src={team.logo || defaultLogo}
+                            alt={team.title}
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
+                        <h3 className="font-semibold text-gray-900 text-center text-sm sm:text-base">
+                          {team.title}
+                        </h3>
+                      </a>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             {/* Clips Section */}
