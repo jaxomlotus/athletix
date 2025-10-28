@@ -6,7 +6,10 @@
       "Bash(yarn prisma migrate:*)",
       "Bash(yarn prisma db push:*)",
       "WebSearch",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "WebFetch(domain:icon-sets.iconify.design)",
+      "Bash(python3:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": [],
     "ask": []

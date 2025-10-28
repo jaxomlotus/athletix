@@ -1,34 +1,27 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '../lib/generated/prisma-client'
 
 const prisma = new PrismaClient()
 
-function createSlug(user: { id: string; displayName: string | null; name: string | null }): string {
-  const displayName = user.displayName || user.name || 'Unknown'
-  const slugName = displayName.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '')
-  return `${user.id}-${slugName}`
-}
-
 async function main() {
-  const users = await prisma.user.findMany({
+  const players = await prisma.entity.findMany({
     where: {
-      NOT: {
-        displayName: null,
-      },
+      type: 'player',
     },
-    select: {
-      id: true,
-      name: true,
-      displayName: true,
-      email: true,
+    include: {
+      parent: true,
     },
   })
 
   console.log('\n🏃 Player Profile Links:\n')
-  users.forEach((user) => {
-    const slug = createSlug(user)
-    console.log(`${user.displayName || user.name}:`)
-    console.log(`  http://localhost:3000/player/${slug}`)
-    console.log(`  Email: ${user.email}\n`)
+  players.forEach((player) => {
+    const metadata = (player.metadata || {}) as any
+    const displayName = metadata.displayName || player.name
+    console.log(`${displayName}:`)
+    console.log(`  http://localhost:3000/players/${player.slug}`)
+    if (player.parent) {
+      console.log(`  Team: ${player.parent.name}`)
+    }
+    console.log('')
   })
 }
 

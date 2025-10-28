@@ -7,39 +7,38 @@ import Footer from "@/components/Footer";
 
 async function getHomeData() {
   try {
-    // Fetch men's sports
-    const mensSports = await prisma.sport.findMany({
-      where: { mens: true },
+    // Fetch all sports entities
+    const allSports = await prisma.entity.findMany({
+      where: { type: 'sport' },
       orderBy: { name: 'asc' },
     });
 
-    // Fetch women's sports
-    const womensSports = await prisma.sport.findMany({
-      where: { womens: true },
-      orderBy: { name: 'asc' },
-    });
+    // Filter sports by gender metadata
+    const mensSports = allSports.filter(sport =>
+      (sport.metadata as { mens?: boolean })?.mens === true
+    );
+    const womensSports = allSports.filter(sport =>
+      (sport.metadata as { womens?: boolean })?.womens === true
+    );
+    const coedSports = allSports.filter(sport =>
+      (sport.metadata as { coed?: boolean })?.coed === true
+    );
 
-    // Fetch coed sports
-    const coedSports = await prisma.sport.findMany({
-      where: { coed: true },
-      orderBy: { name: 'asc' },
-    });
-
-    // Fetch all clips from all users
+    // Fetch all clips from player entities
     const allClips = await prisma.clip.findMany({
       include: {
-        userClips: {
+        entityClips: {
           include: {
-            user: {
+            entity: {
               select: {
                 id: true,
-                displayName: true,
                 name: true,
-                avatar: true,
+                logo: true,
+                type: true,
               },
             },
           },
-          take: 1, // Get first user who has this clip
+          take: 1, // Get first entity who has this clip
         },
       },
       orderBy: {
@@ -67,23 +66,23 @@ export default async function HomePage() {
 
   // Prepare clips for ClipsSection
   const formattedClips = allClips
-    .filter((clip) => clip.userClips.length > 0)
+    .filter((clip) => clip.entityClips.length > 0)
     .map((clip) => {
-      const userClip = clip.userClips[0];
+      const entityClip = clip.entityClips[0];
+      const entity = entityClip.entity;
       return {
         clip: {
           ...clip,
           createdAt: clip.createdAt,
         },
-        playerName:
-          userClip.user.displayName || userClip.user.name || "Unknown",
-        playerId: userClip.user.id,
-        playerAvatar: userClip.user.avatar,
+        playerName: entity.name || "Unknown",
+        playerId: entity.id,
+        playerAvatar: entity.logo,
         playerTags: [
           {
-            name: userClip.user.displayName || userClip.user.name || "Unknown",
-            id: userClip.user.id,
-            avatar: userClip.user.avatar,
+            name: entity.name || "Unknown",
+            id: entity.id,
+            avatar: entity.logo,
           },
         ],
       };
@@ -152,11 +151,10 @@ export default async function HomePage() {
                   </h3>
                   <ul className="space-y-2">
                     {mensSports.map((sport) => {
-                      const sportSlug = createSportSlug(sport.name);
                       return (
                         <li key={sport.id}>
                           <a
-                            href={`/sports/${sportSlug}`}
+                            href={`/sports/${sport.slug}`}
                             className="text-blue-600 hover:text-blue-800 hover:underline"
                           >
                             {sport.name}
@@ -174,11 +172,10 @@ export default async function HomePage() {
                       </h3>
                       <ul className="space-y-2">
                         {coedSports.map((sport) => {
-                          const sportSlug = createSportSlug(sport.name);
                           return (
                             <li key={sport.id}>
                               <a
-                                href={`/sports/${sportSlug}`}
+                                href={`/sports/${sport.slug}`}
                                 className="text-blue-600 hover:text-blue-800 hover:underline"
                               >
                                 {sport.name}
@@ -198,11 +195,10 @@ export default async function HomePage() {
                   </h3>
                   <ul className="space-y-2">
                     {womensSports.map((sport) => {
-                      const sportSlug = createSportSlug(sport.name);
                       return (
                         <li key={sport.id}>
                           <a
-                            href={`/sports/${sportSlug}`}
+                            href={`/sports/${sport.slug}`}
                             className="text-blue-600 hover:text-blue-800 hover:underline"
                           >
                             {sport.name}

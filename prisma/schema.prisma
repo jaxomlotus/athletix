@@ -7,7 +7,7 @@
 generator client {
   provider      = "prisma-client-js"
   output        = "../lib/generated/prisma-client"
-  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+  binaryTargets = ["native", "rhel-openssl-3.0.x", "windows", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -17,8 +17,8 @@ datasource db {
 
 // Auth.js / NextAuth models
 model Account {
-  id                String  @id @default(cuid())
-  userId            String
+  id                Int     @id @default(autoincrement())
+  userId            Int
   type              String
   provider          String
   providerAccountId String
@@ -37,9 +37,9 @@ model Account {
 }
 
 model Session {
-  id           String   @id @default(cuid())
+  id           Int      @id @default(autoincrement())
   sessionToken String   @unique
-  userId       String
+  userId       Int
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -47,7 +47,7 @@ model Session {
 }
 
 model User {
-  id             String    @id @default(cuid())
+  id             Int       @id @default(autoincrement())
   name           String?
   email          String?   @unique
   emailVerified  DateTime?
@@ -73,7 +73,8 @@ model User {
   // Relations
   accounts       Account[]
   sessions       Session[]
-  teamUsers      TeamUser[]
+  ownedEntities  Entity[]     @relation("EntityOwner")
+  follows        Follow[]
   userClips      UserClip[]
 
   @@map("Users")
@@ -88,78 +89,64 @@ model VerificationToken {
   @@map("VerificationTokens")
 }
 
-// Sports and Teams
-model Sport {
-  id          String   @id @default(cuid())
-  name        String
-  description String?  @db.Text
-  mens        Boolean  @default(true)
-  womens      Boolean  @default(true)
-  coed        Boolean  @default(false)
-  logo        String?  @db.Text
-  banner      String?  @db.Text
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+// Unified Entity System
+model Entity {
+  id             Int      @id @default(autoincrement())
+  type           String   @db.VarChar(50) // 'sport', 'league', 'team', 'player'
+  slug           String   @unique
+  name           String   @db.VarChar(256)
+  description    String?  @db.Text
+  logo           String?  @db.Text
+  banner         String?  @db.Text
 
-  leagues     League[]
-  teams       Team[]
+  // Hierarchical structure
+  parentId       Int?
+  parent         Entity?  @relation("EntityHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children       Entity[] @relation("EntityHierarchy")
+  childEntities  String?  @db.VarChar(100) // e.g., "Leagues", "Teams", "Players" - used for UI labels
 
-  @@map("Sport")
+  // Ownership & Moderation
+  ownerId        Int?
+  owner          User?    @relation("EntityOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  modsJson       Json?    // Array of { userId: number, permissions: string[] }
+
+  // Social
+  followerCount  Int      @default(0)
+
+  // Type-specific data stored as JSON
+  metadata       Json?    // Flexible field for type-specific data
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  follows        Follow[]
+  clips          EntityClip[]
+
+  @@index([type])
+  @@index([parentId])
+  @@index([ownerId])
+  @@map("Entities")
 }
 
-model League {
-  id          String   @id @default(cuid())
-  name        String
-  sportId     String
-  description String?  @db.Text
-  logo        String?  @db.Text
-  banner      String?  @db.Text
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+// Unified Follow System
+model Follow {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  entityId   Int
+  followedAt DateTime @default(now())
 
-  sport       Sport    @relation(fields: [sportId], references: [id], onDelete: Cascade)
-  teams       Team[]
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entity     Entity   @relation(fields: [entityId], references: [id], onDelete: Cascade)
 
-  @@map("Leagues")
-}
-
-model Team {
-  id          String   @id @default(cuid())
-  title       String   @unique
-  sportId     String
-  leagueId    String
-  description String?  @db.Text
-  logo        String?  @db.VarChar(256)
-  banner      String?  @db.Text
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  sport       Sport      @relation(fields: [sportId], references: [id], onDelete: Cascade)
-  league      League     @relation(fields: [leagueId], references: [id], onDelete: Cascade)
-  teamUsers   TeamUser[]
-
-  @@map("Teams")
-}
-
-model TeamUser {
-  id        String   @id @default(cuid())
-  userId    String
-  teamId    String
-  role      String?  @db.VarChar(100) // e.g., "Player", "Coach", "Manager"
-  jerseyNumber Int?
-  position  String?  @db.VarChar(100)
-  joinedAt  DateTime @default(now())
-  leftAt    DateTime?
-
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-
-  @@map("TeamUsers")
+  @@unique([userId, entityId])
+  @@index([userId])
+  @@index([entityId])
+  @@map("Follows")
 }
 
 // Clips
 model Clip {
-  id          String   @id @default(cuid())
+  id          Int      @id @default(autoincrement())
   url         String   @db.VarChar(512)
   title       String   @db.VarChar(256)
   description String?  @db.Text
@@ -169,14 +156,15 @@ model Clip {
   updatedAt   DateTime @updatedAt
 
   userClips   UserClip[]
+  entityClips EntityClip[]
 
   @@map("Clips")
 }
 
 model UserClip {
-  id        String   @id @default(cuid())
-  userId    String
-  clipId    String
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  clipId    Int
   order     Int      @default(0)
   addedAt   DateTime @default(now())
 
@@ -184,4 +172,18 @@ model UserClip {
   clip      Clip     @relation(fields: [clipId], references: [id], onDelete: Cascade)
 
   @@map("UserClips")
+}
+
+model EntityClip {
+  id        Int      @id @default(autoincrement())
+  entityId  Int
+  clipId    Int
+  order     Int      @default(0)
+  addedAt   DateTime @default(now())
+
+  entity    Entity   @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  clip      Clip     @relation(fields: [clipId], references: [id], onDelete: Cascade)
+
+  @@unique([entityId, clipId])
+  @@map("EntityClips")
 }
