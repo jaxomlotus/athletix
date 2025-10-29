@@ -15,8 +15,55 @@ import {
   EntityType,
 } from "@/lib/entity-utils";
 import Image from "next/image";
+import { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ type: string; slug: string }>;
+}): Promise<Metadata> {
+  const { type, slug } = await params;
+  const entityType = getEntityType(type);
+
+  if (!entityType) {
+    return {
+      title: "Not Found",
+      description: "The requested page could not be found.",
+    };
+  }
+
+  const entity = await prisma.entity.findUnique({
+    where: { slug, type: entityType },
+    select: {
+      name: true,
+      description: true,
+      metadata: true,
+    },
+  });
+
+  if (!entity) {
+    return {
+      title: "Not Found",
+      description: "The requested page could not be found.",
+    };
+  }
+
+  const metadata = (entity.metadata || {}) as any;
+  const description = metadata.bio || entity.description || `View ${entity.name}'s profile on Athletix`;
+  const displayType = getEntityDisplayName(entityType);
+
+  return {
+    title: `${entity.name} | ${displayType}`,
+    description: description,
+    openGraph: {
+      title: `${entity.name} | ${displayType}`,
+      description: description,
+      type: "profile",
+    },
+  };
+}
 
 async function getEntityData(type: string, slug: string) {
   try {
@@ -44,6 +91,7 @@ async function getEntityData(type: string, slug: string) {
                 name: true,
                 slug: true,
                 logo: true,
+                metadata: true,
                 parent: {
                   select: {
                     id: true,
@@ -170,7 +218,7 @@ function buildBreadcrumbs(entity: any, entityType: EntityType) {
     { label: "Home", href: "/" },
   ];
 
-  // For players and schools, just show Home \ Type
+  // For players, schools, and locations, just show Home \ Type
   if (entityType === "player") {
     crumbs.push({
       label: "Players",
@@ -183,6 +231,14 @@ function buildBreadcrumbs(entity: any, entityType: EntityType) {
     crumbs.push({
       label: "Schools",
       href: "/schools",
+    });
+    return crumbs;
+  }
+
+  if (entityType === "location") {
+    crumbs.push({
+      label: "Locations",
+      href: "/locations",
     });
     return crumbs;
   }
@@ -410,6 +466,112 @@ export default async function EntityDetailPage({
         ) || []
     ) || [];
 
+  // For locations, find all schools, teams, and players in this location
+  let locationSchools: any[] = [];
+  let locationTeams: any[] = [];
+  let locationPlayers: any[] = [];
+
+  if (entityType === "location") {
+    // Query entities where metadata contains this location
+    const allEntities = await prisma.entity.findMany({
+      where: {
+        OR: [
+          { type: "school" },
+          { type: "team" },
+          { type: "player" },
+        ],
+      },
+      include: {
+        clips: {
+          include: {
+            clip: true,
+          },
+        },
+      },
+    });
+
+    // Filter by location slug in metadata
+    locationSchools = allEntities.filter(
+      (e) => e.type === "school" && (e.metadata as any)?.locationSlug === entity.slug
+    );
+    locationTeams = allEntities.filter(
+      (e) => e.type === "team" && (e.metadata as any)?.locationSlug === entity.slug
+    );
+    locationPlayers = allEntities.filter(
+      (e) => e.type === "player" && (e.metadata as any)?.locationSlug === entity.slug
+    );
+  }
+
+  // Clips from location entities (schools, teams, players)
+  const locationClips =
+    entityType === "location"
+      ? [
+          ...locationSchools.flatMap((school: any) =>
+            school.clips?.map(({ clip }: any) => ({
+              clip: {
+                ...clip,
+                id: clip.id.toString(),
+                createdAt: clip.createdAt,
+              },
+              playerName: school.name,
+              playerId: school.id.toString(),
+              playerSlug: school.slug,
+              playerAvatar: school.logo,
+              playerTags: [
+                {
+                  name: school.name,
+                  id: school.id.toString(),
+                  slug: school.slug,
+                  avatar: school.logo,
+                },
+              ],
+            })) || []
+          ),
+          ...locationTeams.flatMap((team: any) =>
+            team.clips?.map(({ clip }: any) => ({
+              clip: {
+                ...clip,
+                id: clip.id.toString(),
+                createdAt: clip.createdAt,
+              },
+              playerName: team.name,
+              playerId: team.id.toString(),
+              playerSlug: team.slug,
+              playerAvatar: team.logo,
+              playerTags: [
+                {
+                  name: team.name,
+                  id: team.id.toString(),
+                  slug: team.slug,
+                  avatar: team.logo,
+                },
+              ],
+            })) || []
+          ),
+          ...locationPlayers.flatMap((player: any) =>
+            player.clips?.map(({ clip }: any) => ({
+              clip: {
+                ...clip,
+                id: clip.id.toString(),
+                createdAt: clip.createdAt,
+              },
+              playerName: player.name,
+              playerId: player.id.toString(),
+              playerSlug: player.slug,
+              playerAvatar: player.logo,
+              playerTags: [
+                {
+                  name: player.name,
+                  id: player.id.toString(),
+                  slug: player.slug,
+                  avatar: player.logo,
+                },
+              ],
+            })) || []
+          ),
+        ]
+      : [];
+
   const allClips = [
     ...entityClips,
     ...teamMemberClips,
@@ -418,6 +580,7 @@ export default async function EntityDetailPage({
     ...grandchildClips,
     ...grandchildTeamMemberClips,
     ...greatGrandchildClips,
+    ...locationClips,
   ];
 
   // Prepare leaderboard
@@ -438,13 +601,17 @@ export default async function EntityDetailPage({
   if (entityType === "player") {
     const bioText = metadata.bio || entity.description;
     const sportName = entity.parent?.parent?.parent?.name; // Get sport from hierarchy
-    const city = metadata.city;
-    const state = metadata.state;
     const birthdate = metadata.birthdate ? new Date(metadata.birthdate) : null;
 
-    // Get school from current team membership
+    // Get school from current team membership (school info is in team metadata)
     const currentTeam = entity.playerMemberships?.[0]?.team;
-    const school = currentTeam?.parent?.type === "school" ? currentTeam.parent : null;
+    const teamMetadata = (currentTeam?.metadata || {}) as any;
+    const schoolName = teamMetadata.schoolName || null;
+    const schoolSlug = teamMetadata.schoolSlug || null;
+
+    // Get location from metadata
+    const locationName = metadata.locationName;
+    const locationSlug = metadata.locationSlug;
 
     // Calculate age from birthdate
     let age: number | null = null;
@@ -457,14 +624,8 @@ export default async function EntityDetailPage({
       }
     }
 
-    // Build location string
-    const locationParts = [];
-    if (city) locationParts.push(city);
-    if (state) locationParts.push(state);
-    const location = locationParts.join(', ');
-
     // Build info parts for display
-    const hasInfoLine = school || location || age;
+    const hasInfoLine = schoolName || locationName || age;
 
     if (bioText || sportName || hasInfoLine) {
       subtitle = (
@@ -472,19 +633,28 @@ export default async function EntityDetailPage({
           {bioText && <p className="mb-1">{bioText}</p>}
           {hasInfoLine && (
             <p className="text-xs sm:text-sm opacity-80 mb-1">
-              {school && (
+              {schoolName && schoolSlug && (
                 <>
                   <Link
-                    href={`/schools/${school.slug}`}
+                    href={`/schools/${schoolSlug}`}
                     className="underline"
                   >
-                    {school.name}
+                    {schoolName}
                   </Link>
-                  {(location || age) && " • "}
+                  {(locationName || age) && " • "}
                 </>
               )}
-              {location}
-              {location && age && " • "}
+              {locationName && locationSlug && (
+                <>
+                  <Link
+                    href={`/locations/${locationSlug}`}
+                    className="underline"
+                  >
+                    {locationName}
+                  </Link>
+                  {age && " • "}
+                </>
+              )}
               {age && `${age} years old`}
             </p>
           )}
@@ -496,24 +666,20 @@ export default async function EntityDetailPage({
     }
   } else if (entityType === "team") {
     const description = entity.description;
-    const city = metadata.city;
-    const state = metadata.state;
 
     // Get school from metadata (for college teams)
     const schoolName = metadata.schoolName;
     const schoolSlug = metadata.schoolSlug;
 
-    // Build location string
-    const locationParts = [];
-    if (city) locationParts.push(city);
-    if (state) locationParts.push(state);
-    const location = locationParts.join(', ');
+    // Get location from metadata
+    const locationName = metadata.locationName;
+    const locationSlug = metadata.locationSlug;
 
-    if (description || schoolName || location) {
+    if (description || schoolName || locationName) {
       subtitle = (
         <div className="text-sm sm:text-base opacity-90">
           {description && <p className="mb-1">{description}</p>}
-          {(schoolName || location) && (
+          {(schoolName || locationName) && (
             <p className="text-xs sm:text-sm opacity-80">
               {schoolName && schoolSlug && (
                 <>
@@ -523,10 +689,17 @@ export default async function EntityDetailPage({
                   >
                     {schoolName}
                   </Link>
-                  {location && " • "}
+                  {locationName && " • "}
                 </>
               )}
-              {location}
+              {locationName && locationSlug && (
+                <Link
+                  href={`/locations/${locationSlug}`}
+                  className="underline"
+                >
+                  {locationName}
+                </Link>
+              )}
             </p>
           )}
         </div>
@@ -534,22 +707,39 @@ export default async function EntityDetailPage({
     }
   } else if (entityType === "school") {
     const description = entity.description;
-    const city = metadata.city;
-    const state = metadata.state;
 
-    // Build location string
-    const locationParts = [];
-    if (city) locationParts.push(city);
-    if (state) locationParts.push(state);
-    const location = locationParts.join(', ');
+    // Get location from metadata
+    const locationName = metadata.locationName;
+    const locationSlug = metadata.locationSlug;
 
-    if (description || location) {
+    if (description || locationName) {
       subtitle = (
         <div className="text-sm sm:text-base opacity-90">
           {description && <p className="mb-1">{description}</p>}
-          {location && (
+          {locationName && locationSlug && (
             <p className="text-xs sm:text-sm opacity-80">
-              {location}
+              <Link
+                href={`/locations/${locationSlug}`}
+                className="underline"
+              >
+                {locationName}
+              </Link>
+            </p>
+          )}
+        </div>
+      );
+    }
+  } else if (entityType === "location") {
+    const description = entity.description;
+    const totalEntities = locationSchools.length + locationTeams.length + locationPlayers.length;
+
+    if (description || totalEntities > 0) {
+      subtitle = (
+        <div className="text-sm sm:text-base opacity-90">
+          {description && <p className="mb-1">{description}</p>}
+          {totalEntities > 0 && (
+            <p className="text-xs sm:text-sm opacity-80">
+              {locationSchools.length} {locationSchools.length === 1 ? 'School' : 'Schools'} • {locationTeams.length} {locationTeams.length === 1 ? 'Team' : 'Teams'} • {locationPlayers.length} {locationPlayers.length === 1 ? 'Player' : 'Players'}
             </p>
           )}
         </div>
@@ -706,10 +896,134 @@ export default async function EntityDetailPage({
                               {membership.positions.join(" • ")}
                             </p>
                           )}
+                          {player.clips && player.clips.length > 0 && (
+                            <p className="text-xs text-blue-600 font-semibold mt-2">
+                              {player.clips.length} {player.clips.length === 1 ? 'clip' : 'clips'}
+                            </p>
+                          )}
                         </div>
                       </a>
                     );
                   })}
+                </div>
+              </div>
+            )}
+
+            {/* Location Schools Section */}
+            {entityType === "location" && locationSchools.length > 0 && (
+              <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
+                  Schools
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {locationSchools.map((school: any) => (
+                    <a
+                      key={school.id}
+                      href={`/schools/${school.slug}`}
+                      className="flex gap-3 p-4 rounded-lg border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all"
+                    >
+                      {school.logo && (
+                        <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 flex items-center justify-center bg-gray-100">
+                          <img
+                            src={school.logo}
+                            alt={school.name}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-900 text-base sm:text-lg truncate">
+                          {school.name}
+                        </h3>
+                        {school.description && (
+                          <p className="text-sm text-gray-600 line-clamp-2">
+                            {school.description}
+                          </p>
+                        )}
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Location Teams Section */}
+            {entityType === "location" && locationTeams.length > 0 && (
+              <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
+                  Teams
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {locationTeams.map((team: any) => (
+                    <a
+                      key={team.id}
+                      href={`/teams/${team.slug}`}
+                      className="flex gap-3 p-4 rounded-lg border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all"
+                    >
+                      {team.logo && (
+                        <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 flex items-center justify-center bg-gray-100">
+                          <img
+                            src={team.logo}
+                            alt={team.name}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-900 text-base sm:text-lg truncate">
+                          {team.name}
+                        </h3>
+                        {team.description && (
+                          <p className="text-sm text-gray-600 line-clamp-2">
+                            {team.description}
+                          </p>
+                        )}
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Location Players Section */}
+            {entityType === "location" && locationPlayers.length > 0 && (
+              <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
+                  Players
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {locationPlayers.map((player: any) => (
+                    <a
+                      key={player.id}
+                      href={`/players/${player.slug}`}
+                      className="flex gap-3 p-4 rounded-lg border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all"
+                    >
+                      {player.logo && (
+                        <div className="w-12 h-12 rounded-full bg-white overflow-hidden shrink-0 flex items-center justify-center">
+                          <img
+                            src={player.logo}
+                            alt={player.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-900 text-base sm:text-lg truncate">
+                          {player.name}
+                        </h3>
+                        {player.description && (
+                          <p className="text-sm text-gray-600 line-clamp-2">
+                            {player.description}
+                          </p>
+                        )}
+                        {player.clips && player.clips.length > 0 && (
+                          <p className="text-xs text-blue-600 font-semibold mt-2">
+                            {player.clips.length} {player.clips.length === 1 ? 'clip' : 'clips'}
+                          </p>
+                        )}
+                      </div>
+                    </a>
+                  ))}
                 </div>
               </div>
             )}

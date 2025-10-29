@@ -7,8 +7,37 @@ import Leaderboard from "@/components/Leaderboard";
 import Footer from "@/components/Footer";
 import EntityCard from "@/components/EntityCard";
 import { getEntityType, getEntityDisplayName, pluralizeType } from "@/lib/entity-utils";
+import { Metadata } from "next";
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ type: string }>;
+}): Promise<Metadata> {
+  const { type } = await params;
+  const entityType = getEntityType(type);
+
+  if (!entityType) {
+    return {
+      title: "Not Found",
+      description: "The requested page could not be found.",
+    };
+  }
+
+  const displayName = getEntityDisplayName(entityType, true);
+
+  return {
+    title: displayName,
+    description: `Browse all ${displayName.toLowerCase()} on Athletix. Discover sports highlights, stats, and more.`,
+    openGraph: {
+      title: `${displayName} | Athletix`,
+      description: `Browse all ${displayName.toLowerCase()} on Athletix`,
+      type: "website",
+    },
+  };
+}
 
 async function getEntitiesData(type: string) {
   try {
@@ -100,8 +129,8 @@ export default async function EntityListPage({
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 w-full">
-        <div className={`w-full ${entityType !== 'player' && entityType !== 'school' ? 'lg:grid lg:grid-cols-12 lg:gap-8 lg:items-start' : ''}`}>
-          <div className={`w-full ${entityType !== 'player' && entityType !== 'school' ? 'lg:col-span-8' : ''} min-w-0`}>
+        <div className={`w-full ${entityType !== 'player' && entityType !== 'school' && entityType !== 'location' ? 'lg:grid lg:grid-cols-12 lg:gap-8 lg:items-start' : ''}`}>
+          <div className={`w-full ${entityType !== 'player' && entityType !== 'school' && entityType !== 'location' ? 'lg:col-span-8' : ''} min-w-0`}>
             {/* Entities Grid */}
             <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
@@ -123,14 +152,14 @@ export default async function EntityListPage({
               )}
             </div>
 
-            {/* Clips Section - Hide for players and schools list */}
-            {entityType !== 'player' && entityType !== 'school' && (
+            {/* Clips Section - Hide for players, schools, and locations list */}
+            {entityType !== 'player' && entityType !== 'school' && entityType !== 'location' && (
               <ClipsSection clips={allClips} title={`${displayName} Highlights`} />
             )}
           </div>
 
-          {/* Right Column - Leaderboard - Hide for players and schools list */}
-          {entityType !== 'player' && entityType !== 'school' && (
+          {/* Right Column - Leaderboard - Hide for players, schools, and locations list */}
+          {entityType !== 'player' && entityType !== 'school' && entityType !== 'location' && (
             <div className="w-full hidden lg:block lg:col-span-4 min-w-0">
               <Leaderboard clips={leaderboardClips} title={`Top ${displayName}`} />
             </div>

@@ -4,26 +4,21 @@ import NavigationHeader from "@/components/NavigationHeader";
 import ClipsSection from "@/components/ClipsSection";
 import Leaderboard from "@/components/Leaderboard";
 import Footer from "@/components/Footer";
+import { Metadata } from "next";
+import { getCachedSportsData } from "@/lib/sports-cache";
+
+export const metadata: Metadata = {
+  title: "Your Athletic Journey",
+  description: "The ultimate platform for athletes to share highlights, connect with fans, and build their personal brand. Browse sports, players, teams, and more.",
+  openGraph: {
+    title: "Athletix - Your Athletic Journey",
+    description: "The ultimate platform for athletes to share highlights, connect with fans, and build their personal brand",
+    type: "website",
+  },
+};
 
 async function getHomeData() {
   try {
-    // Fetch all sports entities
-    const allSports = await prisma.entity.findMany({
-      where: { type: 'sport' },
-      orderBy: { name: 'asc' },
-    });
-
-    // Filter sports by gender metadata
-    const mensSports = allSports.filter(sport =>
-      (sport.metadata as { mens?: boolean })?.mens === true
-    );
-    const womensSports = allSports.filter(sport =>
-      (sport.metadata as { womens?: boolean })?.womens === true
-    );
-    const coedSports = allSports.filter(sport =>
-      (sport.metadata as { coed?: boolean })?.coed === true
-    );
-
     // Fetch all clips from player entities
     const allClips = await prisma.clip.findMany({
       include: {
@@ -48,22 +43,16 @@ async function getHomeData() {
       take: 20,
     });
 
-    return { mensSports, womensSports, coedSports, allClips };
+    return allClips;
   } catch (error) {
     console.error("Error fetching home data:", error);
-    return { mensSports: [], womensSports: [], coedSports: [], allClips: [] };
+    return [];
   }
 }
 
-function createSportSlug(sportName: string): string {
-  return sportName
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9-]/g, "");
-}
-
 export default async function HomePage() {
-  const { mensSports, womensSports, coedSports, allClips } = await getHomeData();
+  const { mensSports, womensSports, coedSports } = await getCachedSportsData();
+  const allClips = await getHomeData();
 
   // Prepare clips for ClipsSection
   const formattedClips = allClips

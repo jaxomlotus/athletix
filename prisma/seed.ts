@@ -326,6 +326,9 @@ async function main() {
         state: 'CA',
         founded: 1885,
         type: 'Private',
+        locationId: null, // Will be set after locations are created
+        locationName: 'Stanford, CA',
+        locationSlug: 'stanford-ca',
       },
     },
   })
@@ -343,11 +346,87 @@ async function main() {
         state: 'CA',
         founded: 1919,
         type: 'Public',
+        locationId: null, // Will be set after locations are created
+        locationName: 'Los Angeles, CA',
+        locationSlug: 'los-angeles-ca',
       },
     },
   })
 
   console.log('✓ Created schools')
+
+  // Create Locations as Entities
+  const stanfordCA = await prisma.entity.create({
+    data: {
+      type: 'location',
+      slug: 'stanford-ca',
+      name: 'Stanford, CA',
+      description: 'Home to Stanford University and its elite athletic programs in the heart of Silicon Valley.',
+      metadata: {
+        city: 'Stanford',
+        state: 'CA',
+        country: 'USA',
+      },
+    },
+  })
+
+  const losAngelesCA = await prisma.entity.create({
+    data: {
+      type: 'location',
+      slug: 'los-angeles-ca',
+      name: 'Los Angeles, CA',
+      description: 'Major hub for professional and collegiate sports in Southern California.',
+      metadata: {
+        city: 'Los Angeles',
+        state: 'CA',
+        country: 'USA',
+      },
+    },
+  })
+
+  const sanFranciscoCA = await prisma.entity.create({
+    data: {
+      type: 'location',
+      slug: 'san-francisco-ca',
+      name: 'San Francisco, CA',
+      description: 'Bay Area sports hub with rich athletic history.',
+      metadata: {
+        city: 'San Francisco',
+        state: 'CA',
+        country: 'USA',
+      },
+    },
+  })
+
+  const woodmereNY = await prisma.entity.create({
+    data: {
+      type: 'location',
+      slug: 'woodmere-ny',
+      name: 'Woodmere, NY',
+      description: 'Long Island community with strong youth sports programs.',
+      metadata: {
+        city: 'Woodmere',
+        state: 'NY',
+        country: 'USA',
+      },
+    },
+  })
+
+  const kansasCityMO = await prisma.entity.create({
+    data: {
+      type: 'location',
+      slug: 'kansas-city-mo',
+      name: 'Kansas City, MO',
+      description: 'Home of championship sports teams in the heart of America.',
+      metadata: {
+        city: 'Kansas City',
+        state: 'MO',
+        country: 'USA',
+      },
+    },
+  })
+
+  console.log('✓ Created locations')
 
   // Create Leagues as Entities
   const mlb = await prisma.entity.create({
@@ -404,6 +483,9 @@ async function main() {
         schoolSlug: 'stanford-university',
         city: 'Stanford',
         state: 'CA',
+        locationId: null, // Will be set after locations are created
+        locationName: 'Stanford, CA',
+        locationSlug: 'stanford-ca',
       },
     },
   })
@@ -423,6 +505,9 @@ async function main() {
         schoolSlug: 'ucla',
         city: 'Los Angeles',
         state: 'CA',
+        locationId: null, // Will be set after locations are created
+        locationName: 'Los Angeles, CA',
+        locationSlug: 'los-angeles-ca',
       },
     },
   })
@@ -436,6 +521,11 @@ async function main() {
       logo: 'https://a.espncdn.com/i/teamlogos/nba/500/lal.png',
       parentId: nba.id,
       childEntities: 'Players',
+      metadata: {
+        locationId: null, // Will be set after locations are created
+        locationName: 'Los Angeles, CA',
+        locationSlug: 'los-angeles-ca',
+      },
     },
   })
 
@@ -448,6 +538,11 @@ async function main() {
       logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/kc.png',
       parentId: nfl.id,
       childEntities: 'Players',
+      metadata: {
+        locationId: null, // Will be set after locations are created
+        locationName: 'Kansas City, MO',
+        locationSlug: 'kansas-city-mo',
+      },
     },
   })
 
@@ -467,6 +562,9 @@ async function main() {
         city: 'Los Angeles',
         state: 'CA',
         birthdate: '2001-03-15',
+        locationId: null, // Will be set after locations are created
+        locationName: 'Los Angeles, CA',
+        locationSlug: 'los-angeles-ca',
         socialLinks: {
           twitter: '@mrod_baseball',
           instagram: '@marcusrod',
@@ -494,6 +592,9 @@ async function main() {
         city: 'San Francisco',
         state: 'CA',
         birthdate: '2000-07-22',
+        locationId: null, // Will be set after locations are created
+        locationName: 'San Francisco, CA',
+        locationSlug: 'san-francisco-ca',
         socialLinks: {
           twitter: '@sarahace',
           instagram: '@theacesarah',
@@ -619,6 +720,9 @@ async function main() {
         city: 'Woodmere',
         state: 'NY',
         birthdate: '2007-11-08',
+        locationId: null, // Will be set after locations are created
+        locationName: 'Woodmere, NY',
+        locationSlug: 'woodmere-ny',
         socialLinks: { twitter: '@at3_baseball', instagram: '@alexthompson' },
       },
     },
