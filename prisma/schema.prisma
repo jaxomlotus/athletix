@@ -117,6 +117,9 @@ model Entity {
   // Type-specific data stored as JSON
   metadata       Json?    // Flexible field for type-specific data
 
+  // Page layout configuration
+  layout         Json?    // Page layout: { l: [], c: [...widgets], r: [...widgets], x: [{title, content}] }
+
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

@@ -31,11 +31,11 @@ export default function EntityCard({ entity, entityType, pluralType }: EntityCar
   };
 
   return (
-    <div className="relative flex flex-col gap-3 p-4 rounded-lg border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all group">
+    <div className="relative flex flex-col gap-3 p-4 rounded-lg border border-gray-200 hover:border-green-500 hover:shadow-md transition-all group">
       {/* Follow Button - Top Right */}
       <button
         onClick={handleFollow}
-        className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border-2 border-gray-300 bg-white text-gray-700 hover:border-blue-500 hover:text-blue-600 transition-colors"
+        className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border-2 border-gray-300 bg-white text-gray-700 hover:border-green-500 hover:text-green-600 transition-colors"
         title={`Follow ${entity.name}`}
       >
         <FiUserPlus className="w-3.5 h-3.5" />
@@ -44,7 +44,7 @@ export default function EntityCard({ entity, entityType, pluralType }: EntityCar
 
       <a href={`/${pluralType}/${entity.slug}`} className="flex flex-col gap-3">
         {entity.logo && (
-          <div className={`${entityType === 'player' ? 'w-16 h-16 rounded-full bg-white' : `w-16 h-16 rounded-lg ${entityType === 'sport' ? 'bg-gradient-to-br from-blue-500 to-purple-600 p-3' : 'bg-gray-100'}`} overflow-hidden flex items-center justify-center`}>
+          <div className={`${entityType === 'player' ? 'w-16 h-16 rounded-full bg-white' : `w-16 h-16 rounded-lg ${entityType === 'sport' ? 'bg-gradient-to-br from-green-500 to-blue-600 p-3' : 'bg-gray-100'}`} overflow-hidden flex items-center justify-center`}>
             <img
               src={entity.logo}
               alt={entity.name}
@@ -68,7 +68,7 @@ export default function EntityCard({ entity, entityType, pluralType }: EntityCar
             </p>
           )}
           {entityType === 'player' && (
-            <p className="text-xs text-blue-600 font-semibold mt-2">
+            <p className="text-xs text-green-600 font-semibold mt-2">
               {entity._count.clips} {entity._count.clips === 1 ? 'clip' : 'clips'}
             </p>
           )}

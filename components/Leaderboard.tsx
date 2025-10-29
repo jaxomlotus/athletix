@@ -24,7 +24,7 @@ export default function Leaderboard({
   const defaultThumbnail = "https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg";
 
   return (
-    <div className={`w-full bg-white rounded-lg shadow-sm p-4 sticky ${stickyTop}`}>
+    <div className="w-full bg-white rounded-lg shadow-sm p-4">
       <h2 className="text-xl font-bold text-gray-900 mb-4">{title}</h2>
       {!clips || clips.length === 0 ? (
         <p className="w-full text-center text-gray-400 py-8">No clips to show</p>

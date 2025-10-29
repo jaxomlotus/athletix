@@ -14,8 +14,17 @@ import {
   getChildEntityType,
   EntityType,
 } from "@/lib/entity-utils";
+import {
+  getEntityLayout,
+  getCustomWidget,
+  isCustomWidget,
+  getColumnWidgets,
+  EntityLayout,
+} from "@/lib/layout-utils";
 import Image from "next/image";
 import { Metadata } from "next";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export const dynamic = "force-dynamic";
 
@@ -51,7 +60,7 @@ export async function generateMetadata({
   }
 
   const metadata = (entity.metadata || {}) as any;
-  const description = metadata.bio || entity.description || `View ${entity.name}'s profile on Athletix`;
+  const description = metadata.bio || entity.description || `View ${entity.name}'s profile on Voated`;
   const displayType = getEntityDisplayName(entityType);
 
   return {
@@ -98,6 +107,14 @@ async function getEntityData(type: string, slug: string) {
                     name: true,
                     slug: true,
                     type: true,
+                    parent: {
+                      select: {
+                        id: true,
+                        name: true,
+                        slug: true,
+                        type: true,
+                      },
+                    },
                   },
                 },
               },
@@ -466,6 +483,64 @@ export default async function EntityDetailPage({
         ) || []
     ) || [];
 
+  // For schools, find all teams associated with this school
+  let schoolTeams: any[] = [];
+
+  if (entityType === "school") {
+    // Query teams where metadata contains this school's slug
+    const allTeams = await prisma.entity.findMany({
+      where: {
+        type: "team",
+      },
+      include: {
+        parent: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            type: true,
+            parent: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                type: true,
+              },
+            },
+          },
+        },
+        teamMembers: {
+          where: { isCurrent: true },
+          include: {
+            player: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                logo: true,
+                clips: {
+                  include: {
+                    clip: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        clips: {
+          include: {
+            clip: true,
+          },
+        },
+      },
+    });
+
+    // Filter by school slug in metadata
+    schoolTeams = allTeams.filter(
+      (team) => (team.metadata as any)?.schoolSlug === entity.slug
+    );
+  }
+
   // For locations, find all schools, teams, and players in this location
   let locationSchools: any[] = [];
   let locationTeams: any[] = [];
@@ -485,6 +560,24 @@ export default async function EntityDetailPage({
         clips: {
           include: {
             clip: true,
+          },
+        },
+        teamMembers: {
+          where: { isCurrent: true },
+          include: {
+            player: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                logo: true,
+                clips: {
+                  include: {
+                    clip: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -548,6 +641,30 @@ export default async function EntityDetailPage({
               ],
             })) || []
           ),
+          // Clips from players on location teams
+          ...locationTeams.flatMap((team: any) =>
+            team.teamMembers?.flatMap((membership: any) =>
+              membership.player.clips?.map(({ clip }: any) => ({
+                clip: {
+                  ...clip,
+                  id: clip.id.toString(),
+                  createdAt: clip.createdAt,
+                },
+                playerName: membership.player.name,
+                playerId: membership.player.id.toString(),
+                playerSlug: membership.player.slug,
+                playerAvatar: membership.player.logo,
+                playerTags: [
+                  {
+                    name: membership.player.name,
+                    id: membership.player.id.toString(),
+                    slug: membership.player.slug,
+                    avatar: membership.player.logo,
+                  },
+                ],
+              })) || []
+            ) || []
+          ),
           ...locationPlayers.flatMap((player: any) =>
             player.clips?.map(({ clip }: any) => ({
               clip: {
@@ -572,6 +689,34 @@ export default async function EntityDetailPage({
         ]
       : [];
 
+  // Clips from school team players
+  const schoolTeamPlayerClips =
+    entityType === "school"
+      ? schoolTeams.flatMap((team: any) =>
+          team.teamMembers?.flatMap((membership: any) =>
+            membership.player.clips?.map(({ clip }: any) => ({
+              clip: {
+                ...clip,
+                id: clip.id.toString(),
+                createdAt: clip.createdAt,
+              },
+              playerName: membership.player.name,
+              playerId: membership.player.id.toString(),
+              playerSlug: membership.player.slug,
+              playerAvatar: membership.player.logo,
+              playerTags: [
+                {
+                  name: membership.player.name,
+                  id: membership.player.id.toString(),
+                  slug: membership.player.slug,
+                  avatar: membership.player.logo,
+                },
+              ],
+            })) || []
+          ) || []
+        )
+      : [];
+
   const allClips = [
     ...entityClips,
     ...teamMemberClips,
@@ -581,6 +726,7 @@ export default async function EntityDetailPage({
     ...grandchildTeamMemberClips,
     ...greatGrandchildClips,
     ...locationClips,
+    ...schoolTeamPlayerClips,
   ];
 
   // Prepare leaderboard
@@ -596,11 +742,477 @@ export default async function EntityDetailPage({
   const breadcrumbs = buildBreadcrumbs(entity, entityType);
   const displayName = getEntityDisplayName(entityType);
 
+  // Get layout configuration
+  const layout = getEntityLayout(entityType, entity.layout);
+
+  // Helper function to render a widget by name
+  const renderWidget = (widgetName: string) => {
+    // Handle custom widgets (x0, x1, etc.)
+    if (isCustomWidget(widgetName)) {
+      const customWidget = getCustomWidget(layout, widgetName);
+      if (!customWidget) return null;
+
+      return (
+        <div
+          key={widgetName}
+          className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6"
+        >
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
+            {customWidget.title}
+          </h2>
+          <div className="prose prose-sm sm:prose max-w-none [&_a]:text-green-600 [&_a]:underline [&_a:hover]:no-underline">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {customWidget.content}
+            </ReactMarkdown>
+          </div>
+        </div>
+      );
+    }
+
+    // Handle standard widgets
+    switch (widgetName) {
+      case "Meta":
+        if (entityType === "player" && metadata.stats && Object.keys(metadata.stats).length > 0) {
+          return (
+            <div key="Meta" className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
+                Stats
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {Object.entries(metadata.stats).map(([key, value]) => (
+                  <div
+                    key={key}
+                    className="text-center p-3 bg-gray-50 rounded-lg"
+                  >
+                    <p className="text-xs text-gray-600 uppercase tracking-wide mb-1">
+                      {key.replace(/([A-Z])/g, " $1").trim()}
+                    </p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {String(value)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        }
+        return null;
+
+      case "Teams":
+        // For players - show their teams
+        if (entity.playerMemberships && entity.playerMemberships.length > 0) {
+          return (
+            <div key="Teams" className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
+                Teams
+              </h2>
+              <div className="space-y-3">
+                {entity.playerMemberships.map((membership: any) => {
+                  const positions = membership.positions as string[] | null;
+                  return (
+                    <div
+                      key={membership.id}
+                      className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:border-green-500 transition-colors"
+                    >
+                      {membership.team.logo && (
+                        <Link href={`/teams/${membership.team.slug}`}>
+                          <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center hover:opacity-80 transition-opacity">
+                            <Image
+                              src={membership.team.logo}
+                              alt={membership.team.name}
+                              fill
+                              className="object-contain p-1"
+                            />
+                          </div>
+                        </Link>
+                      )}
+                      <div className="flex-1">
+                        <Link
+                          href={`/teams/${membership.team.slug}`}
+                          className="text-lg font-semibold text-gray-900 hover:text-green-600 transition-colors"
+                        >
+                          {membership.team.name}
+                          {membership.jerseyNumber && (
+                            <span className="ml-2 text-gray-500">
+                              #{membership.jerseyNumber}
+                            </span>
+                          )}
+                        </Link>
+                        {positions && positions.length > 0 && (
+                          <p className="text-sm text-gray-600 mt-0.5">
+                            {positions.join(" • ")}
+                          </p>
+                        )}
+                        {membership.season && (
+                          <p className="text-xs text-gray-500 mt-1">
+                            {membership.season}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        }
+        // For schools - show their teams
+        if (schoolTeams.length > 0) {
+          return (
+            <div key="Teams" className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
+                Teams
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {schoolTeams.map((team: any) => {
+                  const sportName = team.parent?.parent?.name;
+                  const leagueName = team.parent?.name;
+                  return (
+                    <a
+                      key={team.id}
+                      href={`/teams/${team.slug}`}
+                      className="flex gap-3 p-4 rounded-lg border border-gray-200 hover:border-green-500 hover:shadow-md transition-all"
+                    >
+                      {team.logo && (
+                        <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 flex items-center justify-center bg-gray-100">
+                          <img
+                            src={team.logo}
+                            alt={team.name}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-900 text-base sm:text-lg truncate">
+                          {team.name}
+                        </h3>
+                        {team.description && (
+                          <p className="text-sm text-gray-600 line-clamp-2">
+                            {team.description}
+                          </p>
+                        )}
+                        {(sportName || leagueName) && (
+                          <p className="text-xs text-gray-500 mt-1">
+                            {sportName && sportName}
+                            {sportName && leagueName && " • "}
+                            {leagueName && leagueName}
+                          </p>
+                        )}
+                        {team.teamMembers && team.teamMembers.length > 0 && (
+                          <p className="text-xs text-green-600 font-semibold mt-2">
+                            {team.teamMembers.length} {team.teamMembers.length === 1 ? 'player' : 'players'}
+                          </p>
+                        )}
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        }
+        // For locations - show their teams
+        if (locationTeams.length > 0) {
+          return (
+            <div key="Teams" className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
+                Teams
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {locationTeams.map((team: any) => (
+                  <a
+                    key={team.id}
+                    href={`/teams/${team.slug}`}
+                    className="flex gap-3 p-4 rounded-lg border border-gray-200 hover:border-green-500 hover:shadow-md transition-all"
+                  >
+                    {team.logo && (
+                      <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 flex items-center justify-center bg-gray-100">
+                        <img
+                          src={team.logo}
+                          alt={team.name}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-900 text-base sm:text-lg truncate">
+                        {team.name}
+                      </h3>
+                      {team.description && (
+                        <p className="text-sm text-gray-600 line-clamp-2">
+                          {team.description}
+                        </p>
+                      )}
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          );
+        }
+        return null;
+
+      case "Players":
+        // For teams - show team members
+        if (entity.teamMembers && entity.teamMembers.length > 0) {
+          return (
+            <div key="Players" className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
+                Players
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {entity.teamMembers.map((membership: any) => {
+                  const player = membership.player;
+                  return (
+                    <a
+                      key={player.id}
+                      href={`/players/${player.slug}`}
+                      className="flex gap-3 p-4 rounded-lg border border-gray-200 hover:border-green-500 hover:shadow-md transition-all"
+                    >
+                      {player.logo && (
+                        <div className="w-12 h-12 rounded-full bg-white overflow-hidden shrink-0 flex items-center justify-center">
+                          <img
+                            src={player.logo}
+                            alt={player.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-900 text-base sm:text-lg truncate">
+                          {player.name}
+                          {membership.jerseyNumber && (
+                            <span className="ml-2 text-gray-500">
+                              #{membership.jerseyNumber}
+                            </span>
+                          )}
+                        </h3>
+                        {player.description && (
+                          <p className="text-sm text-gray-600 line-clamp-2">
+                            {player.description}
+                          </p>
+                        )}
+                        {membership.positions && membership.positions.length > 0 && (
+                          <p className="text-xs text-gray-500 mt-1">
+                            {membership.positions.join(" • ")}
+                          </p>
+                        )}
+                        {player.clips && player.clips.length > 0 && (
+                          <p className="text-xs text-green-600 font-semibold mt-2">
+                            {player.clips.length} {player.clips.length === 1 ? 'clip' : 'clips'}
+                          </p>
+                        )}
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        }
+        // For locations - show location players
+        if (locationPlayers.length > 0) {
+          return (
+            <div key="Players" className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
+                Players
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {locationPlayers.map((player: any) => (
+                  <a
+                    key={player.id}
+                    href={`/players/${player.slug}`}
+                    className="flex gap-3 p-4 rounded-lg border border-gray-200 hover:border-green-500 hover:shadow-md transition-all"
+                  >
+                    {player.logo && (
+                      <div className="w-12 h-12 rounded-full bg-white overflow-hidden shrink-0 flex items-center justify-center">
+                        <img
+                          src={player.logo}
+                          alt={player.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-900 text-base sm:text-lg truncate">
+                        {player.name}
+                      </h3>
+                      {player.description && (
+                        <p className="text-sm text-gray-600 line-clamp-2">
+                          {player.description}
+                        </p>
+                      )}
+                      {player.clips && player.clips.length > 0 && (
+                        <p className="text-xs text-green-600 font-semibold mt-2">
+                          {player.clips.length} {player.clips.length === 1 ? 'clip' : 'clips'}
+                        </p>
+                      )}
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          );
+        }
+        return null;
+
+      case "Schools":
+        if (locationSchools.length > 0) {
+          return (
+            <div key="Schools" className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
+                Schools
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {locationSchools.map((school: any) => (
+                  <a
+                    key={school.id}
+                    href={`/schools/${school.slug}`}
+                    className="flex gap-3 p-4 rounded-lg border border-gray-200 hover:border-green-500 hover:shadow-md transition-all"
+                  >
+                    {school.logo && (
+                      <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 flex items-center justify-center bg-gray-100">
+                        <img
+                          src={school.logo}
+                          alt={school.name}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-900 text-base sm:text-lg truncate">
+                        {school.name}
+                      </h3>
+                      {school.description && (
+                        <p className="text-sm text-gray-600 line-clamp-2">
+                          {school.description}
+                        </p>
+                      )}
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          );
+        }
+        return null;
+
+      case "Leagues":
+      case "Clips":
+        // Handle children sections (Leagues, Teams under leagues, etc.)
+        if (entity.children && entity.children.length > 0) {
+          const firstChildType = entity.children[0]?.type;
+          const shouldShow =
+            (widgetName === "Leagues" && firstChildType === "league") ||
+            (widgetName === "Teams" && firstChildType === "team") ||
+            (widgetName === "Players" && firstChildType === "player");
+
+          if (!shouldShow && widgetName !== "Clips") return null;
+
+          if (widgetName === "Clips") {
+            return (
+              <ClipsSection
+                key="Clips"
+                clips={allClips}
+                title={
+                  entityType === "player"
+                    ? "Highlights"
+                    : `${entity.name} Highlights`
+                }
+              />
+            );
+          }
+
+          return (
+            <div key={widgetName} className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
+                {entity.childEntities ||
+                  getEntityDisplayName(childType || "player", true)}
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {entity.children.map((child: any) => {
+                  const childPluralType = pluralizeType(child.type);
+                  return (
+                    <a
+                      key={child.id}
+                      href={`/${childPluralType}/${child.slug}`}
+                      className="flex gap-3 p-4 rounded-lg border border-gray-200 hover:border-green-500 hover:shadow-md transition-all"
+                    >
+                      {child.logo && (
+                        <div
+                          className={`w-12 h-12 rounded-lg overflow-hidden shrink-0 flex items-center justify-center ${
+                            child.type === "sport"
+                              ? "bg-linear-to-br from-green-500 to-blue-600 p-2"
+                              : "bg-gray-100"
+                          }`}
+                        >
+                          <img
+                            src={child.logo}
+                            alt={child.name}
+                            className="w-full h-full object-contain"
+                            style={
+                              child.type === "sport"
+                                ? { filter: "brightness(0) invert(1)" }
+                                : undefined
+                            }
+                          />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-900 text-base sm:text-lg truncate">
+                          {child.name}
+                        </h3>
+                        {child.description && (
+                          <p className="text-sm text-gray-600 line-clamp-2">
+                            {child.description}
+                          </p>
+                        )}
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        }
+        // Also handle Clips section directly if no children
+        if (widgetName === "Clips") {
+          return (
+            <ClipsSection
+              key="Clips"
+              clips={allClips}
+              title={
+                entityType === "player"
+                  ? "Highlights"
+                  : `${entity.name} Highlights`
+              }
+            />
+          );
+        }
+        return null;
+
+      case "TopClips":
+        return (
+          <Leaderboard
+            key="TopClips"
+            clips={leaderboardClips}
+            title={
+              entityType === "player"
+                ? "Top Clips"
+                : `Top ${displayName} Clips`
+            }
+          />
+        );
+
+      default:
+        return null;
+    }
+  };
+
   // Build subtitle for players with bio and sports
   let subtitle: React.ReactNode = entity.description || undefined;
   if (entityType === "player") {
     const bioText = metadata.bio || entity.description;
-    const sportName = entity.parent?.parent?.parent?.name; // Get sport from hierarchy
     const birthdate = metadata.birthdate ? new Date(metadata.birthdate) : null;
 
     // Get school from current team membership (school info is in team metadata)
@@ -612,6 +1224,17 @@ export default async function EntityDetailPage({
     // Get location from metadata
     const locationName = metadata.locationName;
     const locationSlug = metadata.locationSlug;
+
+    // Get all unique sports from team memberships
+    const sports = entity.playerMemberships
+      ?.map((membership: any) => {
+        // Navigate up: team -> league -> sport
+        const sport = membership.team?.parent?.parent;
+        return sport ? { name: sport.name, slug: sport.slug } : null;
+      })
+      .filter((sport: any, index: number, self: any[]) =>
+        sport && self.findIndex((s: any) => s?.name === sport.name) === index
+      ) || [];
 
     // Calculate age from birthdate
     let age: number | null = null;
@@ -626,8 +1249,9 @@ export default async function EntityDetailPage({
 
     // Build info parts for display
     const hasInfoLine = schoolName || locationName || age;
+    const hasSports = sports.length > 0;
 
-    if (bioText || sportName || hasInfoLine) {
+    if (bioText || hasSports || hasInfoLine) {
       subtitle = (
         <div className="text-sm sm:text-base opacity-90">
           {bioText && <p className="mb-1">{bioText}</p>}
@@ -658,8 +1282,20 @@ export default async function EntityDetailPage({
               {age && `${age} years old`}
             </p>
           )}
-          {sportName && (
-            <p className="text-xs sm:text-sm opacity-80">{sportName}</p>
+          {hasSports && (
+            <p className="text-xs sm:text-sm opacity-80">
+              {sports.map((sport: any, index: number) => (
+                <span key={sport.slug}>
+                  <Link
+                    href={`/sports/${sport.slug}`}
+                    className="underline"
+                  >
+                    {sport.name}
+                  </Link>
+                  {index < sports.length - 1 && " • "}
+                </span>
+              ))}
+            </p>
           )}
         </div>
       );
@@ -764,345 +1400,26 @@ export default async function EntityDetailPage({
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 w-full">
         <div className="w-full lg:grid lg:grid-cols-12 lg:gap-8 lg:items-start">
-          <div className="w-full lg:col-span-8 min-w-0">
-            {/* Teams Section for Players */}
-            {entityType === "player" &&
-              entity.playerMemberships &&
-              entity.playerMemberships.length > 0 && (
-                <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-                    Teams
-                  </h2>
-                  <div className="space-y-3">
-                    {entity.playerMemberships.map((membership: any) => {
-                      const positions = membership.positions as string[] | null;
-                      return (
-                        <div
-                          key={membership.id}
-                          className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:border-blue-500 transition-colors"
-                        >
-                          {membership.team.logo && (
-                            <Link href={`/teams/${membership.team.slug}`}>
-                              <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center hover:opacity-80 transition-opacity">
-                                <Image
-                                  src={membership.team.logo}
-                                  alt={membership.team.name}
-                                  fill
-                                  className="object-contain p-1"
-                                />
-                              </div>
-                            </Link>
-                          )}
-                          <div className="flex-1">
-                            <Link
-                              href={`/teams/${membership.team.slug}`}
-                              className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors"
-                            >
-                              {membership.team.name}
-                              {membership.jerseyNumber && (
-                                <span className="ml-2 text-gray-500">
-                                  #{membership.jerseyNumber}
-                                </span>
-                              )}
-                            </Link>
-                            {positions && positions.length > 0 && (
-                              <p className="text-sm text-gray-600 mt-0.5">
-                                {positions.join(" • ")}
-                              </p>
-                            )}
-                            {membership.season && (
-                              <p className="text-xs text-gray-500 mt-1">
-                                {membership.season}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
+          {/* Left Column */}
+          {layout.l && layout.l.length > 0 && (
+            <div className="w-full lg:col-span-2 min-w-0 mb-6 lg:mb-0">
+              {layout.l.map((widgetName) => renderWidget(widgetName))}
+            </div>
+          )}
 
-            {/* Stats Section for Players */}
-            {entityType === "player" && (
-              <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-                  Stats
-                </h2>
-                {metadata.stats && Object.keys(metadata.stats).length > 0 ? (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    {Object.entries(metadata.stats).map(([key, value]) => (
-                      <div
-                        key={key}
-                        className="text-center p-3 bg-gray-50 rounded-lg"
-                      >
-                        <p className="text-xs text-gray-600 uppercase tracking-wide mb-1">
-                          {key.replace(/([A-Z])/g, " $1").trim()}
-                        </p>
-                        <p className="text-2xl font-bold text-gray-900">
-                          {String(value)}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="w-full text-center text-gray-400 py-8">
-                    No stats to show
-                  </p>
-                )}
-              </div>
-            )}
-
-            {/* Team Members Section (Players on this team/school teams) */}
-            {entity.teamMembers && entity.teamMembers.length > 0 && (
-              <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
-                  Players
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {entity.teamMembers.map((membership: any) => {
-                    const player = membership.player;
-                    return (
-                      <a
-                        key={player.id}
-                        href={`/players/${player.slug}`}
-                        className="flex gap-3 p-4 rounded-lg border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all"
-                      >
-                        {player.logo && (
-                          <div className="w-12 h-12 rounded-full bg-white overflow-hidden shrink-0 flex items-center justify-center">
-                            <img
-                              src={player.logo}
-                              alt={player.name}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 text-base sm:text-lg truncate">
-                            {player.name}
-                            {membership.jerseyNumber && (
-                              <span className="ml-2 text-gray-500">
-                                #{membership.jerseyNumber}
-                              </span>
-                            )}
-                          </h3>
-                          {player.description && (
-                            <p className="text-sm text-gray-600 line-clamp-2">
-                              {player.description}
-                            </p>
-                          )}
-                          {membership.positions && membership.positions.length > 0 && (
-                            <p className="text-xs text-gray-500 mt-1">
-                              {membership.positions.join(" • ")}
-                            </p>
-                          )}
-                          {player.clips && player.clips.length > 0 && (
-                            <p className="text-xs text-blue-600 font-semibold mt-2">
-                              {player.clips.length} {player.clips.length === 1 ? 'clip' : 'clips'}
-                            </p>
-                          )}
-                        </div>
-                      </a>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Location Schools Section */}
-            {entityType === "location" && locationSchools.length > 0 && (
-              <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
-                  Schools
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {locationSchools.map((school: any) => (
-                    <a
-                      key={school.id}
-                      href={`/schools/${school.slug}`}
-                      className="flex gap-3 p-4 rounded-lg border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all"
-                    >
-                      {school.logo && (
-                        <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 flex items-center justify-center bg-gray-100">
-                          <img
-                            src={school.logo}
-                            alt={school.name}
-                            className="w-full h-full object-contain"
-                          />
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 text-base sm:text-lg truncate">
-                          {school.name}
-                        </h3>
-                        {school.description && (
-                          <p className="text-sm text-gray-600 line-clamp-2">
-                            {school.description}
-                          </p>
-                        )}
-                      </div>
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Location Teams Section */}
-            {entityType === "location" && locationTeams.length > 0 && (
-              <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
-                  Teams
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {locationTeams.map((team: any) => (
-                    <a
-                      key={team.id}
-                      href={`/teams/${team.slug}`}
-                      className="flex gap-3 p-4 rounded-lg border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all"
-                    >
-                      {team.logo && (
-                        <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 flex items-center justify-center bg-gray-100">
-                          <img
-                            src={team.logo}
-                            alt={team.name}
-                            className="w-full h-full object-contain"
-                          />
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 text-base sm:text-lg truncate">
-                          {team.name}
-                        </h3>
-                        {team.description && (
-                          <p className="text-sm text-gray-600 line-clamp-2">
-                            {team.description}
-                          </p>
-                        )}
-                      </div>
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Location Players Section */}
-            {entityType === "location" && locationPlayers.length > 0 && (
-              <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
-                  Players
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {locationPlayers.map((player: any) => (
-                    <a
-                      key={player.id}
-                      href={`/players/${player.slug}`}
-                      className="flex gap-3 p-4 rounded-lg border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all"
-                    >
-                      {player.logo && (
-                        <div className="w-12 h-12 rounded-full bg-white overflow-hidden shrink-0 flex items-center justify-center">
-                          <img
-                            src={player.logo}
-                            alt={player.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 text-base sm:text-lg truncate">
-                          {player.name}
-                        </h3>
-                        {player.description && (
-                          <p className="text-sm text-gray-600 line-clamp-2">
-                            {player.description}
-                          </p>
-                        )}
-                        {player.clips && player.clips.length > 0 && (
-                          <p className="text-xs text-blue-600 font-semibold mt-2">
-                            {player.clips.length} {player.clips.length === 1 ? 'clip' : 'clips'}
-                          </p>
-                        )}
-                      </div>
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Children Section */}
-            {entity.children && entity.children.length > 0 && (
-              <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
-                  {entity.childEntities ||
-                    getEntityDisplayName(childType || "player", true)}
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {entity.children.map((child: any) => {
-                    const childPluralType = pluralizeType(child.type);
-                    return (
-                      <a
-                        key={child.id}
-                        href={`/${childPluralType}/${child.slug}`}
-                        className="flex gap-3 p-4 rounded-lg border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all"
-                      >
-                        {child.logo && (
-                          <div
-                            className={`w-12 h-12 rounded-lg overflow-hidden shrink-0 flex items-center justify-center ${
-                              child.type === "sport"
-                                ? "bg-linear-to-br from-blue-500 to-purple-600 p-2"
-                                : "bg-gray-100"
-                            }`}
-                          >
-                            <img
-                              src={child.logo}
-                              alt={child.name}
-                              className="w-full h-full object-contain"
-                              style={
-                                child.type === "sport"
-                                  ? { filter: "brightness(0) invert(1)" }
-                                  : undefined
-                              }
-                            />
-                          </div>
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 text-base sm:text-lg truncate">
-                            {child.name}
-                          </h3>
-                          {child.description && (
-                            <p className="text-sm text-gray-600 line-clamp-2">
-                              {child.description}
-                            </p>
-                          )}
-                        </div>
-                      </a>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Clips Section */}
-            <ClipsSection
-              clips={allClips}
-              title={
-                entityType === "player"
-                  ? "Highlights"
-                  : `${entity.name} Highlights`
-              }
-            />
+          {/* Center Column */}
+          <div className={`w-full min-w-0 ${layout.l && layout.l.length > 0 ? 'lg:col-span-6' : 'lg:col-span-8'}`}>
+            {layout.c.map((widgetName) => renderWidget(widgetName))}
           </div>
 
-          {/* Right Column - Leaderboard */}
-          <div className="w-full hidden lg:block lg:col-span-4 min-w-0">
-            <Leaderboard
-              clips={leaderboardClips}
-              title={
-                entityType === "player"
-                  ? "Top Clips"
-                  : `Top ${displayName} Clips`
-              }
-            />
-          </div>
+          {/* Right Column - Sticky */}
+          {layout.r && layout.r.length > 0 && (
+            <div className="w-full lg:col-span-4 min-w-0 hidden lg:block">
+              <div className="sticky top-6 space-y-6">
+                {layout.r.map((widgetName) => renderWidget(widgetName))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

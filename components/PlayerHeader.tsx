@@ -54,7 +54,7 @@ export default function PlayerHeader({
   return (
     <>
       {/* Banner Image */}
-      <div className="relative w-full h-40 bg-linear-to-r from-blue-600 to-purple-600">
+      <div className="relative w-full h-40 bg-linear-to-r from-green-600 to-blue-600">
         <Image
           src={banner}
           alt={`${name} banner`}
@@ -139,7 +139,7 @@ export default function PlayerHeader({
                     <p className="text-lg sm:text-xl font-semibold">
                       <Link
                         href={`/teams/${team.slug}`}
-                        className="text-blue-600 hover:text-blue-700"
+                        className="text-green-600 hover:text-green-700"
                       >
                         {team.name}
                         {team.jerseyNumber && (
@@ -170,7 +170,7 @@ export default function PlayerHeader({
                   </p>
                   <p className="text-xs sm:text-sm text-gray-500">Followers</p>
                 </div>
-                <button className="flex items-center gap-2 px-6 sm:px-8 py-2 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-sm sm:text-base">
+                <button className="flex items-center gap-2 px-6 sm:px-8 py-2 sm:py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors text-sm sm:text-base">
                   <FiUserPlus className="w-4 h-4 sm:w-5 sm:h-5" />
                   Follow
                 </button>
@@ -182,7 +182,7 @@ export default function PlayerHeader({
 
       {/* Sticky Breadcrumb Header with Avatar and Name */}
       <div
-        className={`sticky top-14 sm:top-16 bg-linear-to-r from-blue-600 to-purple-600 shadow-lg z-40 transition-opacity duration-200 ${
+        className={`sticky top-14 sm:top-16 bg-linear-to-r from-green-600 to-blue-600 shadow-lg z-40 transition-opacity duration-200 ${
           isSticky ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)' }}
@@ -240,7 +240,7 @@ export default function PlayerHeader({
             </div>
 
             {/* Follow Button - vertically centered */}
-            <button className="flex items-center gap-2 px-4 py-1.5 bg-white text-blue-600 hover:bg-gray-100 font-semibold rounded-lg transition-colors text-sm">
+            <button className="flex items-center gap-2 px-4 py-1.5 bg-white text-green-600 hover:bg-gray-100 font-semibold rounded-lg transition-colors text-sm">
               <FiUserPlus className="w-4 h-4" />
               Follow
             </button>

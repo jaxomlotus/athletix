@@ -120,7 +120,7 @@ export default function ClipsSection({ clips, title = "Highlight Clips" }: Clips
                 <div className="flex items-center gap-2 min-w-0">
                   <a
                     href={`/players/${playerSlug}`}
-                    className="flex items-center gap-2 text-xs sm:text-sm text-blue-600 hover:text-blue-700 font-semibold shrink-0"
+                    className="flex items-center gap-2 text-xs sm:text-sm text-green-600 hover:text-green-700 font-semibold shrink-0"
                   >
                     <div className="relative w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden bg-gray-200 shrink-0">
                       <Image
@@ -143,7 +143,7 @@ export default function ClipsSection({ clips, title = "Highlight Clips" }: Clips
                 <div className="flex items-center gap-2">
                   <RankBadge rank={rank} rankChange={rankChange} variant="clip" />
                   <button
-                    className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-full transition-colors shrink-0"
+                    className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 bg-green-50 hover:bg-green-100 text-green-600 rounded-full transition-colors shrink-0"
                     title="Vote for this clip"
                   >
                     <FaThumbsUp className="w-3 sm:w-4 h-3 sm:h-4" />
@@ -175,7 +175,7 @@ export default function ClipsSection({ clips, title = "Highlight Clips" }: Clips
                       <Link
                         key={team.id}
                         href={`/teams/${team.slug}`}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 rounded-full hover:bg-blue-100 transition-colors"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-50 rounded-full hover:bg-green-100 transition-colors"
                       >
                         {team.logo && (
                           <div className="relative w-5 h-5 rounded-full overflow-hidden bg-white shrink-0">
@@ -187,7 +187,7 @@ export default function ClipsSection({ clips, title = "Highlight Clips" }: Clips
                             />
                           </div>
                         )}
-                        <span className="text-xs font-medium text-blue-700">
+                        <span className="text-xs font-medium text-green-700">
                           {team.name}
                         </span>
                       </Link>

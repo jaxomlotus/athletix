@@ -10,7 +10,7 @@ export default function NavigationHeader() {
           <div className="flex items-center gap-3 sm:gap-6 flex-1">
             {/* Logo */}
             <a href="/" className="flex items-center">
-              <div className="text-xl sm:text-2xl font-bold text-blue-600">Athletix</div>
+              <div className="text-xl sm:text-2xl font-bold text-green-600">Voated</div>
             </a>
 
             {/* Search Bar */}
@@ -22,7 +22,7 @@ export default function NavigationHeader() {
                 <input
                   type="text"
                   placeholder="Search athletes, teams..."
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-green-500 focus:border-green-500 sm:text-sm"
                 />
               </div>
             </div>
@@ -30,7 +30,7 @@ export default function NavigationHeader() {
 
           {/* Register Button */}
           <div className="flex items-center">
-            <button className="flex items-center gap-2 px-3 sm:px-6 py-1.5 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-xs sm:text-base">
+            <button className="flex items-center gap-2 px-3 sm:px-6 py-1.5 sm:py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors text-xs sm:text-base">
               <FaRegUserCircle className="w-4 h-4 sm:w-5 sm:h-5" />
               Register
             </button>

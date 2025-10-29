@@ -68,7 +68,7 @@ export default function PageHeader({
       {/* Main Header */}
       <div
         data-page-header
-        className="bg-linear-to-r from-blue-600 to-purple-600 text-white relative"
+        className="bg-linear-to-r from-green-600 to-blue-600 text-white relative"
         style={{
           marginBottom: isSticky
             ? (window.innerWidth < 640 ? '-70px' : '-80px')
@@ -172,7 +172,7 @@ export default function PageHeader({
                     </p>
                     <p className="text-xs sm:text-sm text-white opacity-80">Followers</p>
                   </div>
-                  <button className="flex items-center gap-2 px-3 py-2 sm:px-8 sm:py-3 bg-white hover:bg-gray-100 text-blue-600 font-semibold rounded-lg transition-colors text-sm sm:text-base">
+                  <button className="flex items-center gap-2 px-3 py-2 sm:px-8 sm:py-3 bg-white hover:bg-gray-100 text-green-600 font-semibold rounded-lg transition-colors text-sm sm:text-base">
                     <FiUserPlus className="w-5 h-5" />
                     <span className="hidden sm:inline">Follow</span>
                   </button>
@@ -185,7 +185,7 @@ export default function PageHeader({
 
       {/* Sticky Breadcrumb Header */}
       <div
-        className={`sticky top-12 sm:top-16 ${!banner && 'bg-linear-to-r from-blue-600 to-purple-600'} shadow-lg z-40 ${
+        className={`sticky top-12 sm:top-16 ${!banner && 'bg-linear-to-r from-green-600 to-blue-600'} shadow-lg z-40 ${
           isSticky ? "block" : "hidden"
         }`}
         style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)' }}
@@ -263,7 +263,7 @@ export default function PageHeader({
 
             {/* Follow Button (for players) */}
             {showFollowButton && (
-              <button className="flex items-center gap-2 px-3 sm:px-4 py-1.5 bg-white text-blue-600 hover:bg-gray-100 font-semibold rounded-lg transition-colors text-sm">
+              <button className="flex items-center gap-2 px-3 sm:px-4 py-1.5 bg-white text-green-600 hover:bg-gray-100 font-semibold rounded-lg transition-colors text-sm">
                 <FiUserPlus className="w-4 h-4" />
                 <span className="hidden sm:inline">Follow</span>
               </button>

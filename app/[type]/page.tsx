@@ -30,10 +30,10 @@ export async function generateMetadata({
 
   return {
     title: displayName,
-    description: `Browse all ${displayName.toLowerCase()} on Athletix. Discover sports highlights, stats, and more.`,
+    description: `Browse all ${displayName.toLowerCase()} on Voated. Discover sports highlights, stats, and more.`,
     openGraph: {
-      title: `${displayName} | Athletix`,
-      description: `Browse all ${displayName.toLowerCase()} on Athletix`,
+      title: `${displayName} | Voated`,
+      description: `Browse all ${displayName.toLowerCase()} on Voated`,
       type: "website",
     },
   };

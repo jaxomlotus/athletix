@@ -14,6 +14,11 @@ async function main() {
       description: 'Fast-paced court sport',
       logo: '/icons/sports/basketball.svg',
       childEntities: 'Leagues',
+      layout: {
+        l: [],
+        c: ['Leagues', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         mens: true,
         womens: true,
@@ -30,6 +35,11 @@ async function main() {
       description: 'Precision club and ball sport',
       logo: '/icons/sports/golf.svg',
       childEntities: 'Leagues',
+      layout: {
+        l: [],
+        c: ['Leagues', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         mens: true,
         womens: true,
@@ -46,6 +56,11 @@ async function main() {
       description: 'Ice hockey',
       logo: '/icons/sports/hockey-sticks.svg',
       childEntities: 'Leagues',
+      layout: {
+        l: [],
+        c: ['Leagues', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         mens: true,
         womens: true,
@@ -62,6 +77,11 @@ async function main() {
       description: 'Team sport played with a lacrosse stick and ball',
       logo: '/icons/sports/hockey-sticks.svg',
       childEntities: 'Leagues',
+      layout: {
+        l: [],
+        c: ['Leagues', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         mens: true,
         womens: true,
@@ -78,6 +98,11 @@ async function main() {
       description: 'Competitive rowing and crew',
       logo: '/icons/sports/rowing.svg',
       childEntities: 'Leagues',
+      layout: {
+        l: [],
+        c: ['Leagues', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         mens: true,
         womens: true,
@@ -94,6 +119,11 @@ async function main() {
       description: 'The beautiful game',
       logo: '/icons/sports/soccer.svg',
       childEntities: 'Leagues',
+      layout: {
+        l: [],
+        c: ['Leagues', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         mens: true,
         womens: true,
@@ -110,6 +140,11 @@ async function main() {
       description: 'Competitive swimming and diving',
       logo: '/icons/sports/swim.svg',
       childEntities: 'Leagues',
+      layout: {
+        l: [],
+        c: ['Leagues', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         mens: true,
         womens: true,
@@ -126,6 +161,11 @@ async function main() {
       description: 'Racket sport',
       logo: '/icons/sports/tennis.svg',
       childEntities: 'Leagues',
+      layout: {
+        l: [],
+        c: ['Leagues', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         mens: true,
         womens: true,
@@ -142,6 +182,11 @@ async function main() {
       description: 'Athletics including running, jumping, and throwing events',
       logo: '/icons/sports/run.svg',
       childEntities: 'Leagues',
+      layout: {
+        l: [],
+        c: ['Leagues', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         mens: true,
         womens: true,
@@ -158,6 +203,11 @@ async function main() {
       description: 'Indoor volleyball',
       logo: '/icons/sports/volleyball.svg',
       childEntities: 'Leagues',
+      layout: {
+        l: [],
+        c: ['Leagues', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         mens: true,
         womens: true,
@@ -174,6 +224,11 @@ async function main() {
       description: 'Aquatic team sport',
       logo: '/icons/sports/water.svg',
       childEntities: 'Leagues',
+      layout: {
+        l: [],
+        c: ['Leagues', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         mens: true,
         womens: true,
@@ -190,6 +245,11 @@ async function main() {
       description: 'Combat sport',
       logo: '/icons/sports/karate.svg',
       childEntities: 'Leagues',
+      layout: {
+        l: [],
+        c: ['Leagues', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         mens: true,
         womens: true,
@@ -206,6 +266,11 @@ async function main() {
       description: 'Sand volleyball',
       logo: '/icons/sports/volleyball.svg',
       childEntities: 'Leagues',
+      layout: {
+        l: [],
+        c: ['Leagues', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         mens: false,
         womens: true,
@@ -222,6 +287,11 @@ async function main() {
       description: 'Team sport played with sticks and a ball on grass',
       logo: '/icons/sports/hockey-sticks.svg',
       childEntities: 'Leagues',
+      layout: {
+        l: [],
+        c: ['Leagues', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         mens: false,
         womens: true,
@@ -238,6 +308,11 @@ async function main() {
       description: 'Artistic gymnastics',
       logo: '/icons/sports/gymnastics.svg',
       childEntities: 'Leagues',
+      layout: {
+        l: [],
+        c: ['Leagues', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         mens: false,
         womens: true,
@@ -254,6 +329,11 @@ async function main() {
       description: 'Variant of baseball',
       logo: '/icons/sports/baseball.svg',
       childEntities: 'Leagues',
+      layout: {
+        l: [],
+        c: ['Leagues', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         mens: false,
         womens: true,
@@ -270,6 +350,11 @@ async function main() {
       description: "America's favorite pastime",
       logo: '/icons/sports/baseball.svg',
       childEntities: 'Leagues',
+      layout: {
+        l: [],
+        c: ['Leagues', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         mens: true,
         womens: false,
@@ -286,6 +371,11 @@ async function main() {
       description: 'American football',
       logo: '/icons/sports/football.svg',
       childEntities: 'Leagues',
+      layout: {
+        l: [],
+        c: ['Leagues', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         mens: true,
         womens: false,
@@ -302,6 +392,11 @@ async function main() {
       description: 'Competitive cheerleading and spirit',
       logo: '/icons/sports/bullhorn.svg',
       childEntities: 'Leagues',
+      layout: {
+        l: [],
+        c: ['Leagues', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         mens: false,
         womens: false,
@@ -313,6 +408,7 @@ async function main() {
   console.log('✓ Created sports')
 
   // Create Schools as Entities
+  // Schools bitfield: 510 (Meta + Teams + Players + Clips + Filters + TopClips)
   const stanford = await prisma.entity.create({
     data: {
       type: 'school',
@@ -321,6 +417,11 @@ async function main() {
       description: 'Private research university in Stanford, California, known for academic excellence and competitive athletics.',
       logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/24.png',
       childEntities: 'Teams',
+      layout: {
+        l: [],
+        c: ['Teams', 'Players', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         city: 'Stanford',
         state: 'CA',
@@ -341,6 +442,11 @@ async function main() {
       description: 'University of California, Los Angeles - a leading public research university with a strong athletic tradition.',
       logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/26.png',
       childEntities: 'Teams',
+      layout: {
+        l: [],
+        c: ['Teams', 'Players', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         city: 'Los Angeles',
         state: 'CA',
@@ -356,9 +462,15 @@ async function main() {
   console.log('✓ Created schools')
 
   // Create Locations as Entities
+  // Locations bitfield: 502 (Meta + Schools + Teams + Players + Clips + Filters + TopClips)
   const stanfordCA = await prisma.entity.create({
     data: {
       type: 'location',
+      layout: {
+        l: [],
+        c: ['Schools', 'Teams', 'Players', 'Clips'],
+        r: ['TopClips'],
+      },
       slug: 'stanford-ca',
       name: 'Stanford, CA',
       description: 'Home to Stanford University and its elite athletic programs in the heart of Silicon Valley.',
@@ -373,6 +485,11 @@ async function main() {
   const losAngelesCA = await prisma.entity.create({
     data: {
       type: 'location',
+      layout: {
+        l: [],
+        c: ['Schools', 'Teams', 'Players', 'Clips'],
+        r: ['TopClips'],
+      },
       slug: 'los-angeles-ca',
       name: 'Los Angeles, CA',
       description: 'Major hub for professional and collegiate sports in Southern California.',
@@ -387,6 +504,11 @@ async function main() {
   const sanFranciscoCA = await prisma.entity.create({
     data: {
       type: 'location',
+      layout: {
+        l: [],
+        c: ['Schools', 'Teams', 'Players', 'Clips'],
+        r: ['TopClips'],
+      },
       slug: 'san-francisco-ca',
       name: 'San Francisco, CA',
       description: 'Bay Area sports hub with rich athletic history.',
@@ -401,6 +523,11 @@ async function main() {
   const woodmereNY = await prisma.entity.create({
     data: {
       type: 'location',
+      layout: {
+        l: [],
+        c: ['Schools', 'Teams', 'Players', 'Clips'],
+        r: ['TopClips'],
+      },
       slug: 'woodmere-ny',
       name: 'Woodmere, NY',
       description: 'Long Island community with strong youth sports programs.',
@@ -415,6 +542,11 @@ async function main() {
   const kansasCityMO = await prisma.entity.create({
     data: {
       type: 'location',
+      layout: {
+        l: [],
+        c: ['Schools', 'Teams', 'Players', 'Clips'],
+        r: ['TopClips'],
+      },
       slug: 'kansas-city-mo',
       name: 'Kansas City, MO',
       description: 'Home of championship sports teams in the heart of America.',
@@ -429,6 +561,7 @@ async function main() {
   console.log('✓ Created locations')
 
   // Create Leagues as Entities
+  // Leagues bitfield: 466 (Meta + Teams + Clips + Filters + TopClips)
   const mlb = await prisma.entity.create({
     data: {
       type: 'league',
@@ -438,6 +571,11 @@ async function main() {
       logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/24.png',
       parentId: baseball.id,
       childEntities: 'Teams',
+      layout: {
+        l: [],
+        c: ['Teams', 'Clips'],
+        r: ['TopClips'],
+      },
     },
   })
 
@@ -450,6 +588,11 @@ async function main() {
       logo: 'https://a.espncdn.com/i/teamlogos/nba/500/lal.png',
       parentId: basketball.id,
       childEntities: 'Teams',
+      layout: {
+        l: [],
+        c: ['Teams', 'Clips'],
+        r: ['TopClips'],
+      },
     },
   })
 
@@ -462,12 +605,18 @@ async function main() {
       logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/kc.png',
       parentId: football.id,
       childEntities: 'Teams',
+      layout: {
+        l: [],
+        c: ['Teams', 'Clips'],
+        r: ['TopClips'],
+      },
     },
   })
 
   console.log('✓ Created leagues')
 
   // Create Teams as Entities
+  // Teams bitfield: 486 (Meta + Schools + Players + Clips + Filters + TopClips)
   const cardinals = await prisma.entity.create({
     data: {
       type: 'team',
@@ -477,6 +626,11 @@ async function main() {
       logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/24.png',
       parentId: mlb.id,
       childEntities: 'Players',
+      layout: {
+        l: [],
+        c: ['Schools', 'Players', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         schoolId: stanford.id,
         schoolName: 'Stanford University',
@@ -499,6 +653,11 @@ async function main() {
       logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/26.png',
       parentId: mlb.id,
       childEntities: 'Players',
+      layout: {
+        l: [],
+        c: ['Schools', 'Players', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         schoolId: ucla.id,
         schoolName: 'UCLA',
@@ -521,6 +680,11 @@ async function main() {
       logo: 'https://a.espncdn.com/i/teamlogos/nba/500/lal.png',
       parentId: nba.id,
       childEntities: 'Players',
+      layout: {
+        l: [],
+        c: ['Schools', 'Players', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         locationId: null, // Will be set after locations are created
         locationName: 'Los Angeles, CA',
@@ -538,6 +702,11 @@ async function main() {
       logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/kc.png',
       parentId: nfl.id,
       childEntities: 'Players',
+      layout: {
+        l: [],
+        c: ['Schools', 'Players', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         locationId: null, // Will be set after locations are created
         locationName: 'Kansas City, MO',
@@ -557,6 +726,21 @@ async function main() {
       description: 'Professional baseball player with 5 years in the league. Power hitter and outfielder.',
       logo: 'https://i.pravatar.cc/300?img=12',
       banner: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
+      layout: {
+        l: [],
+        c: ['x0', 'Meta', 'Teams', 'Clips'],
+        r: ['TopClips', 'x1'],
+        x: [
+          {
+            title: 'My Links',
+            content: '[Google](https://google.com)',
+          },
+          {
+            title: 'My Schedule',
+            content: 'Coming soon!',
+          },
+        ],
+      },
       metadata: {
         displayName: 'M-Rod',
         city: 'Los Angeles',
@@ -586,7 +770,11 @@ async function main() {
       description: 'All-star pitcher known for devastating curveball. 2x ERA champion.',
       logo: 'https://i.pravatar.cc/300?img=47',
       banner: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
-
+      layout: {
+        l: [],
+        c: ['Meta', 'Teams', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         displayName: 'The Ace',
         city: 'San Francisco',
@@ -617,7 +805,11 @@ async function main() {
       description: 'Point guard with lightning-fast handles. League assist leader 2023.',
       logo: 'https://i.pravatar.cc/300?img=33',
       banner: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1200',
-
+      layout: {
+        l: [],
+        c: ['Meta', 'Teams', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         displayName: 'J-Will',
         socialLinks: {
@@ -641,7 +833,11 @@ async function main() {
       description: 'Quarterback with a cannon arm. Leading the league in passing yards.',
       logo: 'https://i.pravatar.cc/300?img=15',
       banner: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=1200',
-
+      layout: {
+        l: [],
+        c: ['Meta', 'Teams', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         displayName: 'Tommy Guns',
         socialLinks: {
@@ -666,7 +862,11 @@ async function main() {
       description: 'Solid defensive catcher with a cannon for an arm.',
       logo: 'https://i.pravatar.cc/300?img=13',
       banner: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
-
+      layout: {
+        l: [],
+        c: ['Meta', 'Teams', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         displayName: 'K-Park',
         socialLinks: { twitter: '@kpark_mlb', instagram: '@kevinpark' },
@@ -682,7 +882,11 @@ async function main() {
       description: 'Fireballer with a 98 mph fastball. Closing games since 2020.',
       logo: 'https://i.pravatar.cc/300?img=14',
       banner: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
-
+      layout: {
+        l: [],
+        c: ['Meta', 'Teams', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         displayName: 'El Fuego',
         socialLinks: { twitter: '@elfuego99', instagram: '@diego_martinez' },
@@ -698,7 +902,11 @@ async function main() {
       description: 'Gold Glove shortstop with elite defensive skills.',
       logo: 'https://i.pravatar.cc/300?img=51',
       banner: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
-
+      layout: {
+        l: [],
+        c: ['Meta', 'Teams', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         displayName: 'The Glove',
         socialLinks: { twitter: '@ryantheglove', instagram: '@ryanmitchell' },
@@ -714,7 +922,11 @@ async function main() {
       description: 'Third baseman with power. 25+ home runs every season.',
       logo: 'https://i.pravatar.cc/300?img=52',
       banner: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
-
+      layout: {
+        l: [],
+        c: ['Meta', 'Teams', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         displayName: 'AT3',
         city: 'Woodmere',
@@ -736,7 +948,11 @@ async function main() {
       description: 'Speedster on the bases. League leader in stolen bases.',
       logo: 'https://i.pravatar.cc/300?img=53',
       banner: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
-
+      layout: {
+        l: [],
+        c: ['Meta', 'Teams', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         displayName: 'J-Lee',
         socialLinks: { twitter: '@jlee_speed', instagram: '@jordanlee' },
@@ -752,7 +968,11 @@ async function main() {
       description: 'Veteran first baseman. Team leader and mentor.',
       logo: 'https://i.pravatar.cc/300?img=54',
       banner: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
-
+      layout: {
+        l: [],
+        c: ['Meta', 'Teams', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         displayName: 'Davo',
         socialLinks: { twitter: '@davo_baseball', instagram: '@chrisdavidson' },
@@ -768,7 +988,11 @@ async function main() {
       description: 'Left-handed pitcher with nasty changeup.',
       logo: 'https://i.pravatar.cc/300?img=55',
       banner: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
-
+      layout: {
+        l: [],
+        c: ['Meta', 'Teams', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         displayName: 'T-Wat',
         socialLinks: { twitter: '@twat_pitcher', instagram: '@tylerwatson' },
@@ -784,7 +1008,11 @@ async function main() {
       description: 'Utility player who can play anywhere on the field.',
       logo: 'https://i.pravatar.cc/300?img=56',
       banner: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
-
+      layout: {
+        l: [],
+        c: ['Meta', 'Teams', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         displayName: 'B-Scott',
         socialLinks: { twitter: '@bscott_baseball', instagram: '@brandonscott' },
@@ -800,7 +1028,11 @@ async function main() {
       description: 'Solid defensive second baseman with good bat control.',
       logo: 'https://i.pravatar.cc/300?img=57',
       banner: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
-
+      layout: {
+        l: [],
+        c: ['Meta', 'Teams', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         displayName: 'M-Chang',
         socialLinks: { twitter: '@mchang_mlb', instagram: '@michaelchang' },
@@ -817,7 +1049,11 @@ async function main() {
       description: 'Power-hitting designated hitter. 40+ home runs per season.',
       logo: 'https://i.pravatar.cc/300?img=58',
       banner: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
-
+      layout: {
+        l: [],
+        c: ['Meta', 'Teams', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         displayName: 'Jakey',
         socialLinks: { twitter: '@jakey_bombs', instagram: '@jakeanderson' },
@@ -833,7 +1069,11 @@ async function main() {
       description: 'Team captain and shortstop. Leader on and off the field.',
       logo: 'https://i.pravatar.cc/300?img=59',
       banner: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
-
+      layout: {
+        l: [],
+        c: ['Meta', 'Teams', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         displayName: 'El Capitan',
         socialLinks: { twitter: '@el_capitan', instagram: '@luishernandez' },
@@ -849,7 +1089,11 @@ async function main() {
       description: 'Elite closer. Saving games since 2019.',
       logo: 'https://i.pravatar.cc/300?img=60',
       banner: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
-
+      layout: {
+        l: [],
+        c: ['Meta', 'Teams', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         displayName: 'Stoney',
         socialLinks: { twitter: '@stoney_closes', instagram: '@derekstone' },
@@ -865,7 +1109,11 @@ async function main() {
       description: 'Athletic center fielder with incredible range.',
       logo: 'https://i.pravatar.cc/300?img=61',
       banner: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
-
+      layout: {
+        l: [],
+        c: ['Meta', 'Teams', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         displayName: 'MJ',
         socialLinks: { twitter: '@mj_baseball', instagram: '@marcusjohnson' },
@@ -881,7 +1129,11 @@ async function main() {
       description: 'Veteran catcher and team leader. 15 years in the majors.',
       logo: 'https://i.pravatar.cc/300?img=62',
       banner: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
-
+      layout: {
+        l: [],
+        c: ['Meta', 'Teams', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         displayName: 'Tony R',
         socialLinks: { twitter: '@tonyr_ucla', instagram: '@anthonyromano' },
@@ -897,7 +1149,11 @@ async function main() {
       description: 'Hard-hitting third baseman. Clutch performer.',
       logo: 'https://i.pravatar.cc/300?img=63',
       banner: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
-
+      layout: {
+        l: [],
+        c: ['Meta', 'Teams', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         displayName: 'Los',
         socialLinks: { twitter: '@los_ramirez', instagram: '@carlosramirez' },
@@ -913,7 +1169,11 @@ async function main() {
       description: 'Starting pitcher with a devastating slider.',
       logo: 'https://i.pravatar.cc/300?img=64',
       banner: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
-
+      layout: {
+        l: [],
+        c: ['Meta', 'Teams', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         displayName: 'T-Mills',
         socialLinks: { twitter: '@tmills_pitcher', instagram: '@trevormills' },
@@ -929,7 +1189,11 @@ async function main() {
       description: 'Speedy left fielder with great instincts.',
       logo: 'https://i.pravatar.cc/300?img=65',
       banner: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
-
+      layout: {
+        l: [],
+        c: ['Meta', 'Teams', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         displayName: 'Coop',
         socialLinks: { twitter: '@coop_baseball', instagram: '@jamescooper' },
@@ -945,7 +1209,11 @@ async function main() {
       description: 'Solid second baseman with excellent bat-to-ball skills.',
       logo: 'https://i.pravatar.cc/300?img=66',
       banner: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
-
+      layout: {
+        l: [],
+        c: ['Meta', 'Teams', 'Clips'],
+        r: ['TopClips'],
+      },
       metadata: {
         displayName: 'Bobby T',
         socialLinks: { twitter: '@bobbyt_ucla', instagram: '@roberttaylor' },

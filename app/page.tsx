@@ -8,11 +8,11 @@ import { Metadata } from "next";
 import { getCachedSportsData } from "@/lib/sports-cache";
 
 export const metadata: Metadata = {
-  title: "Your Athletic Journey",
-  description: "The ultimate platform for athletes to share highlights, connect with fans, and build their personal brand. Browse sports, players, teams, and more.",
+  title: "Voated - Vote on the Goat",
+  description: "The ultimate platform for athletes to share highlights, be discovered, and build their personal brand. Browse sports, players, teams, and more.",
   openGraph: {
-    title: "Athletix - Your Athletic Journey",
-    description: "The ultimate platform for athletes to share highlights, connect with fans, and build their personal brand",
+    title: "Voated - Vote on the Goat",
+    description: "The ultimate platform for student athletes to share highlights, be discovered, and build their personal brand",
     type: "website",
   },
 };
@@ -96,7 +96,7 @@ export default async function HomePage() {
       <NavigationHeader />
 
       {/* Hero Section */}
-      <div className="relative bg-linear-to-r from-blue-600 to-purple-600 text-white overflow-hidden">
+      <div className="relative bg-linear-to-r from-green-600 to-blue-600 text-white overflow-hidden">
         <div className="absolute inset-0">
           <Image
             src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1200&h=600&fit=crop"
@@ -108,17 +108,16 @@ export default async function HomePage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
           <div className="text-center max-w-3xl mx-auto">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
-              Your Athletic Journey
+              Your Athletic Presence
             </h1>
             <p className="text-lg sm:text-xl mb-8 opacity-90">
-              The ultimate platform for athletes to share highlights, connect
-              with fans, and build their personal brand
+              The ultimate platform for athletes to share highlights, be discovered, and build their personal brand
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors text-lg">
+              <button className="px-8 py-3 bg-white text-green-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors text-lg">
                 Get Started
               </button>
-              <button className="px-8 py-3 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-blue-600 transition-colors text-lg">
+              <button className="px-8 py-3 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-green-600 transition-colors text-lg">
                 Learn More
               </button>
             </div>
@@ -148,8 +147,18 @@ export default async function HomePage() {
                         <li key={sport.id}>
                           <a
                             href={`/sports/${sport.slug}`}
-                            className="text-blue-600 hover:text-blue-800 hover:underline"
+                            className="text-green-600 hover:text-green-800 hover:underline flex items-center gap-2"
                           >
+                            {sport.logo && (
+                              <Image
+                                src={sport.logo}
+                                alt={`${sport.name} icon`}
+                                width={20}
+                                height={20}
+                                className="object-contain brightness-0 saturate-100 opacity-100"
+                                style={{ filter: 'invert(38%) sepia(96%) saturate(2526%) hue-rotate(101deg) brightness(98%) contrast(101%)' }}
+                              />
+                            )}
                             {sport.name}
                           </a>
                         </li>
@@ -169,8 +178,18 @@ export default async function HomePage() {
                             <li key={sport.id}>
                               <a
                                 href={`/sports/${sport.slug}`}
-                                className="text-blue-600 hover:text-blue-800 hover:underline"
+                                className="text-green-600 hover:text-green-800 hover:underline flex items-center gap-2"
                               >
+                                {sport.logo && (
+                                  <Image
+                                    src={sport.logo}
+                                    alt={`${sport.name} icon`}
+                                    width={20}
+                                    height={20}
+                                    className="object-contain brightness-0 saturate-100 opacity-100"
+                                    style={{ filter: 'invert(38%) sepia(96%) saturate(2526%) hue-rotate(101deg) brightness(98%) contrast(101%)' }}
+                                  />
+                                )}
                                 {sport.name}
                               </a>
                             </li>
@@ -192,8 +211,18 @@ export default async function HomePage() {
                         <li key={sport.id}>
                           <a
                             href={`/sports/${sport.slug}`}
-                            className="text-blue-600 hover:text-blue-800 hover:underline"
+                            className="text-green-600 hover:text-green-800 hover:underline flex items-center gap-2"
                           >
+                            {sport.logo && (
+                              <Image
+                                src={sport.logo}
+                                alt={`${sport.name} icon`}
+                                width={20}
+                                height={20}
+                                className="object-contain brightness-0 saturate-100 opacity-100"
+                                style={{ filter: 'invert(38%) sepia(96%) saturate(2526%) hue-rotate(101deg) brightness(98%) contrast(101%)' }}
+                              />
+                            )}
                             {sport.name}
                           </a>
                         </li>
