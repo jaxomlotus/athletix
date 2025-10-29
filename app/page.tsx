@@ -33,6 +33,7 @@ async function getHomeData() {
               select: {
                 id: true,
                 name: true,
+                slug: true,
                 logo: true,
                 type: true,
               },
@@ -73,15 +74,18 @@ export default async function HomePage() {
       return {
         clip: {
           ...clip,
+          id: clip.id.toString(),
           createdAt: clip.createdAt,
         },
         playerName: entity.name || "Unknown",
-        playerId: entity.id,
+        playerId: entity.id.toString(),
+        playerSlug: entity.slug,
         playerAvatar: entity.logo,
         playerTags: [
           {
             name: entity.name || "Unknown",
-            id: entity.id,
+            id: entity.id.toString(),
+            slug: entity.slug,
             avatar: entity.logo,
           },
         ],
@@ -134,10 +138,10 @@ export default async function HomePage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <div className="lg:grid lg:grid-cols-12 lg:gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 w-full">
+        <div className="w-full lg:grid lg:grid-cols-12 lg:gap-8 lg:items-start">
           {/* Left Column - Main Content */}
-          <div className="lg:col-span-8">
+          <div className="w-full lg:col-span-8 min-w-0">
             {/* Sports Section */}
             <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
@@ -216,7 +220,7 @@ export default async function HomePage() {
           </div>
 
           {/* Right Column - Leaderboard (Hidden on mobile) */}
-          <div className="hidden lg:block lg:col-span-4">
+          <div className="w-full hidden lg:block lg:col-span-4 min-w-0">
             <Leaderboard clips={leaderboardClips} title="Trending Now" stickyTop="top-20" />
           </div>
         </div>

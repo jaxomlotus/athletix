@@ -112,6 +112,7 @@ model Entity {
 
   // Social
   followerCount  Int      @default(0)
+  clipsCount     Int      @default(0)
 
   // Type-specific data stored as JSON
   metadata       Json?    // Flexible field for type-specific data
@@ -121,6 +122,10 @@ model Entity {
 
   follows        Follow[]
   clips          EntityClip[]
+
+  // Team memberships (for players)
+  playerMemberships  TeamMembership[] @relation("PlayerMemberships")
+  teamMembers        TeamMembership[] @relation("TeamMembers")
 
   @@index([type])
   @@index([parentId])
@@ -186,4 +191,28 @@ model EntityClip {
 
   @@unique([entityId, clipId])
   @@map("EntityClips")
+}
+
+// Team Membership - tracks player-team relationships over time
+model TeamMembership {
+  id           Int       @id @default(autoincrement())
+  playerId     Int
+  teamId       Int
+  jerseyNumber Int?
+  positions    Json?     // Array of positions (e.g., ["Catcher", "Pitcher"])
+  season       String?   @db.VarChar(50) // e.g., "2024", "2024-2025", "Fall 2024"
+  startDate    DateTime?
+  endDate      DateTime?
+  isCurrent    Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  player       Entity    @relation("PlayerMemberships", fields: [playerId], references: [id], onDelete: Cascade)
+  team         Entity    @relation("TeamMembers", fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([playerId, teamId, season])
+  @@index([playerId])
+  @@index([teamId])
+  @@index([isCurrent])
+  @@map("TeamMemberships")
 }

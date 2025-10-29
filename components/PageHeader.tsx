@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaHome } from "react-icons/fa";
 import { FiUserPlus } from "react-icons/fi";
+import { EntityType } from "@/lib/entity-utils";
 
 interface Breadcrumb {
   label: string;
@@ -21,6 +22,7 @@ interface PageHeaderProps {
   breadcrumbs: Breadcrumb[];
   followerCount?: number;
   showFollowButton?: boolean;
+  entityType?: EntityType;
 }
 
 function getAllBreadcrumbs(breadcrumbs: Breadcrumb[], currentTitle: string): Breadcrumb[] {
@@ -37,10 +39,12 @@ export default function PageHeader({
   breadcrumbs,
   followerCount,
   showFollowButton = false,
+  entityType,
 }: PageHeaderProps) {
   const [isSticky, setIsSticky] = useState(false);
   const allBreadcrumbs = getAllBreadcrumbs(breadcrumbs, title);
   const defaultBanner = "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1200&h=400&fit=crop";
+  const isSportIcon = entityType === 'sport';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -128,12 +132,13 @@ export default function PageHeader({
             <div className="flex flex-row items-center gap-4 sm:gap-6 w-full sm:justify-between">
               {/* Logo/Avatar */}
               {logo && (
-                <div className={`relative ${showFollowButton ? 'w-24 h-24 sm:w-40 sm:h-40 rounded-full border-4 border-white shadow-xl' : 'w-24 h-24 sm:w-32 sm:h-32 rounded-lg'} overflow-hidden bg-white ${!showFollowButton && 'p-3 sm:p-4'} shrink-0`}>
+                <div className={`relative ${entityType === 'player' ? 'w-24 h-24 sm:w-40 sm:h-40 rounded-full border-4 border-white shadow-xl bg-white' : `w-24 h-24 sm:w-32 sm:h-32 rounded-lg ${isSportIcon ? 'bg-white/10 backdrop-blur-sm' : 'bg-white'}`} overflow-hidden ${entityType !== 'player' && 'p-3 sm:p-4'} shrink-0`}>
                   <Image
                     src={logo}
                     alt={title}
                     fill
-                    className="object-cover"
+                    className={entityType === 'player' ? 'object-cover' : 'object-contain'}
+                    style={isSportIcon ? { filter: 'brightness(0) invert(1)' } : undefined}
                   />
                 </div>
               )}
@@ -237,12 +242,13 @@ export default function PageHeader({
               {/* Current Page Title with Logo/Avatar */}
               <div className="flex items-center gap-2">
                 {logo && (
-                  <div className={`relative ${showFollowButton ? 'w-7 h-7 rounded-full border border-white' : 'w-7 h-7 rounded'} overflow-hidden bg-white ${!showFollowButton && 'p-1'} shrink-0`}>
+                  <div className={`relative ${entityType === 'player' ? 'w-7 h-7 rounded-full border border-white bg-white' : `w-7 h-7 rounded ${isSportIcon ? 'bg-white/10 backdrop-blur-sm' : 'bg-white'}`} overflow-hidden ${entityType !== 'player' && 'p-1'} shrink-0`}>
                     <Image
                       src={logo}
                       alt={title}
                       fill
-                      className={showFollowButton ? 'object-cover' : 'object-contain'}
+                      className={entityType === 'player' ? 'object-cover' : 'object-contain'}
+                      style={isSportIcon ? { filter: 'brightness(0) invert(1)' } : undefined}
                     />
                   </div>
                 )}

@@ -6,12 +6,14 @@ import RankBadge from "./RankBadge";
 interface PlayerTag {
   name: string;
   id: string;
+  slug: string;
   avatar: string | null;
 }
 
 interface TeamTag {
   name: string;
   id: string;
+  slug: string;
   logo: string | null;
 }
 
@@ -27,6 +29,7 @@ interface ClipData {
   };
   playerName: string;
   playerId: string;
+  playerSlug: string;
   playerAvatar: string | null;
   playerTags?: PlayerTag[];
   teamTags?: TeamTag[];
@@ -66,43 +69,23 @@ function getRelativeTime(date: Date): string {
   return `${Math.floor(seconds / 31536000)}y ago`;
 }
 
-function createPlayerSlug(
-  userId: string,
-  displayName: string | null,
-  name: string | null
-): string {
-  const playerName = displayName || name || "Unknown";
-  const slugName = playerName
-    .replace(/\s+/g, "-")
-    .replace(/[^a-zA-Z0-9-]/g, "");
-  return `${userId}-${slugName}`;
-}
-
-function createTeamSlug(teamName: string): string {
-  return teamName
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9-]/g, "");
-}
-
 export default function ClipsSection({ clips, title = "Highlight Clips" }: ClipsSectionProps) {
   const defaultAvatar = "https://i.pravatar.cc/150";
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-4 sm:mb-6">
+    <div className="w-full bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-4 sm:mb-6">
       <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
         {title}
       </h2>
       {!clips || clips.length === 0 ? (
-        <p className="w-full text-center text-gray-400 py-8">Nothing here yet.</p>
+        <p className="w-full text-center text-gray-400 py-8">No clips to show</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-        {clips.map(({ clip, playerName, playerId, playerAvatar, playerTags, teamTags }, index) => {
+        {clips.map(({ clip, playerName, playerId, playerSlug, playerAvatar, playerTags, teamTags }, index) => {
           const embedUrl = getYouTubeEmbedUrl(clip.url);
           const rank = index + 1;
           const rankChange = Math.floor(Math.random() * 7) - 3; // -3 to +3
           const isRising = rankChange > 0;
-          const playerSlug = createPlayerSlug(playerId, playerName, playerName);
 
           return (
             <div key={clip.id} className="space-y-2 sm:space-y-3">
@@ -188,11 +171,10 @@ export default function ClipsSection({ clips, title = "Highlight Clips" }: Clips
                 <div className="flex flex-wrap gap-2">
                   {/* Team Tags */}
                   {teamTags?.map((team) => {
-                    const tagSlug = createTeamSlug(team.name);
                     return (
                       <Link
                         key={team.id}
-                        href={`/team/${tagSlug}`}
+                        href={`/teams/${team.slug}`}
                         className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 rounded-full hover:bg-blue-100 transition-colors"
                       >
                         {team.logo && (
@@ -213,11 +195,10 @@ export default function ClipsSection({ clips, title = "Highlight Clips" }: Clips
                   })}
                   {/* Player Tags */}
                   {playerTags?.map((player) => {
-                    const tagSlug = createPlayerSlug(player.id, player.name, player.name);
                     return (
                       <Link
                         key={player.id}
-                        href={`/players/${tagSlug}`}
+                        href={`/players/${player.slug}`}
                         className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
                       >
                         <div className="relative w-5 h-5 rounded-full overflow-hidden bg-gray-200 shrink-0">

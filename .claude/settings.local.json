@@ -9,7 +9,9 @@
       "Bash(curl:*)",
       "WebFetch(domain:icon-sets.iconify.design)",
       "Bash(python3:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(yarn tsc:*)",
+      "Bash(yarn add:*)"
     ],
     "deny": [],
     "ask": []

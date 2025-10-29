@@ -312,6 +312,43 @@ async function main() {
 
   console.log('✓ Created sports')
 
+  // Create Schools as Entities
+  const stanford = await prisma.entity.create({
+    data: {
+      type: 'school',
+      slug: 'stanford-university',
+      name: 'Stanford University',
+      description: 'Private research university in Stanford, California, known for academic excellence and competitive athletics.',
+      logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/24.png',
+      childEntities: 'Teams',
+      metadata: {
+        city: 'Stanford',
+        state: 'CA',
+        founded: 1885,
+        type: 'Private',
+      },
+    },
+  })
+
+  const ucla = await prisma.entity.create({
+    data: {
+      type: 'school',
+      slug: 'ucla',
+      name: 'UCLA',
+      description: 'University of California, Los Angeles - a leading public research university with a strong athletic tradition.',
+      logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/26.png',
+      childEntities: 'Teams',
+      metadata: {
+        city: 'Los Angeles',
+        state: 'CA',
+        founded: 1919,
+        type: 'Public',
+      },
+    },
+  })
+
+  console.log('✓ Created schools')
+
   // Create Leagues as Entities
   const mlb = await prisma.entity.create({
     data: {
@@ -357,10 +394,17 @@ async function main() {
       type: 'team',
       slug: 'stanford-cardinals',
       name: 'Stanford Cardinals',
-      description: 'Elite college baseball program from Stanford University',
+      description: 'Elite college baseball program',
       logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/24.png',
       parentId: mlb.id,
       childEntities: 'Players',
+      metadata: {
+        schoolId: stanford.id,
+        schoolName: 'Stanford University',
+        schoolSlug: 'stanford-university',
+        city: 'Stanford',
+        state: 'CA',
+      },
     },
   })
 
@@ -369,10 +413,17 @@ async function main() {
       type: 'team',
       slug: 'ucla-bruins',
       name: 'UCLA Bruins',
-      description: 'Prestigious college baseball team from UCLA',
+      description: 'Prestigious college baseball team',
       logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/26.png',
       parentId: mlb.id,
       childEntities: 'Players',
+      metadata: {
+        schoolId: ucla.id,
+        schoolName: 'UCLA',
+        schoolSlug: 'ucla',
+        city: 'Los Angeles',
+        state: 'CA',
+      },
     },
   })
 
@@ -411,11 +462,11 @@ async function main() {
       description: 'Professional baseball player with 5 years in the league. Power hitter and outfielder.',
       logo: 'https://i.pravatar.cc/300?img=12',
       banner: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
-      parentId: cardinals.id,
       metadata: {
         displayName: 'M-Rod',
-        position: 'Outfielder',
-        jerseyNumber: 24,
+        city: 'Los Angeles',
+        state: 'CA',
+        birthdate: '2001-03-15',
         socialLinks: {
           twitter: '@mrod_baseball',
           instagram: '@marcusrod',
@@ -437,11 +488,12 @@ async function main() {
       description: 'All-star pitcher known for devastating curveball. 2x ERA champion.',
       logo: 'https://i.pravatar.cc/300?img=47',
       banner: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
-      parentId: bruins.id,
+
       metadata: {
         displayName: 'The Ace',
-        position: 'Pitcher',
-        jerseyNumber: 45,
+        city: 'San Francisco',
+        state: 'CA',
+        birthdate: '2000-07-22',
         socialLinks: {
           twitter: '@sarahace',
           instagram: '@theacesarah',
@@ -464,11 +516,9 @@ async function main() {
       description: 'Point guard with lightning-fast handles. League assist leader 2023.',
       logo: 'https://i.pravatar.cc/300?img=33',
       banner: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1200',
-      parentId: lakers.id,
+
       metadata: {
         displayName: 'J-Will',
-        position: 'Point Guard',
-        jerseyNumber: 7,
         socialLinks: {
           twitter: '@jwill_hoops',
           instagram: '@jamalwilliams',
@@ -490,11 +540,9 @@ async function main() {
       description: 'Quarterback with a cannon arm. Leading the league in passing yards.',
       logo: 'https://i.pravatar.cc/300?img=15',
       banner: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=1200',
-      parentId: chiefs.id,
+
       metadata: {
         displayName: 'Tommy Guns',
-        position: 'Quarterback',
-        jerseyNumber: 12,
         socialLinks: {
           twitter: '@tommyguns_qb',
           instagram: '@tommyobrien',
@@ -517,11 +565,9 @@ async function main() {
       description: 'Solid defensive catcher with a cannon for an arm.',
       logo: 'https://i.pravatar.cc/300?img=13',
       banner: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
-      parentId: cardinals.id,
+
       metadata: {
         displayName: 'K-Park',
-        position: 'Catcher',
-        jerseyNumber: 7,
         socialLinks: { twitter: '@kpark_mlb', instagram: '@kevinpark' },
       },
     },
@@ -535,11 +581,9 @@ async function main() {
       description: 'Fireballer with a 98 mph fastball. Closing games since 2020.',
       logo: 'https://i.pravatar.cc/300?img=14',
       banner: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
-      parentId: cardinals.id,
+
       metadata: {
         displayName: 'El Fuego',
-        position: 'Relief Pitcher',
-        jerseyNumber: 31,
         socialLinks: { twitter: '@elfuego99', instagram: '@diego_martinez' },
       },
     },
@@ -553,11 +597,9 @@ async function main() {
       description: 'Gold Glove shortstop with elite defensive skills.',
       logo: 'https://i.pravatar.cc/300?img=51',
       banner: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
-      parentId: cardinals.id,
+
       metadata: {
         displayName: 'The Glove',
-        position: 'Shortstop',
-        jerseyNumber: 2,
         socialLinks: { twitter: '@ryantheglove', instagram: '@ryanmitchell' },
       },
     },
@@ -571,11 +613,12 @@ async function main() {
       description: 'Third baseman with power. 25+ home runs every season.',
       logo: 'https://i.pravatar.cc/300?img=52',
       banner: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
-      parentId: cardinals.id,
+
       metadata: {
         displayName: 'AT3',
-        position: 'Third Base',
-        jerseyNumber: 15,
+        city: 'Woodmere',
+        state: 'NY',
+        birthdate: '2007-11-08',
         socialLinks: { twitter: '@at3_baseball', instagram: '@alexthompson' },
       },
     },
@@ -589,11 +632,9 @@ async function main() {
       description: 'Speedster on the bases. League leader in stolen bases.',
       logo: 'https://i.pravatar.cc/300?img=53',
       banner: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
-      parentId: cardinals.id,
+
       metadata: {
         displayName: 'J-Lee',
-        position: 'Center Field',
-        jerseyNumber: 11,
         socialLinks: { twitter: '@jlee_speed', instagram: '@jordanlee' },
       },
     },
@@ -607,11 +648,9 @@ async function main() {
       description: 'Veteran first baseman. Team leader and mentor.',
       logo: 'https://i.pravatar.cc/300?img=54',
       banner: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
-      parentId: cardinals.id,
+
       metadata: {
         displayName: 'Davo',
-        position: 'First Base',
-        jerseyNumber: 28,
         socialLinks: { twitter: '@davo_baseball', instagram: '@chrisdavidson' },
       },
     },
@@ -625,11 +664,9 @@ async function main() {
       description: 'Left-handed pitcher with nasty changeup.',
       logo: 'https://i.pravatar.cc/300?img=55',
       banner: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
-      parentId: cardinals.id,
+
       metadata: {
         displayName: 'T-Wat',
-        position: 'Starting Pitcher',
-        jerseyNumber: 42,
         socialLinks: { twitter: '@twat_pitcher', instagram: '@tylerwatson' },
       },
     },
@@ -643,11 +680,9 @@ async function main() {
       description: 'Utility player who can play anywhere on the field.',
       logo: 'https://i.pravatar.cc/300?img=56',
       banner: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
-      parentId: cardinals.id,
+
       metadata: {
         displayName: 'B-Scott',
-        position: 'Utility',
-        jerseyNumber: 19,
         socialLinks: { twitter: '@bscott_baseball', instagram: '@brandonscott' },
       },
     },
@@ -661,11 +696,9 @@ async function main() {
       description: 'Solid defensive second baseman with good bat control.',
       logo: 'https://i.pravatar.cc/300?img=57',
       banner: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=1200',
-      parentId: cardinals.id,
+
       metadata: {
         displayName: 'M-Chang',
-        position: 'Second Base',
-        jerseyNumber: 4,
         socialLinks: { twitter: '@mchang_mlb', instagram: '@michaelchang' },
       },
     },
@@ -680,11 +713,9 @@ async function main() {
       description: 'Power-hitting designated hitter. 40+ home runs per season.',
       logo: 'https://i.pravatar.cc/300?img=58',
       banner: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
-      parentId: bruins.id,
+
       metadata: {
         displayName: 'Jakey',
-        position: 'Designated Hitter',
-        jerseyNumber: 44,
         socialLinks: { twitter: '@jakey_bombs', instagram: '@jakeanderson' },
       },
     },
@@ -698,11 +729,9 @@ async function main() {
       description: 'Team captain and shortstop. Leader on and off the field.',
       logo: 'https://i.pravatar.cc/300?img=59',
       banner: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
-      parentId: bruins.id,
+
       metadata: {
         displayName: 'El Capitan',
-        position: 'Shortstop',
-        jerseyNumber: 2,
         socialLinks: { twitter: '@el_capitan', instagram: '@luishernandez' },
       },
     },
@@ -716,11 +745,9 @@ async function main() {
       description: 'Elite closer. Saving games since 2019.',
       logo: 'https://i.pravatar.cc/300?img=60',
       banner: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
-      parentId: bruins.id,
+
       metadata: {
         displayName: 'Stoney',
-        position: 'Closer',
-        jerseyNumber: 57,
         socialLinks: { twitter: '@stoney_closes', instagram: '@derekstone' },
       },
     },
@@ -734,11 +761,9 @@ async function main() {
       description: 'Athletic center fielder with incredible range.',
       logo: 'https://i.pravatar.cc/300?img=61',
       banner: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
-      parentId: bruins.id,
+
       metadata: {
         displayName: 'MJ',
-        position: 'Center Field',
-        jerseyNumber: 99,
         socialLinks: { twitter: '@mj_baseball', instagram: '@marcusjohnson' },
       },
     },
@@ -752,11 +777,9 @@ async function main() {
       description: 'Veteran catcher and team leader. 15 years in the majors.',
       logo: 'https://i.pravatar.cc/300?img=62',
       banner: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
-      parentId: bruins.id,
+
       metadata: {
         displayName: 'Tony R',
-        position: 'Catcher',
-        jerseyNumber: 24,
         socialLinks: { twitter: '@tonyr_ucla', instagram: '@anthonyromano' },
       },
     },
@@ -770,11 +793,9 @@ async function main() {
       description: 'Hard-hitting third baseman. Clutch performer.',
       logo: 'https://i.pravatar.cc/300?img=63',
       banner: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
-      parentId: bruins.id,
+
       metadata: {
         displayName: 'Los',
-        position: 'Third Base',
-        jerseyNumber: 13,
         socialLinks: { twitter: '@los_ramirez', instagram: '@carlosramirez' },
       },
     },
@@ -788,11 +809,9 @@ async function main() {
       description: 'Starting pitcher with a devastating slider.',
       logo: 'https://i.pravatar.cc/300?img=64',
       banner: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
-      parentId: bruins.id,
+
       metadata: {
         displayName: 'T-Mills',
-        position: 'Starting Pitcher',
-        jerseyNumber: 22,
         socialLinks: { twitter: '@tmills_pitcher', instagram: '@trevormills' },
       },
     },
@@ -806,11 +825,9 @@ async function main() {
       description: 'Speedy left fielder with great instincts.',
       logo: 'https://i.pravatar.cc/300?img=65',
       banner: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
-      parentId: bruins.id,
+
       metadata: {
         displayName: 'Coop',
-        position: 'Left Field',
-        jerseyNumber: 8,
         socialLinks: { twitter: '@coop_baseball', instagram: '@jamescooper' },
       },
     },
@@ -824,11 +841,9 @@ async function main() {
       description: 'Solid second baseman with excellent bat-to-ball skills.',
       logo: 'https://i.pravatar.cc/300?img=66',
       banner: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200',
-      parentId: bruins.id,
+
       metadata: {
         displayName: 'Bobby T',
-        position: 'Second Base',
-        jerseyNumber: 18,
         socialLinks: { twitter: '@bobbyt_ucla', instagram: '@roberttaylor' },
       },
     },
@@ -901,6 +916,58 @@ async function main() {
   })
 
   console.log('✓ Linked clips to players')
+
+  // Create Team Memberships
+  await prisma.teamMembership.createMany({
+    data: [
+      // Marcus Rodriguez - Stanford Cardinals
+      { playerId: player1.id, teamId: cardinals.id, jerseyNumber: 24, positions: ['Outfielder'], season: '2024', isCurrent: true },
+      // Sarah Chen - UCLA Bruins
+      { playerId: player2.id, teamId: bruins.id, jerseyNumber: 45, positions: ['Pitcher'], season: '2024', isCurrent: true },
+      // Jamal Williams - LA Lakers
+      { playerId: player3.id, teamId: lakers.id, jerseyNumber: 7, positions: ['Point Guard'], season: '2024', isCurrent: true },
+      // Tommy O'Brien - Kansas City Chiefs
+      { playerId: player4.id, teamId: chiefs.id, jerseyNumber: 12, positions: ['Quarterback'], season: '2024', isCurrent: true },
+      // Kevin Park - Stanford Cardinals
+      { playerId: cardinal2.id, teamId: cardinals.id, jerseyNumber: 7, positions: ['Catcher'], season: '2024', isCurrent: true },
+      // Diego Martinez - Stanford Cardinals
+      { playerId: cardinal3.id, teamId: cardinals.id, jerseyNumber: 31, positions: ['Relief Pitcher'], season: '2024', isCurrent: true },
+      // Ryan Mitchell - Stanford Cardinals
+      { playerId: cardinal4.id, teamId: cardinals.id, jerseyNumber: 2, positions: ['Shortstop'], season: '2024', isCurrent: true },
+      // Alex Thompson - Stanford Cardinals
+      { playerId: cardinal5.id, teamId: cardinals.id, jerseyNumber: 15, positions: ['Third Base'], season: '2024', isCurrent: true },
+      // Jordan Lee - Stanford Cardinals
+      { playerId: cardinal6.id, teamId: cardinals.id, jerseyNumber: 11, positions: ['Center Field'], season: '2024', isCurrent: true },
+      // Chris Davidson - Stanford Cardinals
+      { playerId: cardinal7.id, teamId: cardinals.id, jerseyNumber: 28, positions: ['First Base'], season: '2024', isCurrent: true },
+      // Tyler Watson - Stanford Cardinals
+      { playerId: cardinal8.id, teamId: cardinals.id, jerseyNumber: 42, positions: ['Starting Pitcher'], season: '2024', isCurrent: true },
+      // Brandon Scott - Stanford Cardinals
+      { playerId: cardinal9.id, teamId: cardinals.id, jerseyNumber: 19, positions: ['Utility'], season: '2024', isCurrent: true },
+      // Michael Chang - Stanford Cardinals
+      { playerId: cardinal10.id, teamId: cardinals.id, jerseyNumber: 4, positions: ['Second Base'], season: '2024', isCurrent: true },
+      // Jake Anderson - UCLA Bruins
+      { playerId: bruin2.id, teamId: bruins.id, jerseyNumber: 44, positions: ['Designated Hitter'], season: '2024', isCurrent: true },
+      // Luis Hernandez - UCLA Bruins
+      { playerId: bruin3.id, teamId: bruins.id, jerseyNumber: 2, positions: ['Shortstop'], season: '2024', isCurrent: true },
+      // Derek Stone - UCLA Bruins
+      { playerId: bruin4.id, teamId: bruins.id, jerseyNumber: 57, positions: ['Closer'], season: '2024', isCurrent: true },
+      // Marcus Johnson - UCLA Bruins
+      { playerId: bruin5.id, teamId: bruins.id, jerseyNumber: 99, positions: ['Center Field'], season: '2024', isCurrent: true },
+      // Anthony Romano - UCLA Bruins
+      { playerId: bruin6.id, teamId: bruins.id, jerseyNumber: 24, positions: ['Catcher'], season: '2024', isCurrent: true },
+      // Carlos Ramirez - UCLA Bruins
+      { playerId: bruin7.id, teamId: bruins.id, jerseyNumber: 13, positions: ['Third Base'], season: '2024', isCurrent: true },
+      // Trevor Mills - UCLA Bruins
+      { playerId: bruin8.id, teamId: bruins.id, jerseyNumber: 22, positions: ['Starting Pitcher'], season: '2024', isCurrent: true },
+      // James Cooper - UCLA Bruins
+      { playerId: bruin9.id, teamId: bruins.id, jerseyNumber: 8, positions: ['Left Field'], season: '2024', isCurrent: true },
+      // Robert Taylor - UCLA Bruins
+      { playerId: bruin10.id, teamId: bruins.id, jerseyNumber: 18, positions: ['Second Base'], season: '2024', isCurrent: true },
+    ],
+  })
+
+  console.log('✓ Created team memberships')
 
   console.log('✅ Seed completed successfully!')
 }

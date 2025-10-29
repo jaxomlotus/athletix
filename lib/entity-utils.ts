@@ -2,7 +2,7 @@
  * Utility functions for working with Entity types
  */
 
-export type EntityType = 'sport' | 'league' | 'team' | 'player';
+export type EntityType = 'sport' | 'league' | 'team' | 'player' | 'school';
 
 // Map plural URLs to singular entity types
 const TYPE_MAP: Record<string, EntityType> = {
@@ -10,10 +10,12 @@ const TYPE_MAP: Record<string, EntityType> = {
   leagues: 'league',
   teams: 'team',
   players: 'player',
+  schools: 'school',
   sport: 'sport',
   league: 'league',
   team: 'team',
   player: 'player',
+  school: 'school',
 };
 
 // Map singular entity types to plural URLs
@@ -22,6 +24,7 @@ const PLURAL_MAP: Record<EntityType, string> = {
   league: 'leagues',
   team: 'teams',
   player: 'players',
+  school: 'schools',
 };
 
 /**
@@ -61,6 +64,7 @@ export function getChildEntityType(parentType: EntityType): EntityType | null {
     sport: 'league',
     league: 'team',
     team: 'player',
+    school: 'team', // Schools can have teams
     player: null,
   };
   return hierarchy[parentType];

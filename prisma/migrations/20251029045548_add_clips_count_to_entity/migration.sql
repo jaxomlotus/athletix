@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Entities` ADD COLUMN `clipsCount` INTEGER NOT NULL DEFAULT 0;

@@ -125,7 +125,7 @@ export default function PlayerHeader({
               {team && (
                 <div className="flex items-center justify-center sm:justify-start gap-3 mb-2">
                   {team.logo && (
-                    <Link href={`/team/${team.slug}`}>
+                    <Link href={`/teams/${team.slug}`}>
                       <Image
                         src={team.logo}
                         alt={team.name}
@@ -138,7 +138,7 @@ export default function PlayerHeader({
                   <div>
                     <p className="text-lg sm:text-xl font-semibold">
                       <Link
-                        href={`/team/${team.slug}`}
+                        href={`/teams/${team.slug}`}
                         className="text-blue-600 hover:text-blue-700"
                       >
                         {team.name}
@@ -152,7 +152,7 @@ export default function PlayerHeader({
                     <p className="text-xs sm:text-sm text-gray-500">
                       {team.position} •{" "}
                       <Link
-                        href={`/league/${team.leagueSlug}`}
+                        href={`/leagues/${team.leagueSlug}`}
                         className="hover:text-gray-700 hover:underline"
                       >
                         {team.league}
