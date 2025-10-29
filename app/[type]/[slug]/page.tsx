@@ -1103,9 +1103,7 @@ export default async function EntityDetailPage({
         if (entity.children && entity.children.length > 0) {
           const firstChildType = entity.children[0]?.type;
           const shouldShow =
-            (widgetName === "Leagues" && firstChildType === "league") ||
-            (widgetName === "Teams" && firstChildType === "team") ||
-            (widgetName === "Players" && firstChildType === "player");
+            widgetName === "Leagues" && firstChildType === "league";
 
           if (!shouldShow && widgetName !== "Clips") return null;
 
