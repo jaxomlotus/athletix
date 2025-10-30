@@ -66,11 +66,6 @@ export default function Filter({ config }: FilterProps) {
     setSelectedGrade("");
     setSearchName("");
 
-    // Set loading flag in localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('filterLoading', 'true');
-    }
-
     // Reload the page to reset everything
     window.location.href = window.location.pathname;
   };
@@ -94,11 +89,6 @@ export default function Filter({ config }: FilterProps) {
 
     const queryString = params.toString();
     const newUrl = queryString ? `${window.location.pathname}?${queryString}` : window.location.pathname;
-
-    // Set loading flag in localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('filterLoading', 'true');
-    }
 
     // Navigate to URL with filters (causes full page reload with new data)
     window.location.href = newUrl;
@@ -137,11 +127,6 @@ export default function Filter({ config }: FilterProps) {
     const queryString = params.toString();
     const newUrl = queryString ? `${window.location.pathname}?${queryString}` : window.location.pathname;
 
-    // Set loading flag in localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('filterLoading', 'true');
-    }
-
     // Navigate to URL with filters (causes full page reload with new data)
     window.location.href = newUrl;
   };
@@ -178,11 +163,6 @@ export default function Filter({ config }: FilterProps) {
 
     const queryString = params.toString();
     const newUrl = queryString ? `${window.location.pathname}?${queryString}` : window.location.pathname;
-
-    // Set loading flag in localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('filterLoading', 'true');
-    }
 
     // Navigate to URL with filters (causes full page reload with new data)
     window.location.href = newUrl;
