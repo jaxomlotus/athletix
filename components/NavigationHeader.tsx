@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { FaSearch } from "react-icons/fa";
 import { FaRegUserCircle } from "react-icons/fa";
 import { meta } from "@/lib/config";
+import { authClient } from "@/lib/auth-client";
+import AuthModal from "./AuthModal";
 
 interface SearchResult {
   id: number;
@@ -27,8 +29,12 @@ export default function NavigationHeader() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [results, setResults] = useState<SearchResults | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const { data: session, isPending } = authClient.useSession();
 
   // Debounced search
   useEffect(() => {
@@ -63,11 +69,20 @@ export default function NavigationHeader() {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setShowDropdown(false);
       }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleSignOut = async () => {
+    await authClient.signOut();
+    setShowUserMenu(false);
+    router.refresh();
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -209,15 +224,59 @@ export default function NavigationHeader() {
             </div>
           </div>
 
-          {/* Register Button */}
+          {/* Auth Section */}
           <div className="flex items-center">
-            <button className="flex items-center gap-2 px-3 sm:px-6 py-1.5 sm:py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors text-xs sm:text-base cursor-pointer">
-              <FaRegUserCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-              Register
-            </button>
+            {isPending ? (
+              <div className="text-sm text-gray-500">Loading...</div>
+            ) : session?.user ? (
+              <div ref={userMenuRef} className="relative">
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 rounded-lg transition-colors text-xs sm:text-base cursor-pointer"
+                >
+                  <FaRegUserCircle className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
+                  <span className="hidden sm:inline text-gray-900 font-medium">
+                    {session.user.name || session.user.email}
+                  </span>
+                </button>
+
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50">
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {session.user.name}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {session.user.email}
+                      </p>
+                    </div>
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 transition-colors cursor-pointer"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowAuthModal(true)}
+                className="flex items-center gap-2 px-3 sm:px-6 py-1.5 sm:py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors text-xs sm:text-base cursor-pointer"
+              >
+                <FaRegUserCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                Sign In
+              </button>
+            )}
           </div>
         </div>
       </div>
+
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        defaultMode="signup"
+      />
     </header>
   );
 }

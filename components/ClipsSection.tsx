@@ -82,7 +82,7 @@ export default function ClipsSection({ clips, title = "Highlight Clips" }: Clips
       {!clips || clips.length === 0 ? (
         <p className="w-full text-center text-gray-400 py-8">No clips to show</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6">
         {clips.map(({ clip, playerName, playerId, playerSlug, playerAvatar, playerTags, teamTags }, index) => {
           const embedUrl = getYouTubeEmbedUrl(clip.url);
           const rank = index + 1;

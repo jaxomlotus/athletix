@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import Filter, { FilterConfig } from "@/components/Filter";
 import FilterLoadingOverlay from "@/components/FilterLoadingOverlay";
 import ActiveFilterPills from "@/components/ActiveFilterPills";
+import CollapsibleSection from "@/components/CollapsibleSection";
 import { Metadata } from "next";
 import { getCachedSportsData } from "@/lib/sports-cache";
 import { meta } from "@/lib/config";
@@ -514,7 +515,7 @@ export default async function HomePage({
             className="object-cover opacity-50"
           />
         </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-13 sm:py-16">
           <div className="text-center max-w-3xl mx-auto">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
               {meta.slogan}
@@ -543,15 +544,12 @@ export default async function HomePage({
             <ActiveFilterPills filterLabels={filterLabels} />
 
             {/* Sports Section */}
-            <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
-                <a
-                  href="/sports"
-                  className="hover:text-green-600 hover:underline"
-                >
-                  All Sports
-                </a>
-              </h2>
+            <CollapsibleSection
+              title="All Sports"
+              titleLink="/sports"
+              showPreview={true}
+              previewHeight="150px"
+            >
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
                 {/* Men's Sports Column */}
                 <div>
@@ -657,7 +655,7 @@ export default async function HomePage({
                   </ul>
                 </div>
               </div>
-            </div>
+            </CollapsibleSection>
 
             {/* Clips Section */}
             <ClipsSection clips={formattedClips} title="Latest Highlights" />

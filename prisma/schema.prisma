@@ -15,43 +15,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Auth.js / NextAuth models
-model Account {
-  id                Int     @id @default(autoincrement())
-  userId            Int
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-  @@map("Accounts")
-}
-
-model Session {
-  id           Int      @id @default(autoincrement())
-  sessionToken String   @unique
-  userId       Int
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("Sessions")
-}
-
+// Better Auth models
 model User {
-  id             Int       @id @default(autoincrement())
+  id             String    @id @default(cuid())
   name           String?
-  email          String?   @unique
-  emailVerified  DateTime?
+  email          String    @unique
+  emailVerified  Boolean   @default(false)
   image          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   // Profile fields
   avatar         String?   @db.VarChar(256)
@@ -80,13 +52,54 @@ model User {
   @@map("Users")
 }
 
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@unique([identifier, token])
-  @@map("VerificationTokens")
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("Sessions")
+}
+
+model Account {
+  id                     String    @id @default(cuid())
+  userId                 String
+  accountId              String
+  providerId             String
+  accessToken            String?   @db.Text
+  refreshToken           String?   @db.Text
+  idToken                String?   @db.Text
+  accessTokenExpiresAt   DateTime?
+  refreshTokenExpiresAt  DateTime?
+  scope                  String?
+  password               String?   @db.Text
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+  @@map("Accounts")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, value])
+  @@map("Verifications")
 }
 
 // Unified Entity System
@@ -106,7 +119,7 @@ model Entity {
   childEntities  String?  @db.VarChar(100) // e.g., "Leagues", "Teams", "Players" - used for UI labels
 
   // Ownership & Moderation
-  ownerId        Int?
+  ownerId        String?
   owner          User?    @relation("EntityOwner", fields: [ownerId], references: [id], onDelete: SetNull)
   modsJson       Json?    // Array of { userId: number, permissions: string[] }
 
@@ -139,7 +152,7 @@ model Entity {
 // Unified Follow System
 model Follow {
   id         Int      @id @default(autoincrement())
-  userId     Int
+  userId     String
   entityId   Int
   followedAt DateTime @default(now())
 
@@ -171,7 +184,7 @@ model Clip {
 
 model UserClip {
   id        Int      @id @default(autoincrement())
-  userId    Int
+  userId    String
   clipId    Int
   order     Int      @default(0)
   addedAt   DateTime @default(now())
