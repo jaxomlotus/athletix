@@ -172,7 +172,7 @@ export default function PageHeader({
                     </p>
                     <p className="text-xs sm:text-sm text-white opacity-80">Followers</p>
                   </div>
-                  <button className="flex items-center gap-2 px-3 py-2 sm:px-8 sm:py-3 bg-white hover:bg-gray-100 text-green-600 font-semibold rounded-lg transition-colors text-sm sm:text-base">
+                  <button className="flex items-center gap-2 px-3 py-2 sm:px-8 sm:py-3 bg-white hover:bg-gray-100 text-green-600 font-semibold rounded-lg transition-colors text-sm sm:text-base cursor-pointer">
                     <FiUserPlus className="w-5 h-5" />
                     <span className="hidden sm:inline">Follow</span>
                   </button>
@@ -263,7 +263,7 @@ export default function PageHeader({
 
             {/* Follow Button (for players) */}
             {showFollowButton && (
-              <button className="flex items-center gap-2 px-3 sm:px-4 py-1.5 bg-white text-green-600 hover:bg-gray-100 font-semibold rounded-lg transition-colors text-sm">
+              <button className="flex items-center gap-2 px-3 sm:px-4 py-1.5 bg-white text-green-600 hover:bg-gray-100 font-semibold rounded-lg transition-colors text-sm cursor-pointer">
                 <FiUserPlus className="w-4 h-4" />
                 <span className="hidden sm:inline">Follow</span>
               </button>

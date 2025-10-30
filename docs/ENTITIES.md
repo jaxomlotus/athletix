@@ -1,6 +1,6 @@
 # Entity Display Information
 
-This document explains how different entity types display information panels in the Voated application using the JSON-based layout system.
+This document explains how different entity types display information panels in the application using the JSON-based layout system.
 
 ## Layout System Overview
 

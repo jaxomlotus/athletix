@@ -1,7 +1,22 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { FaSearch } from "react-icons/fa";
 import { FaRegUserCircle } from "react-icons/fa";
+import { meta } from "@/lib/config";
 
 export default function NavigationHeader() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -10,27 +25,34 @@ export default function NavigationHeader() {
           <div className="flex items-center gap-3 sm:gap-6 flex-1">
             {/* Logo */}
             <a href="/" className="flex items-center">
-              <div className="text-xl sm:text-2xl font-bold text-green-600">Voated</div>
+              <div className="text-xl sm:text-2xl font-bold text-green-600">
+                {meta.brand}
+              </div>
             </a>
 
             {/* Search Bar */}
-            <div className="hidden sm:block flex-1 max-w-md">
+            <form
+              onSubmit={handleSearch}
+              className="hidden sm:block flex-1 max-w-md"
+            >
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <FaSearch className="h-4 w-4 text-gray-400" />
                 </div>
                 <input
                   type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search athletes, teams..."
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-green-500 focus:border-green-500 sm:text-sm cursor-text"
                 />
               </div>
-            </div>
+            </form>
           </div>
 
           {/* Register Button */}
           <div className="flex items-center">
-            <button className="flex items-center gap-2 px-3 sm:px-6 py-1.5 sm:py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors text-xs sm:text-base">
+            <button className="flex items-center gap-2 px-3 sm:px-6 py-1.5 sm:py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors text-xs sm:text-base cursor-pointer">
               <FaRegUserCircle className="w-4 h-4 sm:w-5 sm:h-5" />
               Register
             </button>

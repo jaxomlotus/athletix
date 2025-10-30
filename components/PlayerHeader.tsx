@@ -170,7 +170,7 @@ export default function PlayerHeader({
                   </p>
                   <p className="text-xs sm:text-sm text-gray-500">Followers</p>
                 </div>
-                <button className="flex items-center gap-2 px-6 sm:px-8 py-2 sm:py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors text-sm sm:text-base">
+                <button className="flex items-center gap-2 px-6 sm:px-8 py-2 sm:py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors text-sm sm:text-base cursor-pointer">
                   <FiUserPlus className="w-4 h-4 sm:w-5 sm:h-5" />
                   Follow
                 </button>
@@ -240,7 +240,7 @@ export default function PlayerHeader({
             </div>
 
             {/* Follow Button - vertically centered */}
-            <button className="flex items-center gap-2 px-4 py-1.5 bg-white text-green-600 hover:bg-gray-100 font-semibold rounded-lg transition-colors text-sm">
+            <button className="flex items-center gap-2 px-4 py-1.5 bg-white text-green-600 hover:bg-gray-100 font-semibold rounded-lg transition-colors text-sm cursor-pointer">
               <FiUserPlus className="w-4 h-4" />
               Follow
             </button>

@@ -746,6 +746,7 @@ async function main() {
         city: 'Los Angeles',
         state: 'CA',
         birthdate: '2001-03-15',
+        grade: 'Senior',
         locationId: null, // Will be set after locations are created
         locationName: 'Los Angeles, CA',
         locationSlug: 'los-angeles-ca',
@@ -780,6 +781,7 @@ async function main() {
         city: 'San Francisco',
         state: 'CA',
         birthdate: '2000-07-22',
+        grade: 'Graduate',
         locationId: null, // Will be set after locations are created
         locationName: 'San Francisco, CA',
         locationSlug: 'san-francisco-ca',
@@ -932,6 +934,7 @@ async function main() {
         city: 'Woodmere',
         state: 'NY',
         birthdate: '2007-11-08',
+        grade: 'Junior',
         locationId: null, // Will be set after locations are created
         locationName: 'Woodmere, NY',
         locationSlug: 'woodmere-ny',

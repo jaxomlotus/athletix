@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { FaThumbsUp } from "react-icons/fa";
@@ -84,7 +86,11 @@ export default function ClipsSection({ clips, title = "Highlight Clips" }: Clips
         {clips.map(({ clip, playerName, playerId, playerSlug, playerAvatar, playerTags, teamTags }, index) => {
           const embedUrl = getYouTubeEmbedUrl(clip.url);
           const rank = index + 1;
-          const rankChange = Math.floor(Math.random() * 7) - 3; // -3 to +3
+
+          // Generate deterministic values based on clip ID for consistent server/client rendering
+          const clipIdNum = parseInt(clip.id);
+          const rankChange = (clipIdNum % 7) - 3; // -3 to +3
+          const votesCount = ((clipIdNum * 37) % 450) + 50; // 50 to 499
           const isRising = rankChange > 0;
 
           return (
@@ -143,12 +149,12 @@ export default function ClipsSection({ clips, title = "Highlight Clips" }: Clips
                 <div className="flex items-center gap-2">
                   <RankBadge rank={rank} rankChange={rankChange} variant="clip" />
                   <button
-                    className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 bg-green-50 hover:bg-green-100 text-green-600 rounded-full transition-colors shrink-0"
+                    className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 bg-green-50 hover:bg-green-100 text-green-600 rounded-full transition-colors shrink-0 cursor-pointer"
                     title="Vote for this clip"
                   >
                     <FaThumbsUp className="w-3 sm:w-4 h-3 sm:h-4" />
                     <span className="font-semibold text-xs sm:text-sm">
-                      {Math.floor(Math.random() * 500) + 50}
+                      {votesCount}
                     </span>
                   </button>
                 </div>

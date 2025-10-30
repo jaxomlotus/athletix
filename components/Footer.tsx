@@ -107,7 +107,9 @@ export default async function Footer() {
 
             {coedSports.length > 0 && (
               <>
-                <h3 className="text-white font-semibold mb-4 mt-6">Coed Sports</h3>
+                <h3 className="text-white font-semibold mb-4 mt-6">
+                  Coed Sports
+                </h3>
                 <ul className="space-y-2 text-sm">
                   {coedSports.map((sport) => (
                     <li key={sport.id}>
@@ -126,7 +128,9 @@ export default async function Footer() {
 
           {/* Women's Sports */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Women&apos;s Sports</h3>
+            <h3 className="text-white font-semibold mb-4">
+              Women&apos;s Sports
+            </h3>
             <ul className="space-y-2 text-sm">
               {womensSports.map((sport) => (
                 <li key={sport.id}>
@@ -143,7 +147,7 @@ export default async function Footer() {
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-sm text-center">
-          <p>&copy; 2024 Voated. All rights reserved.</p>
+          <p>&copy; 2025 Unleavened, LLC. All rights reserved.</p>
         </div>
       </div>
     </footer>

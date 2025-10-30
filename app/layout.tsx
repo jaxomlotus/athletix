@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Analytics } from "@vercel/analytics/next"
+import { Analytics } from "@vercel/analytics/next";
+import { meta } from "@/lib/config";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,12 +16,19 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Voated",
-    template: "%s | Voated",
+    default: meta.brand,
+    template: `%s | ${meta.brand}`,
   },
-  description: "The ultimate platform for athletes to share highlights, connect with fans, and build their personal brand.",
-  keywords: ["sports", "athletics", "highlights", "athletes", "teams", "sports videos"],
-  authors: [{ name: "Voated" }],
+  description: meta.description,
+  keywords: [
+    "sports",
+    "athletics",
+    "highlights",
+    "athletes",
+    "teams",
+    "sports videos",
+  ],
+  authors: [{ name: meta.brand }],
   icons: {
     icon: [
       { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
@@ -34,7 +42,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    siteName: "Voated",
+    siteName: meta.brand,
   },
 };
 
@@ -49,7 +57,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
-        <Analytics/>
+        <Analytics />
       </body>
     </html>
   );
