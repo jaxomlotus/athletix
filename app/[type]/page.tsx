@@ -4,6 +4,8 @@ import {
   buildFilterOptions,
   type AdvancedEntityFilters,
 } from "@/lib/data-access";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import NavigationHeader from "@/components/NavigationHeader";
 import PageHeader from "@/components/PageHeader";
 import ClipsSection from "@/components/ClipsSection";
@@ -73,8 +75,14 @@ async function getEntitiesData(
       gender: searchParams.gender as 'mens' | 'womens' | 'coed' | undefined,
     };
 
-    // Use backend filtering function
-    const entities = await getEntitiesWithAdvancedFilters(entityType, filters);
+    // Get current user session
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+    const userId = session?.user?.id || null;
+
+    // Use backend filtering function with userId for follow status
+    const entities = await getEntitiesWithAdvancedFilters(entityType, filters, userId);
 
     return { entities, entityType };
   } catch (error) {

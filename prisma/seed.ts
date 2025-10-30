@@ -570,6 +570,7 @@ async function main() {
       description: 'Competitive college baseball league',
       logo: 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/24.png',
       parentId: baseball.id,
+      gender: 'MENS',
       childEntities: 'Teams',
       layout: {
         l: [],
@@ -587,6 +588,7 @@ async function main() {
       description: 'Professional basketball league',
       logo: 'https://a.espncdn.com/i/teamlogos/nba/500/lal.png',
       parentId: basketball.id,
+      gender: 'MENS',
       childEntities: 'Teams',
       layout: {
         l: [],
@@ -604,6 +606,7 @@ async function main() {
       description: 'Professional American football league',
       logo: 'https://a.espncdn.com/i/teamlogos/nfl/500/kc.png',
       parentId: football.id,
+      gender: 'MENS',
       childEntities: 'Teams',
       layout: {
         l: [],

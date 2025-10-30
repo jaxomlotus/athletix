@@ -69,8 +69,8 @@ export default function AuthModal({ isOpen, onClose, defaultMode = "signin" }: A
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-md w-full p-6 relative">
+    <div className="fixed inset-0 backdrop-blur-md bg-black/20 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-md w-full p-6 relative shadow-2xl">
         {/* Close button */}
         <button
           onClick={onClose}
@@ -166,6 +166,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = "signin" }: A
           <button
             type="submit"
             disabled={loading}
+            autoFocus
             className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {loading ? "Loading..." : mode === "signin" ? "Sign In" : "Sign Up"}

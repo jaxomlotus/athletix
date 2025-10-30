@@ -3,6 +3,8 @@ import Link from "next/link";
 import React from "react";
 import prisma from "@/lib/prisma";
 import { getEntityBySlug } from "@/lib/data-access";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import NavigationHeader from "@/components/NavigationHeader";
 import PageHeader from "@/components/PageHeader";
 import ClipsSection from "@/components/ClipsSection";
@@ -83,8 +85,14 @@ async function getEntityData(type: string, slug: string) {
     const entityType = getEntityType(type);
     if (!entityType) return null;
 
-    // Use shared data access function
-    const entity = await getEntityBySlug(entityType, slug);
+    // Get current user session
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+    const userId = session?.user?.id || null;
+
+    // Use shared data access function with userId for follow status
+    const entity = await getEntityBySlug(entityType, slug, userId);
 
     return { entity, entityType };
   } catch (error) {
@@ -645,9 +653,15 @@ export default async function EntityDetailPage({
   if (entityType === "sport" && entity.children && entity.children.length > 0) {
     // Build leagues list for filter
     const leaguesMap = new Map<string, string>();
+    const gendersSet = new Set<string>();
+
     entity.children.forEach((child: any) => {
       if (child.type === "league") {
         leaguesMap.set(child.slug, child.name);
+        // Collect unique genders from leagues
+        if (child.gender) {
+          gendersSet.add(child.gender);
+        }
       }
     });
 
@@ -665,11 +679,40 @@ export default async function EntityDetailPage({
       });
     }
 
-    // Apply league filter if active
-    if (filters.league) {
-      filteredChildren = entity.children.filter(
-        (child: any) => child.slug === filters.league
-      );
+    // Build gender filter
+    if (gendersSet.size > 0) {
+      const genderLabelMap: { [key: string]: string } = {
+        'MENS': "Men's",
+        'WOMENS': "Women's",
+        'COED': 'Coed',
+      };
+
+      filterConfig.gender = Array.from(gendersSet)
+        .map((gender) => ({
+          value: gender.toLowerCase(),
+          label: genderLabelMap[gender] || gender,
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label));
+
+      // Build filter labels
+      filterConfig.gender.forEach((opt) => {
+        filterLabels[opt.value] = opt.label;
+      });
+    }
+
+    // Apply filters if active
+    if (filters.league || filters.gender) {
+      filteredChildren = entity.children.filter((child: any) => {
+        // Apply league filter
+        if (filters.league && child.slug !== filters.league) {
+          return false;
+        }
+        // Apply gender filter
+        if (filters.gender && child.gender?.toLowerCase() !== filters.gender) {
+          return false;
+        }
+        return true;
+      });
     }
   }
 
@@ -1489,6 +1532,8 @@ export default async function EntityDetailPage({
         followerCount={entity.followerCount}
         showFollowButton={true}
         entityType={entityType}
+        entityId={entity.id}
+        isFollowing={(entity as any).isFollowing ?? false}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 w-full">

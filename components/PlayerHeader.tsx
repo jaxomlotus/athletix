@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FaHome } from "react-icons/fa";
-import { FiUserPlus } from "react-icons/fi";
+import { FiUserPlus, FiCheck } from "react-icons/fi";
+import { useFollow } from "@/lib/hooks/useFollow";
+import AuthModal from "./AuthModal";
+import ConfirmModal from "./ConfirmModal";
 
 interface Breadcrumb {
   label: string;
@@ -28,6 +31,8 @@ interface PlayerHeaderProps {
   breadcrumbs: Breadcrumb[];
   team?: Team;
   followerCount: number;
+  entityId?: number;
+  isFollowing?: boolean;
 }
 
 export default function PlayerHeader({
@@ -36,9 +41,22 @@ export default function PlayerHeader({
   banner,
   breadcrumbs,
   team,
-  followerCount,
+  followerCount: initialFollowerCount,
+  entityId,
+  isFollowing: initialFollowStatus = false,
 }: PlayerHeaderProps) {
   const [isSticky, setIsSticky] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  const { isFollowing, followerCount, isLoading, toggleFollow, performUnfollow } = useFollow({
+    entityId: entityId || 0,
+    entityName: name,
+    initialFollowStatus,
+    initialFollowerCount: initialFollowerCount || 0,
+    onAuthRequired: () => setShowAuthModal(true),
+    onUnfollowRequest: () => setShowConfirmModal(true),
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -170,9 +188,26 @@ export default function PlayerHeader({
                   </p>
                   <p className="text-xs sm:text-sm text-gray-500">Followers</p>
                 </div>
-                <button className="flex items-center gap-2 px-6 sm:px-8 py-2 sm:py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors text-sm sm:text-base cursor-pointer">
-                  <FiUserPlus className="w-4 h-4 sm:w-5 sm:h-5" />
-                  Follow
+                <button
+                  onClick={toggleFollow}
+                  disabled={isLoading}
+                  className={`flex items-center gap-2 px-6 sm:px-8 py-2 sm:py-3 font-semibold rounded-lg transition-colors text-sm sm:text-base cursor-pointer disabled:opacity-50 ${
+                    isFollowing
+                      ? 'bg-green-600 text-white hover:bg-red-600'
+                      : 'bg-green-600 text-white hover:bg-green-700'
+                  }`}
+                >
+                  {isFollowing ? (
+                    <>
+                      <FiCheck className="w-4 h-4 sm:w-5 sm:h-5" />
+                      Following
+                    </>
+                  ) : (
+                    <>
+                      <FiUserPlus className="w-4 h-4 sm:w-5 sm:h-5" />
+                      Follow
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -240,13 +275,48 @@ export default function PlayerHeader({
             </div>
 
             {/* Follow Button - vertically centered */}
-            <button className="flex items-center gap-2 px-4 py-1.5 bg-white text-green-600 hover:bg-gray-100 font-semibold rounded-lg transition-colors text-sm cursor-pointer">
-              <FiUserPlus className="w-4 h-4" />
-              Follow
+            <button
+              onClick={toggleFollow}
+              disabled={isLoading}
+              className={`flex items-center gap-2 px-4 py-1.5 font-semibold rounded-lg transition-colors text-sm cursor-pointer disabled:opacity-50 ${
+                isFollowing
+                  ? 'bg-white text-green-600 hover:bg-red-50 hover:text-red-600'
+                  : 'bg-white text-green-600 hover:bg-gray-100'
+              }`}
+            >
+              {isFollowing ? (
+                <>
+                  <FiCheck className="w-4 h-4" />
+                  Following
+                </>
+              ) : (
+                <>
+                  <FiUserPlus className="w-4 h-4" />
+                  Follow
+                </>
+              )}
             </button>
           </div>
         </div>
       </div>
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        defaultMode="signup"
+      />
+
+      {/* Confirm Unfollow Modal */}
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={performUnfollow}
+        title="Unfollow"
+        message={`Are you sure you want to unfollow ${name}?`}
+        confirmText="Unfollow"
+        cancelText="Cancel"
+      />
     </>
   );
 }

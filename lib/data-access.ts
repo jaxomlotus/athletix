@@ -21,6 +21,66 @@ import type {
 // CLIPS
 // ============================================================================
 
+// ============================================================================
+// FOLLOW STATUS HELPERS
+// ============================================================================
+
+/**
+ * Check if a user follows specific entities
+ * Returns a Map of entityId -> isFollowing
+ */
+async function getFollowStatusMap(userId: string | null | undefined, entityIds: number[]): Promise<Map<number, boolean>> {
+  if (!userId || entityIds.length === 0) {
+    return new Map();
+  }
+
+  const follows = await prisma.follow.findMany({
+    where: {
+      userId,
+      entityId: {
+        in: entityIds,
+      },
+    },
+    select: {
+      entityId: true,
+    },
+  });
+
+  const followMap = new Map<number, boolean>();
+  follows.forEach(follow => {
+    followMap.set(follow.entityId, true);
+  });
+
+  return followMap;
+}
+
+/**
+ * Attach follow status to a single entity
+ */
+function attachFollowStatus<T extends { id: number }>(
+  entity: T,
+  followMap: Map<number, boolean>
+): T & { isFollowing?: boolean } {
+  return {
+    ...entity,
+    isFollowing: followMap.get(entity.id) || false,
+  };
+}
+
+/**
+ * Attach follow status to multiple entities
+ */
+function attachFollowStatusToEntities<T extends { id: number }>(
+  entities: T[],
+  followMap: Map<number, boolean>
+): (T & { isFollowing?: boolean })[] {
+  return entities.map(entity => attachFollowStatus(entity, followMap));
+}
+
+// ============================================================================
+// CLIPS
+// ============================================================================
+
 /**
  * Get clips with filters and pagination
  * Used by: Homepage, Clips API
@@ -282,9 +342,9 @@ export async function deleteClip(id: number, userId: string) {
  */
 export async function getEntitiesByType(
   type: string,
-  filters: EntityFilters & { page?: number; limit?: number } = {}
+  filters: EntityFilters & { page?: number; limit?: number; userId?: string | null } = {}
 ) {
-  const { page = 1, limit = 20, search, ...otherFilters } = filters;
+  const { page = 1, limit = 20, search, userId, ...otherFilters } = filters;
   const skip = (page - 1) * limit;
 
   const where: Prisma.EntityWhereInput = {
@@ -325,6 +385,7 @@ export async function getEntitiesByType(
             name: true,
             slug: true,
             type: true,
+            gender: true,
           },
         },
         clips: {
@@ -346,8 +407,16 @@ export async function getEntitiesByType(
     prisma.entity.count({ where }),
   ]);
 
+  // Attach follow status if user is authenticated
+  let entitiesWithFollowStatus = entities;
+  if (userId) {
+    const entityIds = entities.map(e => e.id);
+    const followMap = await getFollowStatusMap(userId, entityIds);
+    entitiesWithFollowStatus = attachFollowStatusToEntities(entities, followMap);
+  }
+
   return {
-    entities,
+    entities: entitiesWithFollowStatus,
     total,
     page,
     limit,
@@ -373,7 +442,8 @@ export interface AdvancedEntityFilters {
 
 export async function getEntitiesWithAdvancedFilters(
   entityType: string,
-  filters: AdvancedEntityFilters
+  filters: AdvancedEntityFilters,
+  userId?: string | null
 ) {
   // Start with base query
   let entities = await prisma.entity.findMany({
@@ -638,6 +708,13 @@ export async function getEntitiesWithAdvancedFilters(
       const metadata = entity.metadata as any;
       return metadata?.grade === filters.grade;
     });
+  }
+
+  // Attach follow status if user is authenticated
+  if (userId) {
+    const entityIds = entities.map(e => e.id);
+    const followMap = await getFollowStatusMap(userId, entityIds);
+    return attachFollowStatusToEntities(entities, followMap);
   }
 
   return entities;
@@ -1167,8 +1244,8 @@ export async function buildFilterOptions(
  * Get entity by slug and type
  * Used by: Entity detail pages, Entities API
  */
-export async function getEntityBySlug(type: string, slug: string) {
-  return prisma.entity.findUnique({
+export async function getEntityBySlug(type: string, slug: string, userId?: string | null) {
+  const entity = await prisma.entity.findUnique({
     where: {
       slug,
       type,
@@ -1205,6 +1282,7 @@ export async function getEntityBySlug(type: string, slug: string) {
           slug: true,
           type: true,
           logo: true,
+          gender: true,
         },
       },
       clips: {
@@ -1261,6 +1339,18 @@ export async function getEntityBySlug(type: string, slug: string) {
       },
     },
   });
+
+  if (!entity) {
+    return null;
+  }
+
+  // Attach follow status if user is authenticated
+  if (userId) {
+    const followMap = await getFollowStatusMap(userId, [entity.id]);
+    return attachFollowStatus(entity, followMap);
+  }
+
+  return entity;
 }
 
 /**

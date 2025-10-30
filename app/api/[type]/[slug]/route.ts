@@ -35,8 +35,8 @@ export async function GET(
       return errorResponse('Rate limit exceeded', 429);
     }
 
-    // Fetch entity
-    const entity = await getEntityBySlug(entityType, slug);
+    // Fetch entity with follow status if user is authenticated
+    const entity = await getEntityBySlug(entityType, slug, user?.id);
 
     if (!entity) {
       return errorResponse('Entity not found', 404);

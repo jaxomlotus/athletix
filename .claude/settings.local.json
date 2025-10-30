@@ -15,7 +15,8 @@
       "Bash(powershell.exe -Command \"where.exe node\")",
       "Bash(powershell.exe -Command \"node --version\")",
       "Bash(node:*)",
-      "Read(//mnt/c/Users/muchn/OneDrive/Documents/GitHub/**)"
+      "Read(//mnt/c/Users/muchn/OneDrive/Documents/GitHub/**)",
+      "Bash(yarn tsx:*)"
     ],
     "deny": [],
     "ask": []

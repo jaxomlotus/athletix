@@ -1,9 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
-import { FiUserPlus } from "react-icons/fi";
+import { FiUserPlus, FiCheck } from "react-icons/fi";
 import { EntityType } from "@/lib/entity-utils";
+import { useFollow } from "@/lib/hooks/useFollow";
+import AuthModal from "./AuthModal";
+import ConfirmModal from "./ConfirmModal";
 
 interface EntityCardProps {
   entity: {
@@ -20,17 +23,28 @@ interface EntityCardProps {
     };
     metadata?: any;
     children?: any[];
+    isFollowing?: boolean;
   };
   entityType: EntityType;
   pluralType: string;
 }
 
 export default function EntityCard({ entity, entityType, pluralType }: EntityCardProps) {
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  const { isFollowing, isLoading, toggleFollow, performUnfollow } = useFollow({
+    entityId: entity.id,
+    entityName: entity.name,
+    initialFollowStatus: entity.isFollowing,
+    onAuthRequired: () => setShowAuthModal(true),
+    onUnfollowRequest: () => setShowConfirmModal(true),
+  });
+
   const handleFollow = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    // TODO: Implement follow functionality
-    console.log(`Follow ${entity.name}`);
+    toggleFollow();
   };
 
   // Build gender display for sports
@@ -66,16 +80,31 @@ export default function EntityCard({ entity, entityType, pluralType }: EntityCar
   };
 
   return (
-    <div className="relative flex flex-col gap-3 p-4 rounded-lg border border-gray-200 hover:border-green-500 hover:shadow-md transition-all group">
-      {/* Follow Button - Top Right */}
-      <button
-        onClick={handleFollow}
-        className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border-2 border-gray-300 bg-white text-gray-700 hover:border-green-500 hover:text-green-600 transition-colors cursor-pointer"
-        title={`Follow ${entity.name}`}
-      >
-        <FiUserPlus className="w-3.5 h-3.5" />
-        <span>Follow</span>
-      </button>
+    <>
+      <div className="relative flex flex-col gap-3 p-4 rounded-lg border border-gray-200 hover:border-green-500 hover:shadow-md transition-all group">
+        {/* Follow Button - Top Right */}
+        <button
+          onClick={handleFollow}
+          disabled={isLoading}
+          className={`absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border-2 transition-colors cursor-pointer disabled:opacity-50 ${
+            isFollowing
+              ? 'border-green-500 bg-green-50 text-green-600 hover:border-red-500 hover:bg-red-50 hover:text-red-600'
+              : 'border-gray-300 bg-white text-gray-700 hover:border-green-500 hover:text-green-600'
+          }`}
+          title={isFollowing ? `Unfollow ${entity.name}` : `Follow ${entity.name}`}
+        >
+          {isFollowing ? (
+            <>
+              <FiCheck className="w-3.5 h-3.5" />
+              <span>Following</span>
+            </>
+          ) : (
+            <>
+              <FiUserPlus className="w-3.5 h-3.5" />
+              <span>Follow</span>
+            </>
+          )}
+        </button>
 
       <a href={`/${pluralType}/${entity.slug}`} className="flex flex-col gap-3">
         {entity.logo && (
@@ -120,5 +149,24 @@ export default function EntityCard({ entity, entityType, pluralType }: EntityCar
         </div>
       </a>
     </div>
+
+    {/* Auth Modal */}
+    <AuthModal
+      isOpen={showAuthModal}
+      onClose={() => setShowAuthModal(false)}
+      defaultMode="signup"
+    />
+
+    {/* Confirm Unfollow Modal */}
+    <ConfirmModal
+      isOpen={showConfirmModal}
+      onClose={() => setShowConfirmModal(false)}
+      onConfirm={performUnfollow}
+      title="Unfollow"
+      message={`Are you sure you want to unfollow ${entity.name}?`}
+      confirmText="Unfollow"
+      cancelText="Cancel"
+    />
+    </>
   );
 }

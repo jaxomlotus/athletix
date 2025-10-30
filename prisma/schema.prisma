@@ -111,6 +111,7 @@ model Entity {
   description    String?  @db.Text
   logo           String?  @db.Text
   banner         String?  @db.Text
+  gender         String?  @db.VarChar(20) // 'MENS', 'WOMENS', 'COED' - for leagues/teams (single value)
 
   // Hierarchical structure
   parentId       Int?

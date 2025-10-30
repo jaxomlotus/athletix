@@ -55,10 +55,11 @@ export async function GET(
     // Validate filters
     const validatedFilters = entityFiltersSchema.parse(filters);
 
-    // Fetch entities
+    // Fetch entities with follow status if user is authenticated
     const result = await getEntitiesByType(entityType, {
       ...validatedFilters,
       ...pagination,
+      userId: user?.id,
     });
 
     return paginatedResponse(

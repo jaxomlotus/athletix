@@ -4,8 +4,11 @@ import { useEffect, useState, ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FaHome } from "react-icons/fa";
-import { FiUserPlus } from "react-icons/fi";
+import { FiUserPlus, FiCheck } from "react-icons/fi";
 import { EntityType } from "@/lib/entity-utils";
+import { useFollow } from "@/lib/hooks/useFollow";
+import AuthModal from "./AuthModal";
+import ConfirmModal from "./ConfirmModal";
 
 interface Breadcrumb {
   label: string;
@@ -23,6 +26,8 @@ interface PageHeaderProps {
   followerCount?: number;
   showFollowButton?: boolean;
   entityType?: EntityType;
+  entityId?: number;
+  isFollowing?: boolean;
 }
 
 function getAllBreadcrumbs(breadcrumbs: Breadcrumb[], currentTitle: string): Breadcrumb[] {
@@ -37,14 +42,27 @@ export default function PageHeader({
   logo,
   banner,
   breadcrumbs,
-  followerCount,
+  followerCount: initialFollowerCount,
   showFollowButton = false,
   entityType,
+  entityId,
+  isFollowing: initialFollowStatus = false,
 }: PageHeaderProps) {
   const [isSticky, setIsSticky] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const allBreadcrumbs = getAllBreadcrumbs(breadcrumbs, title);
   const defaultBanner = "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1200&h=400&fit=crop";
   const isSportIcon = entityType === 'sport';
+
+  const { isFollowing, followerCount, isLoading, toggleFollow, performUnfollow } = useFollow({
+    entityId: entityId || 0,
+    entityName: title,
+    initialFollowStatus,
+    initialFollowerCount: initialFollowerCount || 0,
+    onAuthRequired: () => setShowAuthModal(true),
+    onUnfollowRequest: () => setShowConfirmModal(true),
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -172,9 +190,26 @@ export default function PageHeader({
                     </p>
                     <p className="text-xs sm:text-sm text-white opacity-80">Followers</p>
                   </div>
-                  <button className="flex items-center gap-2 px-3 py-2 sm:px-8 sm:py-3 bg-white hover:bg-gray-100 text-green-600 font-semibold rounded-lg transition-colors text-sm sm:text-base cursor-pointer">
-                    <FiUserPlus className="w-5 h-5" />
-                    <span className="hidden sm:inline">Follow</span>
+                  <button
+                    onClick={toggleFollow}
+                    disabled={isLoading}
+                    className={`flex items-center gap-2 px-3 py-2 sm:px-8 sm:py-3 font-semibold rounded-lg transition-colors text-sm sm:text-base cursor-pointer disabled:opacity-50 ${
+                      isFollowing
+                        ? 'bg-white text-green-600 hover:bg-red-50 hover:text-red-600'
+                        : 'bg-white text-green-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    {isFollowing ? (
+                      <>
+                        <FiCheck className="w-5 h-5" />
+                        <span className="hidden sm:inline">Following</span>
+                      </>
+                    ) : (
+                      <>
+                        <FiUserPlus className="w-5 h-5" />
+                        <span className="hidden sm:inline">Follow</span>
+                      </>
+                    )}
                   </button>
                 </div>
               )}
@@ -263,14 +298,49 @@ export default function PageHeader({
 
             {/* Follow Button (for players) */}
             {showFollowButton && (
-              <button className="flex items-center gap-2 px-3 sm:px-4 py-1.5 bg-white text-green-600 hover:bg-gray-100 font-semibold rounded-lg transition-colors text-sm cursor-pointer">
-                <FiUserPlus className="w-4 h-4" />
-                <span className="hidden sm:inline">Follow</span>
+              <button
+                onClick={toggleFollow}
+                disabled={isLoading}
+                className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 font-semibold rounded-lg transition-colors text-sm cursor-pointer disabled:opacity-50 ${
+                  isFollowing
+                    ? 'bg-white text-green-600 hover:bg-red-50 hover:text-red-600'
+                    : 'bg-white text-green-600 hover:bg-gray-100'
+                }`}
+              >
+                {isFollowing ? (
+                  <>
+                    <FiCheck className="w-4 h-4" />
+                    <span className="hidden sm:inline">Following</span>
+                  </>
+                ) : (
+                  <>
+                    <FiUserPlus className="w-4 h-4" />
+                    <span className="hidden sm:inline">Follow</span>
+                  </>
+                )}
               </button>
             )}
           </div>
         </div>
       </div>
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        defaultMode="signup"
+      />
+
+      {/* Confirm Unfollow Modal */}
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={performUnfollow}
+        title="Unfollow"
+        message={`Are you sure you want to unfollow ${title}?`}
+        confirmText="Unfollow"
+        cancelText="Cancel"
+      />
     </>
   );
 }
