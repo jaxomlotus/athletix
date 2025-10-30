@@ -13,7 +13,9 @@
       "Bash(yarn tsc:*)",
       "WebFetch(domain:*)",
       "Bash(powershell.exe -Command \"where.exe node\")",
-      "Bash(powershell.exe -Command \"node --version\")"
+      "Bash(powershell.exe -Command \"node --version\")",
+      "Bash(node:*)",
+      "Read(//mnt/c/Users/muchn/OneDrive/Documents/GitHub/**)"
     ],
     "deny": [],
     "ask": []

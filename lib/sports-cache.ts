@@ -1,25 +1,20 @@
-import prisma from "@/lib/prisma";
+/**
+ * @deprecated Use getCachedSports() from lib/data-access.ts instead
+ * This file is kept for backwards compatibility but now wraps the shared function
+ */
 import { unstable_cache } from "next/cache";
+import { getCachedSports } from "./data-access";
 
 export const getCachedSportsData = unstable_cache(
   async () => {
     try {
-      const allSports = await prisma.entity.findMany({
-        where: { type: 'sport' },
-        orderBy: { name: 'asc' },
-      });
-
-      const mensSports = allSports.filter(sport =>
-        (sport.metadata as { mens?: boolean })?.mens === true
-      );
-      const womensSports = allSports.filter(sport =>
-        (sport.metadata as { womens?: boolean })?.womens === true
-      );
-      const coedSports = allSports.filter(sport =>
-        (sport.metadata as { coed?: boolean })?.coed === true
-      );
-
-      return { mensSports, womensSports, coedSports };
+      // Use shared data access function
+      const result = await getCachedSports();
+      return {
+        mensSports: result.mensSports,
+        womensSports: result.womensSports,
+        coedSports: result.coedSports,
+      };
     } catch (error) {
       console.error("Error fetching sports:", error);
       return { mensSports: [], womensSports: [], coedSports: [] };

@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { getEntityBySlug, updateEntity, deleteEntity } from '@/lib/data-access';
+import { getClipById, updateClip, deleteClip } from '@/lib/data-access';
 import { requireAuth, optionalAuth } from '@/lib/api-auth';
 import { checkRateLimit } from '@/lib/rate-limit';
 import {
@@ -7,25 +7,19 @@ import {
   errorResponse,
   handleError,
 } from '@/lib/api-helpers';
-import { updateEntitySchema } from '@/lib/validation';
-import { getEntityType } from '@/lib/entity-utils';
+import { updateClipSchema } from '@/lib/validation';
 
 /**
- * GET /api/[type]/[slug]
- * Get a single entity by slug and type
+ * GET /api/clips/[id]
+ * Get a single clip by ID
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ type: string; slug: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { type, slug } = await params;
-    const entityType = getEntityType(type);
-
-    if (!entityType) {
-      return errorResponse('Invalid entity type', 400);
-    }
-
+    const { id } = await params;
+    
     // Optional auth (for rate limiting)
     const user = await optionalAuth(request);
 
@@ -35,35 +29,36 @@ export async function GET(
       return errorResponse('Rate limit exceeded', 429);
     }
 
-    // Fetch entity
-    const entity = await getEntityBySlug(entityType, slug);
-
-    if (!entity) {
-      return errorResponse('Entity not found', 404);
+    // Parse and validate ID
+    const clipId = parseInt(id, 10);
+    if (isNaN(clipId)) {
+      return errorResponse('Invalid clip ID', 400);
     }
 
-    return successResponse(entity);
+    // Fetch clip
+    const clip = await getClipById(clipId);
+
+    if (!clip) {
+      return errorResponse('Clip not found', 404);
+    }
+
+    return successResponse(clip);
   } catch (error) {
     return handleError(error);
   }
 }
 
 /**
- * PUT /api/[type]/[slug]
- * Update an entity (requires authentication and ownership)
+ * PUT /api/clips/[id]
+ * Update a clip (requires authentication and ownership)
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ type: string; slug: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { type, slug } = await params;
-    const entityType = getEntityType(type);
-
-    if (!entityType) {
-      return errorResponse('Invalid entity type', 400);
-    }
-
+    const { id } = await params;
+    
     // Require authentication
     const authResult = await requireAuth(request);
     if (!authResult.success) {
@@ -76,37 +71,38 @@ export async function PUT(
     const rateLimit = checkRateLimit(request, user.id, 'mutations');
     if (!rateLimit.allowed) {
       return errorResponse('Rate limit exceeded', 429);
+    }
+
+    // Parse and validate ID
+    const clipId = parseInt(id, 10);
+    if (isNaN(clipId)) {
+      return errorResponse('Invalid clip ID', 400);
     }
 
     // Parse and validate request body
     const body = await request.json();
-    const validatedData = updateEntitySchema.parse(body);
+    const validatedData = updateClipSchema.parse(body);
 
-    // Update entity (ownership check is done in data-access)
-    const entity = await updateEntity(entityType, slug, validatedData, user.id);
+    // Update clip (ownership check is done in data-access)
+    const clip = await updateClip(clipId, validatedData, user.id);
 
-    return successResponse(entity, 'Entity updated successfully');
+    return successResponse(clip, 'Clip updated successfully');
   } catch (error) {
     return handleError(error);
   }
 }
 
 /**
- * DELETE /api/[type]/[slug]
- * Delete an entity (requires authentication and ownership)
+ * DELETE /api/clips/[id]
+ * Delete a clip (requires authentication and ownership)
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ type: string; slug: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { type, slug } = await params;
-    const entityType = getEntityType(type);
-
-    if (!entityType) {
-      return errorResponse('Invalid entity type', 400);
-    }
-
+    const { id } = await params;
+    
     // Require authentication
     const authResult = await requireAuth(request);
     if (!authResult.success) {
@@ -121,10 +117,16 @@ export async function DELETE(
       return errorResponse('Rate limit exceeded', 429);
     }
 
-    // Delete entity (ownership check is done in data-access)
-    await deleteEntity(entityType, slug, user.id);
+    // Parse and validate ID
+    const clipId = parseInt(id, 10);
+    if (isNaN(clipId)) {
+      return errorResponse('Invalid clip ID', 400);
+    }
 
-    return successResponse(null, 'Entity deleted successfully');
+    // Delete clip (ownership check is done in data-access)
+    await deleteClip(clipId, user.id);
+
+    return successResponse(null, 'Clip deleted successfully');
   } catch (error) {
     return handleError(error);
   }

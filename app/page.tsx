@@ -9,7 +9,7 @@ import FilterLoadingOverlay from "@/components/FilterLoadingOverlay";
 import ActiveFilterPills from "@/components/ActiveFilterPills";
 import CollapsibleSection from "@/components/CollapsibleSection";
 import { Metadata } from "next";
-import { getCachedSportsData } from "@/lib/sports-cache";
+import { getClipsWithFilters, getCachedSports } from "@/lib/data-access";
 import { meta } from "@/lib/config";
 
 export const metadata: Metadata = {
@@ -22,106 +22,30 @@ export const metadata: Metadata = {
   },
 };
 
-async function getHomeData(searchParams: Record<string, string>) {
-  try {
-    // Fetch all clips from player entities with full entity information
-    const allClips = await prisma.clip.findMany({
-      include: {
-        entityClips: {
-          include: {
-            entity: {
-              select: {
-                id: true,
-                name: true,
-                slug: true,
-                logo: true,
-                type: true,
-                metadata: true,
-                playerMemberships: {
-                  where: { isCurrent: true },
-                  include: {
-                    team: {
-                      select: {
-                        parent: {
-                          select: {
-                            slug: true,
-                            type: true,
-                            parent: {
-                              select: {
-                                slug: true,
-                                type: true,
-                              },
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-          take: 1, // Get first entity who has this clip
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      take: 100, // Fetch more to account for filtering
-    });
-
-    // Filter clips based on search params
-    let filteredClips = allClips.filter((clip) => clip.entityClips.length > 0);
-
-    // Filter by sport
-    if (searchParams.sport) {
-      filteredClips = filteredClips.filter((clip) => {
-        const entity = clip.entityClips[0]?.entity;
-        if (!entity || entity.type !== "player") return false;
-
-        return (entity as any).playerMemberships?.some((membership: any) => {
-          let current: any = membership.team?.parent;
-          while (current && current.type !== "sport") {
-            current = current.parent;
-          }
-          return current?.slug === searchParams.sport;
-        });
-      });
-    }
-
-    // Filter by location
-    if (searchParams.location) {
-      filteredClips = filteredClips.filter((clip) => {
-        const entity = clip.entityClips[0]?.entity;
-        const metadata = entity?.metadata as any;
-        return metadata?.locationSlug === searchParams.location;
-      });
-    }
-
-    // Filter by school
-    if (searchParams.school) {
-      filteredClips = filteredClips.filter((clip) => {
-        const entity = clip.entityClips[0]?.entity;
-        const metadata = entity?.metadata as any;
-        return metadata?.schoolSlug === searchParams.school;
-      });
-    }
-
-    return filteredClips.slice(0, 20); // Return top 20 after filtering
-  } catch (error) {
-    console.error("Error fetching home data:", error);
-    return [];
-  }
-}
+// Removed getHomeData - now using shared getClipsWithFilters() from data-access.ts
 
 export default async function HomePage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string>>;
 }) {
-  const { mensSports, womensSports, coedSports } = await getCachedSportsData();
   const filters = await searchParams;
-  const allClips = await getHomeData(filters);
+
+  // Fetch cached sports data using shared function
+  const { mensSports, womensSports, coedSports } = await getCachedSports();
+
+  // Fetch clips using shared data access function
+  const clipsResult = await getClipsWithFilters({
+    sport: filters.sport,
+    location: filters.location,
+    school: filters.school,
+    position: filters.position,
+    gender: filters.gender as 'mens' | 'womens' | 'coed' | undefined,
+    page: 1,
+    limit: 20,
+  });
+
+  const allClips = clipsResult.clips;
 
   // Prepare clips for ClipsSection
   const formattedClips = allClips

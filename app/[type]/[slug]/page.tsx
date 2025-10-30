@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import React from "react";
 import prisma from "@/lib/prisma";
+import { getEntityBySlug } from "@/lib/data-access";
 import NavigationHeader from "@/components/NavigationHeader";
 import PageHeader from "@/components/PageHeader";
 import ClipsSection from "@/components/ClipsSection";
@@ -48,14 +49,8 @@ export async function generateMetadata({
     };
   }
 
-  const entity = await prisma.entity.findUnique({
-    where: { slug, type: entityType },
-    select: {
-      name: true,
-      description: true,
-      metadata: true,
-    },
-  });
+  // Use shared data access function
+  const entity = await getEntityBySlug(entityType, slug);
 
   if (!entity) {
     return {
@@ -82,154 +77,14 @@ export async function generateMetadata({
   };
 }
 
+// Refactored to use shared data access function
 async function getEntityData(type: string, slug: string) {
   try {
     const entityType = getEntityType(type);
     if (!entityType) return null;
 
-    const entity = await prisma.entity.findUnique({
-      where: { slug, type: entityType },
-      include: {
-        parent: {
-          include: {
-            parent: {
-              include: {
-                parent: true,
-              },
-            },
-          },
-        },
-        playerMemberships: {
-          where: { isCurrent: true },
-          include: {
-            team: {
-              select: {
-                id: true,
-                name: true,
-                slug: true,
-                logo: true,
-                metadata: true,
-                parent: {
-                  select: {
-                    id: true,
-                    name: true,
-                    slug: true,
-                    type: true,
-                    parent: {
-                      select: {
-                        id: true,
-                        name: true,
-                        slug: true,
-                        type: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-          orderBy: {
-            createdAt: "desc",
-          },
-        },
-        teamMembers: {
-          where: { isCurrent: true },
-          include: {
-            player: {
-              select: {
-                id: true,
-                name: true,
-                slug: true,
-                logo: true,
-                type: true,
-                description: true,
-                clips: {
-                  include: {
-                    clip: true,
-                  },
-                },
-              },
-            },
-          },
-          orderBy: {
-            createdAt: "desc",
-          },
-        },
-        children: {
-          include: {
-            teamMembers: {
-              where: { isCurrent: true },
-              include: {
-                player: {
-                  select: {
-                    id: true,
-                    name: true,
-                    slug: true,
-                    logo: true,
-                    type: true,
-                    clips: {
-                      include: {
-                        clip: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-            children: {
-              include: {
-                teamMembers: {
-                  where: { isCurrent: true },
-                  include: {
-                    player: {
-                      select: {
-                        id: true,
-                        name: true,
-                        slug: true,
-                        logo: true,
-                        type: true,
-                        clips: {
-                          include: {
-                            clip: true,
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-                children: {
-                  include: {
-                    clips: {
-                      include: {
-                        clip: true,
-                      },
-                    },
-                  },
-                },
-                clips: {
-                  include: {
-                    clip: true,
-                  },
-                },
-              },
-            },
-            clips: {
-              include: {
-                clip: true,
-              },
-            },
-          },
-        },
-        clips: {
-          include: {
-            clip: true,
-          },
-          orderBy: {
-            order: "asc",
-          },
-        },
-      },
-    });
+    // Use shared data access function
+    const entity = await getEntityBySlug(entityType, slug);
 
     return { entity, entityType };
   } catch (error) {
@@ -1372,7 +1227,7 @@ export default async function EntityDetailPage({
     const birthdate = metadata.birthdate ? new Date(metadata.birthdate) : null;
 
     // Get school from current team membership (school info is in team metadata)
-    const currentTeam = entity.playerMemberships?.[0]?.team;
+    const currentTeam = entity.playerMemberships?.[0]?.team as any;
     const teamMetadata = (currentTeam?.metadata || {}) as any;
     const schoolName = teamMetadata.schoolName || null;
     const schoolSlug = teamMetadata.schoolSlug || null;

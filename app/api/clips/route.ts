@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { getEntitiesByType, createEntity } from '@/lib/data-access';
+import { getClipsWithFilters, createClip } from '@/lib/data-access';
 import { requireAuth, optionalAuth } from '@/lib/api-auth';
 import { checkRateLimit } from '@/lib/rate-limit';
 import {
@@ -9,26 +9,15 @@ import {
   handleError,
   getPaginationParams,
 } from '@/lib/api-helpers';
-import { createEntitySchema, entityFiltersSchema } from '@/lib/validation';
-import { getEntityType } from '@/lib/entity-utils';
+import { createClipSchema, clipFiltersSchema } from '@/lib/validation';
 
 /**
- * GET /api/[type]
- * List entities by type with filters and pagination
+ * GET /api/clips
+ * List clips with filters and pagination
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ type: string }> }
-) {
+export async function GET(request: NextRequest) {
   try {
-    const { type } = await params;
-    const entityType = getEntityType(type);
-
-    if (!entityType) {
-      return errorResponse('Invalid entity type', 400);
-    }
-
-    // Optional auth (for rate limiting)
+    // Optional auth (for rate limiting purposes)
     const user = await optionalAuth(request);
 
     // Check rate limit
@@ -43,26 +32,27 @@ export async function GET(
 
     // Parse filters
     const filters = {
-      search: searchParams.get('search') || undefined,
       sport: searchParams.get('sport') || undefined,
       league: searchParams.get('league') || undefined,
+      team: searchParams.get('team') || undefined,
+      player: searchParams.get('player') || undefined,
       location: searchParams.get('location') || undefined,
       school: searchParams.get('school') || undefined,
+      position: searchParams.get('position') || undefined,
       gender: searchParams.get('gender') as 'mens' | 'womens' | 'coed' | undefined,
-      parentId: searchParams.get('parentId') ? parseInt(searchParams.get('parentId')!, 10) : undefined,
     };
 
     // Validate filters
-    const validatedFilters = entityFiltersSchema.parse(filters);
+    const validatedFilters = clipFiltersSchema.parse(filters);
 
-    // Fetch entities
-    const result = await getEntitiesByType(entityType, {
+    // Fetch clips
+    const result = await getClipsWithFilters({
       ...validatedFilters,
       ...pagination,
     });
 
     return paginatedResponse(
-      result.entities,
+      result.clips,
       {
         page: result.page,
         limit: result.limit,
@@ -75,21 +65,11 @@ export async function GET(
 }
 
 /**
- * POST /api/[type]
- * Create a new entity (requires authentication)
+ * POST /api/clips
+ * Create a new clip (requires authentication)
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ type: string }> }
-) {
+export async function POST(request: NextRequest) {
   try {
-    const { type } = await params;
-    const entityType = getEntityType(type);
-
-    if (!entityType) {
-      return errorResponse('Invalid entity type', 400);
-    }
-
     // Require authentication
     const authResult = await requireAuth(request);
     if (!authResult.success) {
@@ -98,7 +78,7 @@ export async function POST(
 
     const user = authResult.user;
 
-    // Check rate limit
+    // Check rate limit (mutations are more strict)
     const rateLimit = checkRateLimit(request, user.id, 'mutations');
     if (!rateLimit.allowed) {
       return errorResponse('Rate limit exceeded', 429);
@@ -106,15 +86,12 @@ export async function POST(
 
     // Parse and validate request body
     const body = await request.json();
-    const validatedData = createEntitySchema.parse({
-      ...body,
-      type: entityType, // Ensure type matches URL
-    });
+    const validatedData = createClipSchema.parse(body);
 
-    // Create entity
-    const entity = await createEntity(validatedData, user.id);
+    // Create clip
+    const clip = await createClip(validatedData, user.id);
 
-    return successResponse(entity, 'Entity created successfully', 201);
+    return successResponse(clip, 'Clip created successfully', 201);
   } catch (error) {
     return handleError(error);
   }

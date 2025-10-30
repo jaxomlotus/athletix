@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import prisma from "@/lib/prisma";
+import { searchEntities as searchEntitiesData } from "@/lib/data-access";
 import NavigationHeader from "@/components/NavigationHeader";
 import PageHeader from "@/components/PageHeader";
 import Footer from "@/components/Footer";
@@ -25,6 +25,7 @@ export async function generateMetadata({
   };
 }
 
+// Refactored to use shared data access function
 async function searchEntities(searchTerm: string) {
   if (!searchTerm || searchTerm.trim().length === 0) {
     return {
@@ -38,123 +39,19 @@ async function searchEntities(searchTerm: string) {
 
   const normalizedSearch = searchTerm.toLowerCase().trim();
 
-  // Search across multiple entity types
-  const [sports, leagues, teams, players, locations] = await Promise.all([
-    // Search sports
-    prisma.entity.findMany({
-      where: {
-        type: "sport",
-        name: {
-          contains: normalizedSearch,
-        },
-      },
-      include: {
-        parent: {
-          select: {
-            name: true,
-          },
-        },
-        _count: {
-          select: {
-            clips: true,
-          },
-        },
-      },
-      take: 20,
-    }),
+  // Use shared search function with specific entity types and limit
+  const results = await searchEntitiesData(
+    normalizedSearch,
+    ['sport', 'league', 'team', 'player', 'location'],
+    20
+  );
 
-    // Search leagues
-    prisma.entity.findMany({
-      where: {
-        type: "league",
-        name: {
-          contains: normalizedSearch,
-        },
-      },
-      include: {
-        parent: {
-          select: {
-            name: true,
-          },
-        },
-        _count: {
-          select: {
-            clips: true,
-          },
-        },
-      },
-      take: 20,
-    }),
-
-    // Search teams
-    prisma.entity.findMany({
-      where: {
-        type: "team",
-        name: {
-          contains: normalizedSearch,
-        },
-      },
-      include: {
-        parent: {
-          select: {
-            name: true,
-          },
-        },
-        _count: {
-          select: {
-            clips: true,
-          },
-        },
-      },
-      take: 20,
-    }),
-
-    // Search players
-    prisma.entity.findMany({
-      where: {
-        type: "player",
-        name: {
-          contains: normalizedSearch,
-        },
-      },
-      include: {
-        parent: {
-          select: {
-            name: true,
-          },
-        },
-        _count: {
-          select: {
-            clips: true,
-          },
-        },
-      },
-      take: 20,
-    }),
-
-    // Search locations
-    prisma.entity.findMany({
-      where: {
-        type: "location",
-        name: {
-          contains: normalizedSearch,
-        },
-      },
-      include: {
-        parent: {
-          select: {
-            name: true,
-          },
-        },
-        _count: {
-          select: {
-            clips: true,
-          },
-        },
-      },
-      take: 20,
-    }),
-  ]);
+  // Group results by type
+  const sports = results.filter(e => e.type === 'sport');
+  const leagues = results.filter(e => e.type === 'league');
+  const teams = results.filter(e => e.type === 'team');
+  const players = results.filter(e => e.type === 'player');
+  const locations = results.filter(e => e.type === 'location');
 
   return {
     sports,
