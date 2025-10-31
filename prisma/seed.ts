@@ -757,11 +757,6 @@ async function main() {
           twitter: '@mrod_baseball',
           instagram: '@marcusrod',
         },
-        stats: {
-          battingAverage: '.305',
-          homeRuns: 28,
-          rbi: 87,
-        },
       },
     },
   })
@@ -793,11 +788,6 @@ async function main() {
           instagram: '@theacesarah',
           youtube: '@SarahChenBaseball',
         },
-        stats: {
-          era: '2.15',
-          wins: 18,
-          strikeouts: 245,
-        },
       },
     },
   })
@@ -821,11 +811,6 @@ async function main() {
           twitter: '@jwill_hoops',
           instagram: '@jamalwilliams',
         },
-        stats: {
-          pointsPerGame: 18.5,
-          assistsPerGame: 9.2,
-          stealsPerGame: 2.1,
-        },
       },
     },
   })
@@ -848,11 +833,6 @@ async function main() {
         socialLinks: {
           twitter: '@tommyguns_qb',
           instagram: '@tommyobrien',
-        },
-        stats: {
-          passingYards: 4235,
-          touchdowns: 38,
-          completionPercentage: '68.5%',
         },
       },
     },
@@ -1379,6 +1359,501 @@ async function main() {
   })
 
   console.log('✓ Created team memberships')
+
+  // Create Stats Templates
+  const baseballPlayerBattingTemplate = await prisma.statsTemplate.create({
+    data: {
+      name: 'Baseball Player - Batting',
+      entityType: 'player',
+      sportId: baseball.id,
+      schema: {
+        category: 'batting',
+        fields: [
+          {
+            key: 'gamesPlayed',
+            label: 'Games Played',
+            type: 'integer',
+            required: true,
+            rankable: true,
+            sortOrder: 'desc',
+          },
+          {
+            key: 'atBats',
+            label: 'At Bats',
+            type: 'integer',
+            required: true,
+            rankable: false,
+          },
+          {
+            key: 'hits',
+            label: 'Hits',
+            type: 'integer',
+            required: true,
+            rankable: true,
+            sortOrder: 'desc',
+          },
+          {
+            key: 'battingAverage',
+            label: 'Batting Average',
+            type: 'decimal',
+            format: '.XXX',
+            required: false,
+            calculated: true,
+            formula: 'hits / atBats',
+            rankable: true,
+            sortOrder: 'desc',
+          },
+          {
+            key: 'homeRuns',
+            label: 'Home Runs',
+            type: 'integer',
+            required: true,
+            rankable: true,
+            sortOrder: 'desc',
+          },
+          {
+            key: 'rbi',
+            label: 'RBI',
+            type: 'integer',
+            required: true,
+            rankable: true,
+            sortOrder: 'desc',
+          },
+          {
+            key: 'stolenBases',
+            label: 'Stolen Bases',
+            type: 'integer',
+            required: false,
+            rankable: true,
+            sortOrder: 'desc',
+          },
+        ],
+      },
+    },
+  })
+
+  const baseballPlayerPitchingTemplate = await prisma.statsTemplate.create({
+    data: {
+      name: 'Baseball Player - Pitching',
+      entityType: 'player',
+      sportId: baseball.id,
+      schema: {
+        category: 'pitching',
+        fields: [
+          {
+            key: 'gamesPlayed',
+            label: 'Games Played',
+            type: 'integer',
+            required: true,
+            rankable: true,
+            sortOrder: 'desc',
+          },
+          {
+            key: 'wins',
+            label: 'Wins',
+            type: 'integer',
+            required: true,
+            rankable: true,
+            sortOrder: 'desc',
+          },
+          {
+            key: 'losses',
+            label: 'Losses',
+            type: 'integer',
+            required: true,
+            rankable: true,
+            sortOrder: 'asc',
+          },
+          {
+            key: 'era',
+            label: 'ERA',
+            type: 'decimal',
+            format: 'X.XX',
+            required: true,
+            rankable: true,
+            sortOrder: 'asc',
+          },
+          {
+            key: 'strikeouts',
+            label: 'Strikeouts',
+            type: 'integer',
+            required: true,
+            rankable: true,
+            sortOrder: 'desc',
+          },
+          {
+            key: 'saves',
+            label: 'Saves',
+            type: 'integer',
+            required: false,
+            rankable: true,
+            sortOrder: 'desc',
+          },
+        ],
+      },
+    },
+  })
+
+  const baseballTeamTemplate = await prisma.statsTemplate.create({
+    data: {
+      name: 'Baseball Team - Season',
+      entityType: 'team',
+      sportId: baseball.id,
+      schema: {
+        category: 'season',
+        fields: [
+          {
+            key: 'wins',
+            label: 'Wins',
+            type: 'integer',
+            required: true,
+            rankable: true,
+            sortOrder: 'desc',
+          },
+          {
+            key: 'losses',
+            label: 'Losses',
+            type: 'integer',
+            required: true,
+            rankable: true,
+            sortOrder: 'asc',
+          },
+          {
+            key: 'winPercentage',
+            label: 'Win %',
+            type: 'decimal',
+            format: '.XXX',
+            required: false,
+            calculated: true,
+            formula: 'wins / (wins + losses)',
+            rankable: true,
+            sortOrder: 'desc',
+          },
+          {
+            key: 'runsScored',
+            label: 'Runs Scored',
+            type: 'integer',
+            required: false,
+            rankable: true,
+            sortOrder: 'desc',
+          },
+          {
+            key: 'runsAllowed',
+            label: 'Runs Allowed',
+            type: 'integer',
+            required: false,
+            rankable: true,
+            sortOrder: 'asc',
+          },
+        ],
+      },
+    },
+  })
+
+  const basketballPlayerTemplate = await prisma.statsTemplate.create({
+    data: {
+      name: 'Basketball Player - Season',
+      entityType: 'player',
+      sportId: basketball.id,
+      schema: {
+        category: 'season',
+        fields: [
+          {
+            key: 'gamesPlayed',
+            label: 'Games Played',
+            type: 'integer',
+            required: true,
+            rankable: true,
+            sortOrder: 'desc',
+          },
+          {
+            key: 'pointsPerGame',
+            label: 'Points Per Game',
+            type: 'decimal',
+            format: 'XX.X',
+            required: true,
+            rankable: true,
+            sortOrder: 'desc',
+          },
+          {
+            key: 'assistsPerGame',
+            label: 'Assists Per Game',
+            type: 'decimal',
+            format: 'XX.X',
+            required: true,
+            rankable: true,
+            sortOrder: 'desc',
+          },
+          {
+            key: 'reboundsPerGame',
+            label: 'Rebounds Per Game',
+            type: 'decimal',
+            format: 'XX.X',
+            required: true,
+            rankable: true,
+            sortOrder: 'desc',
+          },
+          {
+            key: 'stealsPerGame',
+            label: 'Steals Per Game',
+            type: 'decimal',
+            format: 'X.X',
+            required: false,
+            rankable: true,
+            sortOrder: 'desc',
+          },
+          {
+            key: 'fieldGoalPercentage',
+            label: 'FG%',
+            type: 'decimal',
+            format: '.XXX',
+            required: false,
+            rankable: true,
+            sortOrder: 'desc',
+          },
+        ],
+      },
+    },
+  })
+
+  const basketballTeamTemplate = await prisma.statsTemplate.create({
+    data: {
+      name: 'Basketball Team - Season',
+      entityType: 'team',
+      sportId: basketball.id,
+      schema: {
+        category: 'season',
+        fields: [
+          {
+            key: 'wins',
+            label: 'Wins',
+            type: 'integer',
+            required: true,
+            rankable: true,
+            sortOrder: 'desc',
+          },
+          {
+            key: 'losses',
+            label: 'Losses',
+            type: 'integer',
+            required: true,
+            rankable: true,
+            sortOrder: 'asc',
+          },
+          {
+            key: 'winPercentage',
+            label: 'Win %',
+            type: 'decimal',
+            format: '.XXX',
+            required: false,
+            calculated: true,
+            formula: 'wins / (wins + losses)',
+            rankable: true,
+            sortOrder: 'desc',
+          },
+          {
+            key: 'pointsPerGame',
+            label: 'Points Per Game',
+            type: 'decimal',
+            format: 'XXX.X',
+            required: false,
+            rankable: true,
+            sortOrder: 'desc',
+          },
+        ],
+      },
+    },
+  })
+
+  console.log('✓ Created stats templates')
+
+  // Create Entity Stats for Players
+  await prisma.entityStats.createMany({
+    data: [
+      // Marcus Rodriguez - 2024 Season at Stanford (Batting)
+      {
+        entityId: player1.id,
+        parentId: cardinals.id,
+        season: '2024',
+        statsType: 'normalized',
+        templateId: baseballPlayerBattingTemplate.id,
+        stats: {
+          gamesPlayed: 52,
+          atBats: 198,
+          hits: 62,
+          battingAverage: '.313',
+          homeRuns: 14,
+          rbi: 48,
+          stolenBases: 8,
+        },
+      },
+      // Marcus Rodriguez - 2023 Season at UCLA (Batting)
+      {
+        entityId: player1.id,
+        parentId: bruins.id,
+        season: '2023',
+        statsType: 'normalized',
+        templateId: baseballPlayerBattingTemplate.id,
+        stats: {
+          gamesPlayed: 48,
+          atBats: 185,
+          hits: 55,
+          battingAverage: '.297',
+          homeRuns: 9,
+          rbi: 32,
+          stolenBases: 12,
+        },
+      },
+      // Marcus Rodriguez - Career Stats (aggregate)
+      {
+        entityId: player1.id,
+        parentId: null,
+        season: 'career',
+        statsType: 'normalized',
+        templateId: baseballPlayerBattingTemplate.id,
+        stats: {
+          gamesPlayed: 145,
+          atBats: 560,
+          hits: 171,
+          battingAverage: '.305',
+          homeRuns: 28,
+          rbi: 87,
+          stolenBases: 24,
+        },
+      },
+      // Sarah Chen - 2024 Season at UCLA (Pitching)
+      {
+        entityId: player2.id,
+        parentId: bruins.id,
+        season: '2024',
+        statsType: 'normalized',
+        templateId: baseballPlayerPitchingTemplate.id,
+        stats: {
+          gamesPlayed: 18,
+          wins: 12,
+          losses: 3,
+          era: '2.15',
+          strikeouts: 156,
+          saves: 0,
+        },
+      },
+      // Sarah Chen - 2023 Season at UCLA (Pitching)
+      {
+        entityId: player2.id,
+        parentId: bruins.id,
+        season: '2023',
+        statsType: 'normalized',
+        templateId: baseballPlayerPitchingTemplate.id,
+        stats: {
+          gamesPlayed: 15,
+          wins: 9,
+          losses: 4,
+          era: '2.68',
+          strikeouts: 132,
+          saves: 2,
+        },
+      },
+      // Jamal Williams - 2024 Season at Lakers (Basketball)
+      {
+        entityId: player3.id,
+        parentId: lakers.id,
+        season: '2024',
+        statsType: 'normalized',
+        templateId: basketballPlayerTemplate.id,
+        stats: {
+          gamesPlayed: 72,
+          pointsPerGame: 18.5,
+          assistsPerGame: 9.2,
+          reboundsPerGame: 4.1,
+          stealsPerGame: 2.1,
+          fieldGoalPercentage: '.445',
+        },
+      },
+      // Jamal Williams - 2023 Season at UCLA (Basketball)
+      {
+        entityId: player3.id,
+        parentId: bruins.id,
+        season: '2023',
+        statsType: 'normalized',
+        templateId: basketballPlayerTemplate.id,
+        stats: {
+          gamesPlayed: 32,
+          pointsPerGame: 15.8,
+          assistsPerGame: 6.5,
+          reboundsPerGame: 3.8,
+          stealsPerGame: 1.8,
+          fieldGoalPercentage: '.418',
+        },
+      },
+    ],
+  })
+
+  // Create Entity Stats for Teams
+  await prisma.entityStats.createMany({
+    data: [
+      // Stanford Cardinals - 2024 Season
+      {
+        entityId: cardinals.id,
+        parentId: mlb.id,
+        season: '2024',
+        statsType: 'normalized',
+        templateId: baseballTeamTemplate.id,
+        stats: {
+          wins: 42,
+          losses: 18,
+          winPercentage: '.700',
+          runsScored: 428,
+          runsAllowed: 312,
+        },
+      },
+      // Stanford Cardinals - 2023 Season
+      {
+        entityId: cardinals.id,
+        parentId: mlb.id,
+        season: '2023',
+        statsType: 'normalized',
+        templateId: baseballTeamTemplate.id,
+        stats: {
+          wins: 38,
+          losses: 22,
+          winPercentage: '.633',
+          runsScored: 385,
+          runsAllowed: 340,
+        },
+      },
+      // UCLA Bruins - 2024 Season
+      {
+        entityId: bruins.id,
+        parentId: mlb.id,
+        season: '2024',
+        statsType: 'normalized',
+        templateId: baseballTeamTemplate.id,
+        stats: {
+          wins: 35,
+          losses: 25,
+          winPercentage: '.583',
+          runsScored: 372,
+          runsAllowed: 358,
+        },
+      },
+      // LA Lakers - 2024 Season
+      {
+        entityId: lakers.id,
+        parentId: nba.id,
+        season: '2024',
+        statsType: 'normalized',
+        templateId: basketballTeamTemplate.id,
+        stats: {
+          wins: 47,
+          losses: 35,
+          winPercentage: '.573',
+          pointsPerGame: 112.4,
+        },
+      },
+    ],
+  })
+
+  console.log('✓ Created entity stats')
 
   console.log('✅ Seed completed successfully!')
 }

@@ -1863,6 +1863,80 @@ export async function getPlayerSports(playerId: number): Promise<Array<{ slug: s
   return Array.from(sportsMap.entries()).map(([slug, name]) => ({ slug, name }));
 }
 
+/**
+ * Get entity stats for a specific entity (player, team, etc.)
+ * Used by: Entity detail pages to display stats
+ */
+export async function getEntityStats(
+  entityId: number,
+  options: {
+    season?: string | null;
+    statsType?: 'normalized' | 'custom';
+    includeCareer?: boolean;
+  } = {}
+) {
+  const { season, statsType, includeCareer = false } = options;
+
+  const where: any = {
+    entityId,
+  };
+
+  if (statsType) {
+    where.statsType = statsType;
+  }
+
+  // If a specific season is requested, get that season
+  // If includeCareer is true, also get career stats
+  // Otherwise, get all stats
+  if (season && !includeCareer) {
+    where.season = season;
+  } else if (season && includeCareer) {
+    where.OR = [{ season }, { season: 'career' }];
+  }
+
+  const stats = await prisma.entityStats.findMany({
+    where,
+    include: {
+      template: {
+        include: {
+          sport: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+            },
+          },
+          league: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+            },
+          },
+        },
+      },
+      parent: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          type: true,
+        },
+      },
+    },
+    orderBy: [
+      {
+        season: 'desc',
+      },
+      {
+        createdAt: 'desc',
+      },
+    ],
+  });
+
+  return stats;
+}
+
 // ============================================================================
 // SPORTS CACHE
 // ============================================================================

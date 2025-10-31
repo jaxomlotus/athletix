@@ -204,7 +204,7 @@ export default function PageHeader({
                   )}
                 </h1>
                 {subtitle && (
-                  <div className="text-base sm:text-xl font-semibold mb-1 sm:mb-2 text-white opacity-90">
+                  <div className="text-base sm:text-xl  mb-1 sm:mb-2 text-white opacity-90">
                     {subtitle}
                   </div>
                 )}

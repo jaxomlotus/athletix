@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import React from "react";
 import prisma from "@/lib/prisma";
-import { getEntityBySlug, getEntitySeasons, getPlayerSports } from "@/lib/data-access";
+import { getEntityBySlug, getEntitySeasons, getPlayerSports, getEntityStats } from "@/lib/data-access";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import NavigationHeader from "@/components/NavigationHeader";
@@ -14,6 +14,7 @@ import RankBadge from "@/components/RankBadge";
 import Filter, { FilterConfig } from "@/components/Filter";
 import FilterLoadingOverlay from "@/components/FilterLoadingOverlay";
 import ActiveFilterPills from "@/components/ActiveFilterPills";
+import StatsTable from "@/components/StatsTable";
 import {
   getEntityType,
   getEntityDisplayName,
@@ -98,7 +99,19 @@ async function getEntityData(
     // Use shared data access function with userId for follow status and season filter
     const entity = await getEntityBySlug(entityType, slug, userId, season);
 
-    return { entity, entityType };
+    if (!entity) return null;
+
+    // Fetch entity stats (for players and teams)
+    let entityStats: any[] = [];
+    if (entityType === 'player' || entityType === 'team') {
+      entityStats = await getEntityStats(entity.id, {
+        season: season || undefined,
+        statsType: 'normalized',
+        includeCareer: !season, // Include career stats when no season filter is active
+      });
+    }
+
+    return { entity, entityType, entityStats };
   } catch (error) {
     console.error("Error fetching entity:", error);
     return null;
@@ -190,7 +203,7 @@ export default async function EntityDetailPage({
     notFound();
   }
 
-  const { entity, entityType } = data;
+  const { entity, entityType, entityStats } = data;
 
   // Get team IDs for season filtering (for clip filtering by team tags)
   let seasonTeamIds: number[] = [];
@@ -899,36 +912,9 @@ export default async function EntityDetailPage({
     // Handle standard widgets
     switch (widgetName) {
       case "Meta":
-        if (
-          entityType === "player" &&
-          metadata.stats &&
-          Object.keys(metadata.stats).length > 0
-        ) {
-          return (
-            <div
-              key="Meta"
-              className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6"
-            >
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-                Stats
-              </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {Object.entries(metadata.stats).map(([key, value]) => (
-                  <div
-                    key={key}
-                    className="text-center p-3 bg-gray-50 rounded-lg"
-                  >
-                    <p className="text-xs text-gray-600 uppercase tracking-wide mb-1">
-                      {key.replace(/([A-Z])/g, " $1").trim()}
-                    </p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {String(value)}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
+        // Show stats table for players and teams
+        if ((entityType === "player" || entityType === "team") && entityStats && entityStats.length > 0) {
+          return <StatsTable key="Meta" stats={entityStats} title="Stats" />;
         }
         return null;
 

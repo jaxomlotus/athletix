@@ -144,6 +144,12 @@ model Entity {
   playerMemberships  TeamMembership[] @relation("PlayerMemberships")
   teamMembers        TeamMembership[] @relation("TeamMembers")
 
+  // Stats system
+  statsTemplatesForSport  StatsTemplate[] @relation("SportTemplates")
+  statsTemplatesForLeague StatsTemplate[] @relation("LeagueTemplates")
+  entityStats             EntityStats[]   @relation("EntityStats")
+  statsAsParent           EntityStats[]   @relation("StatsParent")
+
   @@index([type])
   @@index([parentId])
   @@index([ownerId])
@@ -233,4 +239,50 @@ model TeamMembership {
   @@index([teamId])
   @@index([isCurrent])
   @@map("TeamMemberships")
+}
+
+// Stats Template - defines structure for different stat types
+model StatsTemplate {
+  id           Int      @id @default(autoincrement())
+  name         String   @db.VarChar(256) // "Baseball Player Batting", "Basketball Team Season"
+  entityType   String   @db.VarChar(50)  // "player", "team", "league" - what entity type this template is for
+  sportId      Int      // Links to sport entity
+  leagueId     Int?     // Optional - for league-specific customizations
+  schema       Json     // Defines the stats fields, types, labels, validation, etc.
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sport        Entity       @relation("SportTemplates", fields: [sportId], references: [id], onDelete: Cascade)
+  league       Entity?      @relation("LeagueTemplates", fields: [leagueId], references: [id], onDelete: Cascade)
+  entityStats  EntityStats[]
+
+  @@index([sportId])
+  @@index([leagueId])
+  @@index([entityType])
+  @@map("StatsTemplates")
+}
+
+// Entity Stats - stats for any entity (player, team, league, etc.)
+model EntityStats {
+  id          Int      @id @default(autoincrement())
+  entityId    Int      // The entity these stats belong to (player, team, etc.)
+  parentId    Int?     // Optional parent entity (e.g., which team for player, which league for team)
+  season      String   @db.VarChar(50) // "2024", "2024-2025", "career"
+  statsType   String   @db.VarChar(50) // "normalized", "custom"
+  templateId  Int?     // Links to StatsTemplate if normalized
+  stats       Json     // The actual stats data
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  entity      Entity          @relation("EntityStats", fields: [entityId], references: [id], onDelete: Cascade)
+  parent      Entity?         @relation("StatsParent", fields: [parentId], references: [id], onDelete: SetNull)
+  template    StatsTemplate?  @relation(fields: [templateId], references: [id], onDelete: SetNull)
+
+  @@unique([entityId, season, parentId, statsType, templateId])
+  @@index([entityId])
+  @@index([season])
+  @@index([templateId])
+  @@index([parentId])
+  @@map("EntityStats")
 }
