@@ -1244,7 +1244,48 @@ export async function buildFilterOptions(
  * Get entity by slug and type
  * Used by: Entity detail pages, Entities API
  */
-export async function getEntityBySlug(type: string, slug: string, userId?: string | null) {
+export async function getEntityBySlug(
+  type: string,
+  slug: string,
+  userId?: string | null,
+  season?: string | null
+) {
+  // Build membership filter based on season parameter
+  // If season is provided, filter by that season
+  // If season is null/undefined, show ALL memberships (no filter)
+  const membershipWhere = season ? { season } : {};
+
+  // Build clip filter based on season parameter
+  // Filter clips by recordedAt (or createdAt as fallback) within the season date range
+  let clipWhere = {};
+  if (season) {
+    const seasonYear = season.includes('-')
+      ? parseInt(season.split('-')[0])
+      : parseInt(season);
+
+    const seasonStart = new Date(`${seasonYear}-09-01`);
+    const seasonEnd = new Date(`${seasonYear + 1}-06-01`);
+
+    // Filter clips where recordedAt (or createdAt if recordedAt is null) falls within season
+    clipWhere = {
+      OR: [
+        {
+          recordedAt: {
+            gte: seasonStart,
+            lte: seasonEnd,
+          },
+        },
+        {
+          recordedAt: null,
+          createdAt: {
+            gte: seasonStart,
+            lte: seasonEnd,
+          },
+        },
+      ],
+    };
+  }
+
   const entity = await prisma.entity.findUnique({
     where: {
       slug,
@@ -1286,6 +1327,9 @@ export async function getEntityBySlug(type: string, slug: string, userId?: strin
         },
       },
       clips: {
+        where: {
+          clip: clipWhere,
+        },
         include: {
           clip: true,
         },
@@ -1294,9 +1338,7 @@ export async function getEntityBySlug(type: string, slug: string, userId?: strin
         },
       },
       playerMemberships: {
-        where: {
-          isCurrent: true,
-        },
+        where: membershipWhere,
         include: {
           team: {
             select: {
@@ -1323,9 +1365,7 @@ export async function getEntityBySlug(type: string, slug: string, userId?: strin
         },
       },
       teamMembers: {
-        where: {
-          isCurrent: true,
-        },
+        where: membershipWhere,
         include: {
           player: {
             select: {
@@ -1718,6 +1758,109 @@ export async function deleteMembership(id: number, userId: string) {
   return prisma.teamMembership.delete({
     where: { id },
   });
+}
+
+// ============================================================================
+// SEASONS
+// ============================================================================
+
+/**
+ * Get available seasons from team memberships
+ * Used by: Entity detail pages for season filter
+ */
+export async function getAvailableSeasons(): Promise<string[]> {
+  const memberships = await prisma.teamMembership.findMany({
+    where: {
+      season: {
+        not: null,
+      },
+    },
+    select: {
+      season: true,
+    },
+    distinct: ['season'],
+    orderBy: {
+      season: 'desc',
+    },
+  });
+
+  return memberships
+    .map((m) => m.season)
+    .filter((season): season is string => season !== null);
+}
+
+/**
+ * Get available seasons for a specific entity (player or team)
+ * Used by: Entity detail pages for season filter
+ */
+export async function getEntitySeasons(
+  entityId: number,
+  entityType: 'player' | 'team'
+): Promise<string[]> {
+  const whereClause =
+    entityType === 'player' ? { playerId: entityId } : { teamId: entityId };
+
+  const memberships = await prisma.teamMembership.findMany({
+    where: {
+      ...whereClause,
+      season: {
+        not: null,
+      },
+    },
+    select: {
+      season: true,
+    },
+    distinct: ['season'],
+    orderBy: {
+      season: 'desc',
+    },
+  });
+
+  return memberships
+    .map((m) => m.season)
+    .filter((season): season is string => season !== null);
+}
+
+/**
+ * Get available sports for a player
+ * Used by: Player detail pages for sport filter
+ */
+export async function getPlayerSports(playerId: number): Promise<Array<{ slug: string; name: string }>> {
+  const memberships = await prisma.teamMembership.findMany({
+    where: {
+      playerId,
+    },
+    include: {
+      team: {
+        include: {
+          parent: {
+            include: {
+              parent: {
+                select: {
+                  id: true,
+                  slug: true,
+                  name: true,
+                  type: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  // Extract unique sports (team -> league -> sport)
+  const sportsMap = new Map<string, string>();
+
+  memberships.forEach((m) => {
+    const sport = m.team?.parent?.parent;
+    if (sport && sport.type === 'sport') {
+      sportsMap.set(sport.slug, sport.name);
+    }
+  });
+
+  return Array.from(sportsMap.entries()).map(([slug, name]) => ({ slug, name }));
 }
 
 // ============================================================================

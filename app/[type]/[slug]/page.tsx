@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import React from "react";
 import prisma from "@/lib/prisma";
-import { getEntityBySlug } from "@/lib/data-access";
+import { getEntityBySlug, getEntitySeasons, getPlayerSports } from "@/lib/data-access";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import NavigationHeader from "@/components/NavigationHeader";
@@ -80,7 +80,11 @@ export async function generateMetadata({
 }
 
 // Refactored to use shared data access function
-async function getEntityData(type: string, slug: string) {
+async function getEntityData(
+  type: string,
+  slug: string,
+  season?: string | null
+) {
   try {
     const entityType = getEntityType(type);
     if (!entityType) return null;
@@ -91,8 +95,8 @@ async function getEntityData(type: string, slug: string) {
     });
     const userId = session?.user?.id || null;
 
-    // Use shared data access function with userId for follow status
-    const entity = await getEntityBySlug(entityType, slug, userId);
+    // Use shared data access function with userId for follow status and season filter
+    const entity = await getEntityBySlug(entityType, slug, userId, season);
 
     return { entity, entityType };
   } catch (error) {
@@ -175,15 +179,58 @@ export default async function EntityDetailPage({
 }) {
   const { type, slug } = await params;
   const filters = await searchParams;
-  const data = await getEntityData(type, slug);
+
+  // Extract filters from URL parameters
+  const season = filters.season || null;
+  const sport = filters.sport || null;
+
+  const data = await getEntityData(type, slug, season);
 
   if (!data || !data.entity) {
     notFound();
   }
 
   const { entity, entityType } = data;
+
+  // Get team IDs for season filtering (for clip filtering by team tags)
+  let seasonTeamIds: number[] = [];
+  if (season && entityType === "player" && entity.playerMemberships) {
+    seasonTeamIds = entity.playerMemberships
+      .filter((m: any) => m.season === season)
+      .map((m: any) => m.teamId);
+  }
+
+  // Get clip IDs that are tagged with the season's teams (for enhanced filtering)
+  let seasonClipIds: Set<number> = new Set();
+  if (seasonTeamIds.length > 0) {
+    const teamClips = await prisma.entityClip.findMany({
+      where: {
+        entityId: {
+          in: seasonTeamIds,
+        },
+      },
+      select: {
+        clipId: true,
+      },
+    });
+    seasonClipIds = new Set(teamClips.map((ec) => ec.clipId));
+  }
+
   const metadata = (entity.metadata || {}) as any;
   const childType = getChildEntityType(entityType);
+
+  // Apply sport filter for player pages
+  if (entityType === "player" && sport && entity.playerMemberships) {
+    entity.playerMemberships = entity.playerMemberships.filter((membership: any) => {
+      const sportEntity = membership.team?.parent?.parent;
+      return sportEntity && sportEntity.slug === sport;
+    });
+  }
+
+  // Filter clips by team tags when season is selected (enhanced filtering)
+  if (season && entityType === "player" && seasonClipIds.size > 0) {
+    entity.clips = entity.clips.filter((ec: any) => seasonClipIds.has(ec.clipId));
+  }
 
   // Aggregate clips from entity and its children
   const entityClips = entity.clips.map(({ clip }: any) => ({
@@ -377,6 +424,38 @@ export default async function EntityDetailPage({
   let schoolTeams: any[] = [];
 
   if (entityType === "school") {
+    // Build membership filter based on season parameter
+    const membershipWhere = season ? { season } : {};
+
+    // Build clip filter based on season parameter
+    let clipWhere = {};
+    if (season) {
+      const seasonYear = season.includes('-')
+        ? parseInt(season.split('-')[0])
+        : parseInt(season);
+
+      const seasonStart = new Date(`${seasonYear}-09-01`);
+      const seasonEnd = new Date(`${seasonYear + 1}-06-01`);
+
+      clipWhere = {
+        OR: [
+          {
+            recordedAt: {
+              gte: seasonStart,
+              lte: seasonEnd,
+            },
+          },
+          {
+            recordedAt: null,
+            createdAt: {
+              gte: seasonStart,
+              lte: seasonEnd,
+            },
+          },
+        ],
+      };
+    }
+
     // Query teams where metadata contains this school's slug
     const allTeams = await prisma.entity.findMany({
       where: {
@@ -400,7 +479,7 @@ export default async function EntityDetailPage({
           },
         },
         teamMembers: {
-          where: { isCurrent: true },
+          where: membershipWhere,
           include: {
             player: {
               select: {
@@ -409,6 +488,9 @@ export default async function EntityDetailPage({
                 slug: true,
                 logo: true,
                 clips: {
+                  where: {
+                    clip: clipWhere,
+                  },
                   include: {
                     clip: true,
                   },
@@ -418,6 +500,9 @@ export default async function EntityDetailPage({
           },
         },
         clips: {
+          where: {
+            clip: clipWhere,
+          },
           include: {
             clip: true,
           },
@@ -437,6 +522,38 @@ export default async function EntityDetailPage({
   let locationPlayers: any[] = [];
 
   if (entityType === "location") {
+    // Build membership filter based on season parameter
+    const membershipWhere = season ? { season } : {};
+
+    // Build clip filter based on season parameter
+    let clipWhere = {};
+    if (season) {
+      const seasonYear = season.includes('-')
+        ? parseInt(season.split('-')[0])
+        : parseInt(season);
+
+      const seasonStart = new Date(`${seasonYear}-09-01`);
+      const seasonEnd = new Date(`${seasonYear + 1}-06-01`);
+
+      clipWhere = {
+        OR: [
+          {
+            recordedAt: {
+              gte: seasonStart,
+              lte: seasonEnd,
+            },
+          },
+          {
+            recordedAt: null,
+            createdAt: {
+              gte: seasonStart,
+              lte: seasonEnd,
+            },
+          },
+        ],
+      };
+    }
+
     // Query entities where metadata contains this location
     const allEntities = await prisma.entity.findMany({
       where: {
@@ -444,12 +561,15 @@ export default async function EntityDetailPage({
       },
       include: {
         clips: {
+          where: {
+            clip: clipWhere,
+          },
           include: {
             clip: true,
           },
         },
         teamMembers: {
-          where: { isCurrent: true },
+          where: membershipWhere,
           include: {
             player: {
               select: {
@@ -458,6 +578,9 @@ export default async function EntityDetailPage({
                 slug: true,
                 logo: true,
                 clips: {
+                  where: {
+                    clip: clipWhere,
+                  },
                   include: {
                     clip: true,
                   },
@@ -645,10 +768,40 @@ export default async function EntityDetailPage({
   const breadcrumbs = buildBreadcrumbs(entity, entityType);
   const displayName = getEntityDisplayName(entityType);
 
-  // Build filter configuration for sports pages
+  // Build filter configuration
   let filterConfig: FilterConfig = {};
   let filterLabels: { [key: string]: string } = {};
   let filteredChildren = entity.children || [];
+
+  // Get available seasons for player and team pages
+  if (entityType === "player" || entityType === "team") {
+    const seasons = await getEntitySeasons(entity.id, entityType);
+    if (seasons.length > 0) {
+      filterConfig.seasons = seasons.map((s) => ({
+        value: s,
+        label: s,
+      }));
+      // Add to filter labels
+      seasons.forEach((s) => {
+        filterLabels[s] = s;
+      });
+    }
+  }
+
+  // Get available sports for player pages
+  if (entityType === "player") {
+    const sports = await getPlayerSports(entity.id);
+    if (sports.length > 0) {
+      filterConfig.sports = sports.map((s) => ({
+        value: s.slug,
+        label: s.name,
+      }));
+      // Add to filter labels
+      sports.forEach((s) => {
+        filterLabels[s.slug] = s.name;
+      });
+    }
+  }
 
   if (entityType === "sport" && entity.children && entity.children.length > 0) {
     // Build leagues list for filter
@@ -781,7 +934,21 @@ export default async function EntityDetailPage({
 
       case "Teams":
         // For players - show their teams
-        if (entity.playerMemberships && entity.playerMemberships.length > 0) {
+        if (entity.playerMemberships) {
+          // Sort memberships by season (descending) then team name (alphabetically)
+          const sortedMemberships = entity.playerMemberships.length > 0
+            ? [...entity.playerMemberships].sort((a: any, b: any) => {
+                // Primary sort: by season (descending - most recent first)
+                const seasonA = a.season || '';
+                const seasonB = b.season || '';
+                if (seasonA !== seasonB) {
+                  return seasonB.localeCompare(seasonA);
+                }
+                // Secondary sort: by team name (alphabetically)
+                return a.team.name.localeCompare(b.team.name);
+              })
+            : [];
+
           return (
             <div
               key="Teams"
@@ -790,17 +957,18 @@ export default async function EntityDetailPage({
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
                 Teams
               </h2>
-              <div className="space-y-3">
-                {entity.playerMemberships.map((membership: any) => {
-                  const positions = membership.positions as string[] | null;
-                  return (
-                    <div
-                      key={membership.id}
-                      className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:border-green-500 transition-colors"
-                    >
-                      {membership.team.logo && (
-                        <Link href={`/teams/${membership.team.slug}`}>
-                          <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center hover:opacity-80 transition-opacity">
+              {sortedMemberships.length > 0 ? (
+                <div className="space-y-3">
+                  {sortedMemberships.map((membership: any) => {
+                    const positions = membership.positions as string[] | null;
+                    return (
+                      <Link
+                        key={membership.id}
+                        href={`/teams/${membership.team.slug}`}
+                        className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:border-green-500 transition-colors cursor-pointer"
+                      >
+                        {membership.team.logo && (
+                          <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
                             <Image
                               src={membership.team.logo}
                               alt={membership.team.name}
@@ -808,40 +976,39 @@ export default async function EntityDetailPage({
                               className="object-contain p-1"
                             />
                           </div>
-                        </Link>
-                      )}
-                      <div className="flex-1">
-                        <Link
-                          href={`/teams/${membership.team.slug}`}
-                          className="text-lg font-semibold text-gray-900 hover:text-green-600 transition-colors"
-                        >
-                          {membership.team.name}
-                          {membership.jerseyNumber && (
-                            <span className="ml-2 text-gray-500">
-                              #{membership.jerseyNumber}
-                            </span>
+                        )}
+                        <div className="flex-1">
+                          <div className="text-lg font-semibold text-gray-900">
+                            {membership.team.name}
+                            {membership.jerseyNumber && (
+                              <span className="ml-2 text-gray-500">
+                                #{membership.jerseyNumber}
+                              </span>
+                            )}
+                          </div>
+                          {positions && positions.length > 0 && (
+                            <p className="text-sm text-gray-600 mt-0.5">
+                              {positions.join(" • ")}
+                            </p>
                           )}
-                        </Link>
-                        {positions && positions.length > 0 && (
-                          <p className="text-sm text-gray-600 mt-0.5">
-                            {positions.join(" • ")}
-                          </p>
-                        )}
-                        {membership.season && (
-                          <p className="text-xs text-gray-500 mt-1">
-                            {membership.season}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                          {membership.season && (
+                            <p className="text-xs text-gray-500 mt-1">
+                              {membership.season}
+                            </p>
+                          )}
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-center py-8">No teams to show</p>
+              )}
             </div>
           );
         }
         // For schools - show their teams
-        if (schoolTeams.length > 0) {
+        if (entityType === "school") {
           return (
             <div
               key="Teams"
@@ -850,15 +1017,78 @@ export default async function EntityDetailPage({
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
                 Teams
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {schoolTeams.map((team: any) => {
-                  const sportName = team.parent?.parent?.name;
-                  const leagueName = team.parent?.name;
-                  return (
+              {schoolTeams.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {schoolTeams.map((team: any) => {
+                    const sportName = team.parent?.parent?.name;
+                    const leagueName = team.parent?.name;
+                    return (
+                      <a
+                        key={team.id}
+                        href={`/teams/${team.slug}`}
+                        className="flex gap-3 p-4 rounded-lg border border-gray-200 hover:border-green-500 hover:shadow-md transition-all cursor-pointer"
+                      >
+                        {team.logo && (
+                          <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 flex items-center justify-center bg-gray-100">
+                            <img
+                              src={team.logo}
+                              alt={team.name}
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-gray-900 text-base sm:text-lg truncate">
+                            {team.name}
+                          </h3>
+                          {team.description && (
+                            <p className="text-sm text-gray-600 line-clamp-2">
+                              {team.description}
+                            </p>
+                          )}
+                          {(sportName || leagueName) && (
+                            <p className="text-xs text-gray-500 mt-1">
+                              {sportName && sportName}
+                              {sportName && leagueName && " • "}
+                              {leagueName && leagueName}
+                            </p>
+                          )}
+                          {team.teamMembers && team.teamMembers.length > 0 && (
+                            <p className="text-xs text-green-600 font-semibold mt-2">
+                              {team.teamMembers.length}{" "}
+                              {team.teamMembers.length === 1
+                                ? "player"
+                                : "players"}
+                            </p>
+                          )}
+                        </div>
+                      </a>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-center py-8">No teams to show</p>
+              )}
+            </div>
+          );
+        }
+        // For locations - show their teams
+        if (entityType === "location") {
+          return (
+            <div
+              key="Teams"
+              className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6"
+            >
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
+                Teams
+              </h2>
+              {locationTeams.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {locationTeams.map((team: any) => (
                     <a
                       key={team.id}
                       href={`/teams/${team.slug}`}
-                      className="flex gap-3 p-4 rounded-lg border border-gray-200 hover:border-green-500 hover:shadow-md transition-all"
+                      className="flex gap-3 p-4 rounded-lg border border-gray-200 hover:border-green-500 hover:shadow-md transition-all cursor-pointer"
                     >
                       {team.logo && (
                         <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 flex items-center justify-center bg-gray-100">
@@ -878,68 +1108,13 @@ export default async function EntityDetailPage({
                             {team.description}
                           </p>
                         )}
-                        {(sportName || leagueName) && (
-                          <p className="text-xs text-gray-500 mt-1">
-                            {sportName && sportName}
-                            {sportName && leagueName && " • "}
-                            {leagueName && leagueName}
-                          </p>
-                        )}
-                        {team.teamMembers && team.teamMembers.length > 0 && (
-                          <p className="text-xs text-green-600 font-semibold mt-2">
-                            {team.teamMembers.length}{" "}
-                            {team.teamMembers.length === 1
-                              ? "player"
-                              : "players"}
-                          </p>
-                        )}
                       </div>
                     </a>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        }
-        // For locations - show their teams
-        if (locationTeams.length > 0) {
-          return (
-            <div
-              key="Teams"
-              className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6"
-            >
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
-                Teams
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {locationTeams.map((team: any) => (
-                  <a
-                    key={team.id}
-                    href={`/teams/${team.slug}`}
-                    className="flex gap-3 p-4 rounded-lg border border-gray-200 hover:border-green-500 hover:shadow-md transition-all"
-                  >
-                    {team.logo && (
-                      <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 flex items-center justify-center bg-gray-100">
-                        <img
-                          src={team.logo}
-                          alt={team.name}
-                          className="w-full h-full object-contain"
-                        />
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-900 text-base sm:text-lg truncate">
-                        {team.name}
-                      </h3>
-                      {team.description && (
-                        <p className="text-sm text-gray-600 line-clamp-2">
-                          {team.description}
-                        </p>
-                      )}
-                    </div>
-                  </a>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-center py-8">No teams to show</p>
+              )}
             </div>
           );
         }
@@ -1537,8 +1712,9 @@ export default async function EntityDetailPage({
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 w-full">
-        {/* Mobile Filter - Shows at top on mobile (for sports pages only) */}
-        {entityType === "sport" && filterConfig.leagues && (
+        {/* Mobile Filter - Shows at top on mobile */}
+        {((entityType === "sport" && filterConfig.leagues) ||
+          ((entityType === "player" || entityType === "team") && (filterConfig.seasons || filterConfig.sports))) && (
           <div className="lg:hidden mb-6">
             <Filter config={filterConfig} />
           </div>
@@ -1560,11 +1736,15 @@ export default async function EntityDetailPage({
                 : "lg:col-span-8"
             } relative`}
           >
-            {/* Filter Loading Overlay - covers entire column (for sports pages only) */}
-            {entityType === "sport" && <FilterLoadingOverlay />}
+            {/* Filter Loading Overlay - covers entire column */}
+            {((entityType === "sport" && filterConfig.leagues) ||
+              ((entityType === "player" || entityType === "team") && (filterConfig.seasons || filterConfig.sports))) && (
+              <FilterLoadingOverlay />
+            )}
 
-            {/* Active Filter Pills - above all content (for sports pages only) */}
-            {entityType === "sport" && (
+            {/* Active Filter Pills - above all content */}
+            {((entityType === "sport" && filterConfig.leagues) ||
+              ((entityType === "player" || entityType === "team") && (filterConfig.seasons || filterConfig.sports))) && (
               <ActiveFilterPills filterLabels={filterLabels} />
             )}
 
@@ -1575,8 +1755,9 @@ export default async function EntityDetailPage({
           {layout.r && layout.r.length > 0 && (
             <div className="w-full lg:col-span-4 min-w-0 hidden lg:block">
               <div className="sticky top-6 space-y-6">
-                {/* Filter Component - Desktop (for sports pages only) */}
-                {entityType === "sport" && filterConfig.leagues && (
+                {/* Filter Component - Desktop */}
+                {((entityType === "sport" && filterConfig.leagues) ||
+                  ((entityType === "player" || entityType === "team") && (filterConfig.seasons || filterConfig.sports))) && (
                   <Filter config={filterConfig} />
                 )}
 

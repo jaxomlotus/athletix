@@ -20,6 +20,7 @@ export interface FilterConfig {
   positions?: FilterOption[];
   ages?: FilterOption[];
   grades?: FilterOption[];
+  seasons?: FilterOption[];
   showNameSearch?: boolean;
 }
 
@@ -52,6 +53,7 @@ export default function Filter({ config }: FilterProps) {
   const [selectedPosition, setSelectedPosition] = useState(searchParams.get("position") || "");
   const [selectedAge, setSelectedAge] = useState(searchParams.get("age") || "");
   const [selectedGrade, setSelectedGrade] = useState(searchParams.get("grade") || "");
+  const [selectedSeason, setSelectedSeason] = useState(searchParams.get("season") || "");
   const [searchName, setSearchName] = useState(searchParams.get("search") || "");
 
 
@@ -64,13 +66,14 @@ export default function Filter({ config }: FilterProps) {
     setSelectedPosition("");
     setSelectedAge("");
     setSelectedGrade("");
+    setSelectedSeason("");
     setSearchName("");
 
     // Reload the page to reset everything
     window.location.href = window.location.pathname;
   };
 
-  const hasActiveFilters = selectedLeague || selectedSport || selectedGender || selectedLocation || selectedSchool || selectedPosition || selectedAge || selectedGrade || searchName;
+  const hasActiveFilters = selectedLeague || selectedSport || selectedGender || selectedLocation || selectedSchool || selectedPosition || selectedAge || selectedGrade || selectedSeason || searchName;
 
   const handleApplyFilters = (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -85,6 +88,7 @@ export default function Filter({ config }: FilterProps) {
     if (selectedPosition) params.set("position", selectedPosition);
     if (selectedAge) params.set("age", selectedAge);
     if (selectedGrade) params.set("grade", selectedGrade);
+    if (selectedSeason) params.set("season", selectedSeason);
     if (searchName) params.set("search", searchName);
 
     const queryString = params.toString();
@@ -107,6 +111,7 @@ export default function Filter({ config }: FilterProps) {
       position: selectedPosition,
       age: selectedAge,
       grade: selectedGrade,
+      season: selectedSeason,
       search: searchName,
     };
 
@@ -122,6 +127,7 @@ export default function Filter({ config }: FilterProps) {
     if (filters.position) params.set("position", filters.position);
     if (filters.age) params.set("age", filters.age);
     if (filters.grade) params.set("grade", filters.grade);
+    if (filters.season) params.set("season", filters.season);
     if (filters.search) params.set("search", filters.search);
 
     const queryString = params.toString();
@@ -144,6 +150,7 @@ export default function Filter({ config }: FilterProps) {
       position: selectedPosition,
       age: selectedAge,
       grade: selectedGrade,
+      season: selectedSeason,
       search: searchName,
     };
 
@@ -159,6 +166,7 @@ export default function Filter({ config }: FilterProps) {
     if (filters.position) params.set("position", filters.position);
     if (filters.age) params.set("age", filters.age);
     if (filters.grade) params.set("grade", filters.grade);
+    if (filters.season) params.set("season", filters.season);
     if (filters.search) params.set("search", filters.search);
 
     const queryString = params.toString();
@@ -506,6 +514,40 @@ export default function Filter({ config }: FilterProps) {
             >
               <option value="">All Grades</option>
               {config.grades.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}{option.count !== undefined ? ` (${option.count})` : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* Season Filter */}
+        {config.seasons && config.seasons.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label htmlFor="season-filter" className="block text-sm font-medium text-gray-900">
+                Season
+              </label>
+              {selectedSeason && (
+                <button
+                  type="button"
+                  onClick={() => handleClearIndividualFilter("season")}
+                  className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+                  title="Clear season filter"
+                >
+                  <FiX className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            <select
+              id="season-filter"
+              value={selectedSeason}
+              onChange={(e) => handleDropdownChange("season", e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 cursor-pointer"
+            >
+              <option value="">All Time</option>
+              {config.seasons.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}{option.count !== undefined ? ` (${option.count})` : ''}
                 </option>

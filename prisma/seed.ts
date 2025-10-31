@@ -1237,6 +1237,7 @@ async function main() {
       description: 'Marcus Rodriguez working on his baseball fundamentals',
       thumbnail: 'https://img.youtube.com/vi/RddIthm9WAk/maxresdefault.jpg',
       platform: 'youtube',
+      recordedAt: new Date('2024-10-15'), // Recorded during 2024 season at Stanford
     },
   })
 
@@ -1247,6 +1248,7 @@ async function main() {
       description: 'Sarah Chen demonstrates proper pitching mechanics',
       thumbnail: 'https://img.youtube.com/vi/RddIthm9WAk/maxresdefault.jpg',
       platform: 'youtube',
+      recordedAt: new Date('2024-03-20'), // Recorded during 2024 season at UCLA
     },
   })
 
@@ -1257,6 +1259,7 @@ async function main() {
       description: 'Jamal Williams with great court vision and assists',
       thumbnail: 'https://img.youtube.com/vi/RddIthm9WAk/maxresdefault.jpg',
       platform: 'youtube',
+      recordedAt: new Date('2024-11-05'), // Recorded during 2024 season at Lakers
     },
   })
 
@@ -1267,6 +1270,7 @@ async function main() {
       description: "Tommy O'Brien working on quarterback mechanics",
       thumbnail: 'https://img.youtube.com/vi/RddIthm9WAk/maxresdefault.jpg',
       platform: 'youtube',
+      recordedAt: new Date('2024-09-10'), // Recorded during 2024 season
     },
   })
 
@@ -1277,33 +1281,62 @@ async function main() {
       description: 'Marcus practices defensive techniques',
       thumbnail: 'https://img.youtube.com/vi/RddIthm9WAk/maxresdefault.jpg',
       platform: 'youtube',
+      recordedAt: new Date('2023-02-18'), // Recorded during 2023 season at UCLA
     },
   })
 
   console.log('✓ Created clips')
 
-  // Link Clips to Player Entities
+  // Link Clips to Player and Team Entities
   await prisma.entityClip.createMany({
     data: [
+      // clip1: Marcus Rodriguez at Stanford Cardinals (recorded Oct 2024)
       { entityId: player1.id, clipId: clip1.id, order: 1 },
+      { entityId: cardinals.id, clipId: clip1.id, order: 1 },
+
+      // clip5: Marcus Rodriguez at UCLA Bruins (recorded Feb 2023)
       { entityId: player1.id, clipId: clip5.id, order: 2 },
+      { entityId: bruins.id, clipId: clip5.id, order: 2 },
+
+      // clip2: Sarah Chen at UCLA Bruins (recorded Mar 2024)
       { entityId: player2.id, clipId: clip2.id, order: 1 },
+      { entityId: bruins.id, clipId: clip2.id, order: 3 },
+
+      // clip3: Jamal Williams at LA Lakers (recorded Nov 2024)
       { entityId: player3.id, clipId: clip3.id, order: 1 },
+      { entityId: lakers.id, clipId: clip3.id, order: 1 },
+
+      // clip4: Tommy O'Brien at Kansas City Chiefs (recorded Sep 2024)
       { entityId: player4.id, clipId: clip4.id, order: 1 },
+      { entityId: chiefs.id, clipId: clip4.id, order: 1 },
     ],
   })
 
-  console.log('✓ Linked clips to players')
+  console.log('✓ Linked clips to players and teams')
 
   // Create Team Memberships
   await prisma.teamMembership.createMany({
     data: [
-      // Marcus Rodriguez - Stanford Cardinals
+      // Marcus Rodriguez - Current: Stanford Cardinals (2024)
       { playerId: player1.id, teamId: cardinals.id, jerseyNumber: 24, positions: ['Outfielder'], season: '2024', isCurrent: true },
-      // Sarah Chen - UCLA Bruins
+      // Marcus Rodriguez - Historical: UCLA Bruins (2023) - Position change from infield to outfield
+      { playerId: player1.id, teamId: bruins.id, jerseyNumber: 18, positions: ['Right Fielder', 'Center Fielder'], season: '2023', isCurrent: false, startDate: new Date('2023-09-01'), endDate: new Date('2024-06-01') },
+      // Marcus Rodriguez - Historical: LA Lakers (2022) - Started as infielder
+      { playerId: player1.id, teamId: lakers.id, jerseyNumber: 5, positions: ['Second Base', 'Utility'], season: '2022', isCurrent: false, startDate: new Date('2022-09-01'), endDate: new Date('2023-06-01') },
+
+      // Sarah Chen - Current: UCLA Bruins (2024)
       { playerId: player2.id, teamId: bruins.id, jerseyNumber: 45, positions: ['Pitcher'], season: '2024', isCurrent: true },
-      // Jamal Williams - LA Lakers
+      // Sarah Chen - Historical: UCLA Bruins (2023) - Transitioning to pitcher
+      { playerId: player2.id, teamId: bruins.id, jerseyNumber: 21, positions: ['Starting Pitcher', 'Relief Pitcher'], season: '2023', isCurrent: false, startDate: new Date('2023-09-01'), endDate: new Date('2024-06-01') },
+      // Sarah Chen - Historical: UCLA Bruins (2022) - Started as position player
+      { playerId: player2.id, teamId: bruins.id, jerseyNumber: 12, positions: ['Left Fielder', 'Designated Hitter'], season: '2022', isCurrent: false, startDate: new Date('2022-09-01'), endDate: new Date('2023-06-01') },
+
+      // Jamal Williams - Current: LA Lakers (2024)
       { playerId: player3.id, teamId: lakers.id, jerseyNumber: 7, positions: ['Point Guard'], season: '2024', isCurrent: true },
+      // Jamal Williams - Historical: UCLA Bruins (2023) - Transfer #1
+      { playerId: player3.id, teamId: bruins.id, jerseyNumber: 33, positions: ['Shooting Guard'], season: '2023', isCurrent: false, startDate: new Date('2023-09-01'), endDate: new Date('2024-06-01') },
+      // Jamal Williams - Historical: Stanford Cardinals (2022) - Transfer #2, different position
+      { playerId: player3.id, teamId: cardinals.id, jerseyNumber: 15, positions: ['Small Forward', 'Power Forward'], season: '2022', isCurrent: false, startDate: new Date('2022-09-01'), endDate: new Date('2023-06-01') },
       // Tommy O'Brien - Kansas City Chiefs
       { playerId: player4.id, teamId: chiefs.id, jerseyNumber: 12, positions: ['Quarterback'], season: '2024', isCurrent: true },
       // Kevin Park - Stanford Cardinals

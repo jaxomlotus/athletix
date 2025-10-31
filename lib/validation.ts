@@ -117,6 +117,7 @@ export const entityFiltersSchema = z.object({
   school: z.string().optional(),
   gender: z.enum(['mens', 'womens', 'coed']).optional(),
   parentId: z.number().int().optional(),
+  season: z.string().optional(),
 });
 
 export const membershipFiltersSchema = z.object({

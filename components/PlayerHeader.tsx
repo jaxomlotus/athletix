@@ -49,7 +49,13 @@ export default function PlayerHeader({
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-  const { isFollowing, followerCount, isLoading, toggleFollow, performUnfollow } = useFollow({
+  const {
+    isFollowing,
+    followerCount,
+    isLoading,
+    toggleFollow,
+    performUnfollow,
+  } = useFollow({
     entityId: entityId || 0,
     entityName: name,
     initialFollowStatus,
@@ -87,33 +93,31 @@ export default function PlayerHeader({
         <div className="absolute top-0 left-0 right-0 py-3">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center text-sm text-white">
-            {breadcrumbs.map((crumb, index) => (
-              <div key={index} className="flex items-center">
-                {index > 0 && (
-                  <span className="mx-2 opacity-80">\</span>
-                )}
-                {crumb.href ? (
-                  <Link
-                    href={crumb.href}
-                    className="hover:opacity-80 transition-opacity"
-                  >
-                    {crumb.label === "Home" ? (
-                      <FaHome className="w-4 h-4" />
-                    ) : (
-                      crumb.label
-                    )}
-                  </Link>
-                ) : (
-                  <span className="opacity-90">
-                    {crumb.label === "Home" ? (
-                      <FaHome className="w-4 h-4" />
-                    ) : (
-                      crumb.label
-                    )}
-                  </span>
-                )}
-              </div>
-            ))}
+              {breadcrumbs.map((crumb, index) => (
+                <div key={index} className="flex items-center">
+                  {index > 0 && <span className="mx-2 opacity-80">\</span>}
+                  {crumb.href ? (
+                    <Link
+                      href={crumb.href}
+                      className="hover:opacity-80 transition-opacity"
+                    >
+                      {crumb.label === "Home" ? (
+                        <FaHome className="w-4 h-4" />
+                      ) : (
+                        crumb.label
+                      )}
+                    </Link>
+                  ) : (
+                    <span className="opacity-90">
+                      {crumb.label === "Home" ? (
+                        <FaHome className="w-4 h-4" />
+                      ) : (
+                        crumb.label
+                      )}
+                    </span>
+                  )}
+                </div>
+              ))}
               {/* Trailing slash */}
               <span className="mx-2 opacity-80">\</span>
             </div>
@@ -127,12 +131,7 @@ export default function PlayerHeader({
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
             {/* Avatar */}
             <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-white shadow-xl overflow-hidden bg-white shrink-0">
-              <Image
-                src={avatar}
-                alt={name}
-                fill
-                className="object-cover"
-              />
+              <Image src={avatar} alt={name} fill className="object-cover" />
             </div>
 
             {/* Player Info */}
@@ -186,15 +185,15 @@ export default function PlayerHeader({
                   <p className="text-xl sm:text-2xl font-bold text-gray-900">
                     {followerCount.toLocaleString()}
                   </p>
-                  <p className="text-xs sm:text-sm text-gray-500">Followers</p>
+                  <p className="text-xs sm:text-sm text-gray-500">Fans</p>
                 </div>
                 <button
                   onClick={toggleFollow}
                   disabled={isLoading}
                   className={`flex items-center gap-2 px-6 sm:px-8 py-2 sm:py-3 font-semibold rounded-lg transition-colors text-sm sm:text-base cursor-pointer disabled:opacity-50 ${
                     isFollowing
-                      ? 'bg-green-600 text-white hover:bg-red-600'
-                      : 'bg-green-600 text-white hover:bg-green-700'
+                      ? "bg-green-600 text-white hover:bg-red-600"
+                      : "bg-green-600 text-white hover:bg-green-700"
                   }`}
                 >
                   {isFollowing ? (
@@ -220,7 +219,10 @@ export default function PlayerHeader({
         className={`sticky top-14 sm:top-16 bg-linear-to-r from-green-600 to-blue-600 shadow-lg z-40 transition-opacity duration-200 ${
           isSticky ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
-        style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)' }}
+        style={{
+          boxShadow:
+            "0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)",
+        }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex items-center justify-between">
@@ -229,9 +231,7 @@ export default function PlayerHeader({
               <div className="flex items-center text-sm text-white mb-2">
                 {breadcrumbs.map((crumb, index) => (
                   <div key={index} className="flex items-center">
-                    {index > 0 && (
-                      <span className="mx-2 opacity-60">\</span>
-                    )}
+                    {index > 0 && <span className="mx-2 opacity-60">\</span>}
                     {crumb.href ? (
                       <Link
                         href={crumb.href}
@@ -268,9 +268,7 @@ export default function PlayerHeader({
                     className="object-cover"
                   />
                 </div>
-                <span className="text-white text-xl font-bold">
-                  {name}
-                </span>
+                <span className="text-white text-xl font-bold">{name}</span>
               </div>
             </div>
 
@@ -280,8 +278,8 @@ export default function PlayerHeader({
               disabled={isLoading}
               className={`flex items-center gap-2 px-4 py-1.5 font-semibold rounded-lg transition-colors text-sm cursor-pointer disabled:opacity-50 ${
                 isFollowing
-                  ? 'bg-white text-green-600 hover:bg-red-50 hover:text-red-600'
-                  : 'bg-white text-green-600 hover:bg-gray-100'
+                  ? "bg-white text-green-600 hover:bg-red-50 hover:text-red-600"
+                  : "bg-white text-green-600 hover:bg-gray-100"
               }`}
             >
               {isFollowing ? (

@@ -168,14 +168,15 @@ model Follow {
 
 // Clips
 model Clip {
-  id          Int      @id @default(autoincrement())
-  url         String   @db.VarChar(512)
-  title       String   @db.VarChar(256)
-  description String?  @db.Text
-  thumbnail   String?  @db.VarChar(512)
-  platform    String?  @db.VarChar(50) // e.g., "youtube", "vimeo"
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id          Int       @id @default(autoincrement())
+  url         String    @db.VarChar(512)
+  title       String    @db.VarChar(256)
+  description String?   @db.Text
+  thumbnail   String?   @db.VarChar(512)
+  platform    String?   @db.VarChar(50) // e.g., "youtube", "vimeo"
+  recordedAt  DateTime? // When the clip was actually recorded/filmed (optional, falls back to createdAt)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   userClips   UserClip[]
   entityClips EntityClip[]

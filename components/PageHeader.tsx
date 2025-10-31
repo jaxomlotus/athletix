@@ -30,7 +30,10 @@ interface PageHeaderProps {
   isFollowing?: boolean;
 }
 
-function getAllBreadcrumbs(breadcrumbs: Breadcrumb[], currentTitle: string): Breadcrumb[] {
+function getAllBreadcrumbs(
+  breadcrumbs: Breadcrumb[],
+  currentTitle: string
+): Breadcrumb[] {
   return [...breadcrumbs, { label: currentTitle }];
 }
 
@@ -52,10 +55,17 @@ export default function PageHeader({
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const allBreadcrumbs = getAllBreadcrumbs(breadcrumbs, title);
-  const defaultBanner = "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1200&h=400&fit=crop";
-  const isSportIcon = entityType === 'sport';
+  const defaultBanner =
+    "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1200&h=400&fit=crop";
+  const isSportIcon = entityType === "sport";
 
-  const { isFollowing, followerCount, isLoading, toggleFollow, performUnfollow } = useFollow({
+  const {
+    isFollowing,
+    followerCount,
+    isLoading,
+    toggleFollow,
+    performUnfollow,
+  } = useFollow({
     entityId: entityId || 0,
     entityName: title,
     initialFollowStatus,
@@ -89,8 +99,10 @@ export default function PageHeader({
         className="bg-linear-to-r from-green-600 to-blue-600 text-white relative"
         style={{
           marginBottom: isSticky
-            ? (window.innerWidth < 640 ? '-70px' : '-80px')
-            : '0px'
+            ? window.innerWidth < 640
+              ? "-70px"
+              : "-80px"
+            : "0px",
         }}
       >
         {/* Banner Image (if provided) */}
@@ -113,9 +125,7 @@ export default function PageHeader({
             <div className="flex items-center text-sm text-white">
               {breadcrumbs.map((crumb, index) => (
                 <div key={index} className="flex items-center">
-                  {index > 0 && (
-                    <span className="mx-2 opacity-60">\</span>
-                  )}
+                  {index > 0 && <span className="mx-2 opacity-60">\</span>}
                   {crumb.href ? (
                     <Link
                       href={crumb.href}
@@ -146,17 +156,41 @@ export default function PageHeader({
 
         {/* Profile/Content Section - Inside Header */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={`relative ${showFollowButton ? 'py-13 sm:py-12' : 'py-13 sm:py-16'}`}>
+          <div
+            className={`relative ${
+              showFollowButton ? "py-13 sm:py-12" : "py-13 sm:py-16"
+            }`}
+          >
             <div className="flex flex-row items-center gap-4 sm:gap-6 w-full sm:justify-between">
               {/* Logo/Avatar */}
               {logo && (
-                <div className={`relative ${entityType === 'player' ? 'w-24 h-24 sm:w-40 sm:h-40 rounded-full border-4 border-white shadow-xl bg-white' : `w-24 h-24 sm:w-32 sm:h-32 rounded-lg ${isSportIcon ? 'bg-white/10 backdrop-blur-sm' : 'bg-white'}`} overflow-hidden ${entityType !== 'player' && 'p-3 sm:p-4'} shrink-0`}>
+                <div
+                  className={`relative ${
+                    entityType === "player"
+                      ? "w-24 h-24 sm:w-40 sm:h-40 rounded-full border-4 border-white shadow-xl bg-white"
+                      : `w-24 h-24 sm:w-32 sm:h-32 rounded-lg ${
+                          isSportIcon
+                            ? "bg-white/10 backdrop-blur-sm"
+                            : "bg-white"
+                        }`
+                  } overflow-hidden ${
+                    entityType !== "player" && "p-3 sm:p-4"
+                  } shrink-0`}
+                >
                   <Image
                     src={logo}
                     alt={title}
                     fill
-                    className={entityType === 'player' ? 'object-cover' : 'object-contain'}
-                    style={isSportIcon ? { filter: 'brightness(0) invert(1)' } : undefined}
+                    className={
+                      entityType === "player"
+                        ? "object-cover"
+                        : "object-contain"
+                    }
+                    style={
+                      isSportIcon
+                        ? { filter: "brightness(0) invert(1)" }
+                        : undefined
+                    }
                   />
                 </div>
               )}
@@ -181,33 +215,35 @@ export default function PageHeader({
                 )}
               </div>
 
-              {/* Followers and Follow Button - All screens, in header */}
+              {/* Fans and Add Button - All screens, in header */}
               {showFollowButton && followerCount !== undefined && (
                 <div className="absolute bottom-4 right-0 sm:relative sm:bottom-auto sm:right-auto flex flex-row items-center gap-3 sm:gap-6">
                   <div className="text-right sm:text-center">
                     <p className="text-lg sm:text-2xl font-bold text-white">
                       {followerCount.toLocaleString()}
                     </p>
-                    <p className="text-xs sm:text-sm text-white opacity-80">Followers</p>
+                    <p className="text-xs sm:text-sm text-white opacity-80">
+                      Fans
+                    </p>
                   </div>
                   <button
                     onClick={toggleFollow}
                     disabled={isLoading}
                     className={`flex items-center gap-2 px-3 py-2 sm:px-8 sm:py-3 font-semibold rounded-lg transition-colors text-sm sm:text-base cursor-pointer disabled:opacity-50 ${
                       isFollowing
-                        ? 'bg-white text-green-600 hover:bg-red-50 hover:text-red-600'
-                        : 'bg-white text-green-600 hover:bg-gray-100'
+                        ? "bg-white text-green-600 hover:bg-red-50 hover:text-red-600"
+                        : "bg-white text-green-600 hover:bg-gray-100"
                     }`}
                   >
                     {isFollowing ? (
                       <>
                         <FiCheck className="w-5 h-5" />
-                        <span className="hidden sm:inline">Following</span>
+                        <span className="hidden sm:inline">Added</span>
                       </>
                     ) : (
                       <>
                         <FiUserPlus className="w-5 h-5" />
-                        <span className="hidden sm:inline">Follow</span>
+                        <span className="hidden sm:inline">Add</span>
                       </>
                     )}
                   </button>
@@ -220,10 +256,13 @@ export default function PageHeader({
 
       {/* Sticky Breadcrumb Header */}
       <div
-        className={`sticky top-12 sm:top-16 ${!banner && 'bg-linear-to-r from-green-600 to-blue-600'} shadow-lg z-40 ${
-          isSticky ? "block" : "hidden"
-        }`}
-        style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)' }}
+        className={`sticky top-12 sm:top-16 ${
+          !banner && "bg-linear-to-r from-green-600 to-blue-600"
+        } shadow-lg z-40 ${isSticky ? "block" : "hidden"}`}
+        style={{
+          boxShadow:
+            "0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)",
+        }}
       >
         {/* Banner Image for Sticky (if provided) */}
         {banner && (
@@ -245,9 +284,7 @@ export default function PageHeader({
               <div className="flex items-center text-sm text-white mb-2">
                 {allBreadcrumbs.slice(0, -1).map((crumb, index) => (
                   <div key={index} className="flex items-center">
-                    {index > 0 && (
-                      <span className="mx-2 opacity-60">\</span>
-                    )}
+                    {index > 0 && <span className="mx-2 opacity-60">\</span>}
                     {crumb.href ? (
                       <Link
                         href={crumb.href}
@@ -277,13 +314,33 @@ export default function PageHeader({
               {/* Current Page Title with Logo/Avatar */}
               <div className="flex items-center gap-2">
                 {logo && (
-                  <div className={`relative ${entityType === 'player' ? 'w-7 h-7 rounded-full border border-white bg-white' : `w-7 h-7 rounded ${isSportIcon ? 'bg-white/10 backdrop-blur-sm' : 'bg-white'}`} overflow-hidden ${entityType !== 'player' && 'p-1'} shrink-0`}>
+                  <div
+                    className={`relative ${
+                      entityType === "player"
+                        ? "w-7 h-7 rounded-full border border-white bg-white"
+                        : `w-7 h-7 rounded ${
+                            isSportIcon
+                              ? "bg-white/10 backdrop-blur-sm"
+                              : "bg-white"
+                          }`
+                    } overflow-hidden ${
+                      entityType !== "player" && "p-1"
+                    } shrink-0`}
+                  >
                     <Image
                       src={logo}
                       alt={title}
                       fill
-                      className={entityType === 'player' ? 'object-cover' : 'object-contain'}
-                      style={isSportIcon ? { filter: 'brightness(0) invert(1)' } : undefined}
+                      className={
+                        entityType === "player"
+                          ? "object-cover"
+                          : "object-contain"
+                      }
+                      style={
+                        isSportIcon
+                          ? { filter: "brightness(0) invert(1)" }
+                          : undefined
+                      }
                     />
                   </div>
                 )}
@@ -296,26 +353,26 @@ export default function PageHeader({
               </div>
             </div>
 
-            {/* Follow Button (for players) */}
+            {/* Added Button (for players) */}
             {showFollowButton && (
               <button
                 onClick={toggleFollow}
                 disabled={isLoading}
                 className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 font-semibold rounded-lg transition-colors text-sm cursor-pointer disabled:opacity-50 ${
                   isFollowing
-                    ? 'bg-white text-green-600 hover:bg-red-50 hover:text-red-600'
-                    : 'bg-white text-green-600 hover:bg-gray-100'
+                    ? "bg-white text-green-600 hover:bg-red-50 hover:text-red-600"
+                    : "bg-white text-green-600 hover:bg-gray-100"
                 }`}
               >
                 {isFollowing ? (
                   <>
                     <FiCheck className="w-4 h-4" />
-                    <span className="hidden sm:inline">Following</span>
+                    <span className="hidden sm:inline">Added</span>
                   </>
                 ) : (
                   <>
                     <FiUserPlus className="w-4 h-4" />
-                    <span className="hidden sm:inline">Follow</span>
+                    <span className="hidden sm:inline">Add</span>
                   </>
                 )}
               </button>
