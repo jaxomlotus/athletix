@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     const user = await optionalAuth(request);
 
     // Check rate limit
-    const rateLimit = checkRateLimit(request, user?.id || null, 'general');
+    const rateLimit = checkRateLimit(request, user?.id?.toString() || null, 'general');
     if (!rateLimit.allowed) {
       return errorResponse('Rate limit exceeded', 429);
     }
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     const user = authResult.user;
 
     // Check rate limit (mutations are more strict)
-    const rateLimit = checkRateLimit(request, user.id, 'mutations');
+    const rateLimit = checkRateLimit(request, user.id.toString(), 'mutations');
     if (!rateLimit.allowed) {
       return errorResponse('Rate limit exceeded', 429);
     }
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
     const validatedData = createClipSchema.parse(body);
 
     // Create clip
-    const clip = await createClip(validatedData, user.id);
+    const clip = await createClip(validatedData, user.id.toString());
 
     return successResponse(clip, 'Clip created successfully', 201);
   } catch (error) {

@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     const user = await optionalAuth(request);
 
     // Check rate limit
-    const rateLimit = checkRateLimit(request, user?.id || null, 'general');
+    const rateLimit = checkRateLimit(request, user?.id?.toString() || null, 'general');
     if (!rateLimit.allowed) {
       return errorResponse('Rate limit exceeded', 429);
     }

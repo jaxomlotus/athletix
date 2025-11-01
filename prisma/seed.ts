@@ -17,7 +17,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Leagues', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         mens: true,
@@ -38,7 +38,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Leagues', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         mens: true,
@@ -59,7 +59,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Leagues', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         mens: true,
@@ -80,7 +80,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Leagues', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         mens: true,
@@ -101,7 +101,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Leagues', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         mens: true,
@@ -122,7 +122,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Leagues', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         mens: true,
@@ -143,7 +143,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Leagues', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         mens: true,
@@ -164,7 +164,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Leagues', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         mens: true,
@@ -185,7 +185,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Leagues', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         mens: true,
@@ -206,7 +206,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Leagues', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         mens: true,
@@ -227,7 +227,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Leagues', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         mens: true,
@@ -248,7 +248,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Leagues', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         mens: true,
@@ -269,7 +269,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Leagues', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         mens: false,
@@ -290,7 +290,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Leagues', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         mens: false,
@@ -311,7 +311,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Leagues', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         mens: false,
@@ -332,7 +332,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Leagues', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         mens: false,
@@ -353,7 +353,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Leagues', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         mens: true,
@@ -374,7 +374,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Leagues', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         mens: true,
@@ -395,7 +395,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Leagues', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         mens: false,
@@ -420,7 +420,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Teams', 'Players', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         city: 'Stanford',
@@ -445,7 +445,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Teams', 'Players', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         city: 'Los Angeles',
@@ -469,7 +469,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Schools', 'Teams', 'Players', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       slug: 'stanford-ca',
       name: 'Stanford, CA',
@@ -488,7 +488,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Schools', 'Teams', 'Players', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       slug: 'los-angeles-ca',
       name: 'Los Angeles, CA',
@@ -507,7 +507,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Schools', 'Teams', 'Players', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       slug: 'san-francisco-ca',
       name: 'San Francisco, CA',
@@ -526,7 +526,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Schools', 'Teams', 'Players', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       slug: 'woodmere-ny',
       name: 'Woodmere, NY',
@@ -545,7 +545,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Schools', 'Teams', 'Players', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       slug: 'kansas-city-mo',
       name: 'Kansas City, MO',
@@ -575,7 +575,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Teams', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
     },
   })
@@ -593,7 +593,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Teams', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
     },
   })
@@ -611,7 +611,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Teams', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
     },
   })
@@ -632,7 +632,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Schools', 'Players', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         schoolId: stanford.id,
@@ -659,7 +659,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Schools', 'Players', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         schoolId: ucla.id,
@@ -686,7 +686,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Schools', 'Players', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         locationId: null, // Will be set after locations are created
@@ -708,7 +708,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Schools', 'Players', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         locationId: null, // Will be set after locations are created
@@ -772,7 +772,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Meta', 'Teams', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         displayName: 'The Ace',
@@ -803,7 +803,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Meta', 'Teams', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         displayName: 'J-Will',
@@ -826,7 +826,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Meta', 'Teams', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         displayName: 'Tommy Guns',
@@ -850,7 +850,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Meta', 'Teams', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         displayName: 'K-Park',
@@ -870,7 +870,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Meta', 'Teams', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         displayName: 'El Fuego',
@@ -890,7 +890,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Meta', 'Teams', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         displayName: 'The Glove',
@@ -910,7 +910,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Meta', 'Teams', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         displayName: 'AT3',
@@ -937,7 +937,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Meta', 'Teams', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         displayName: 'J-Lee',
@@ -957,7 +957,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Meta', 'Teams', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         displayName: 'Davo',
@@ -977,7 +977,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Meta', 'Teams', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         displayName: 'T-Wat',
@@ -997,7 +997,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Meta', 'Teams', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         displayName: 'B-Scott',
@@ -1017,7 +1017,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Meta', 'Teams', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         displayName: 'M-Chang',
@@ -1038,7 +1038,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Meta', 'Teams', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         displayName: 'Jakey',
@@ -1058,7 +1058,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Meta', 'Teams', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         displayName: 'El Capitan',
@@ -1078,7 +1078,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Meta', 'Teams', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         displayName: 'Stoney',
@@ -1098,7 +1098,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Meta', 'Teams', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         displayName: 'MJ',
@@ -1118,7 +1118,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Meta', 'Teams', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         displayName: 'Tony R',
@@ -1138,7 +1138,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Meta', 'Teams', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         displayName: 'Los',
@@ -1158,7 +1158,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Meta', 'Teams', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         displayName: 'T-Mills',
@@ -1178,7 +1178,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Meta', 'Teams', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         displayName: 'Coop',
@@ -1198,7 +1198,7 @@ async function main() {
       layout: {
         l: [],
         c: ['Meta', 'Teams', 'Clips'],
-        r: ['TopClips'],
+        r: ['TopClips', 'Discussions'],
       },
       metadata: {
         displayName: 'Bobby T',
@@ -1854,6 +1854,368 @@ async function main() {
   })
 
   console.log('✓ Created entity stats')
+
+  // Create Users for discussions
+  const user1 = await prisma.user.create({
+    data: {
+      email: 'john.doe@example.com',
+      name: 'John Doe',
+      displayName: 'JohnnyD',
+      emailVerified: true,
+      image: 'https://i.pravatar.cc/300?img=1',
+    },
+  })
+
+  const user2 = await prisma.user.create({
+    data: {
+      email: 'jane.smith@example.com',
+      name: 'Jane Smith',
+      displayName: 'JaneS',
+      emailVerified: true,
+      image: 'https://i.pravatar.cc/300?img=2',
+    },
+  })
+
+  const user3 = await prisma.user.create({
+    data: {
+      email: 'mike.johnson@example.com',
+      name: 'Mike Johnson',
+      displayName: 'MikeJ',
+      emailVerified: true,
+      image: 'https://i.pravatar.cc/300?img=3',
+    },
+  })
+
+  const user4 = await prisma.user.create({
+    data: {
+      email: 'sarah.williams@example.com',
+      name: 'Sarah Williams',
+      displayName: 'SarahW',
+      emailVerified: true,
+      image: 'https://i.pravatar.cc/300?img=4',
+    },
+  })
+
+  console.log('✓ Created users')
+
+  // Create Discussion Categories
+  const generalCategory = await prisma.discussionCategory.create({
+    data: {
+      name: 'General',
+      slug: 'general',
+      description: 'General discussion',
+      color: '#3b82f6',
+      order: 1,
+    },
+  })
+
+  const newsCategory = await prisma.discussionCategory.create({
+    data: {
+      name: 'News',
+      slug: 'news',
+      description: 'Latest news and updates',
+      color: '#ef4444',
+      order: 2,
+    },
+  })
+
+  const recruitingCategory = await prisma.discussionCategory.create({
+    data: {
+      name: 'Recruiting',
+      slug: 'recruiting',
+      description: 'Recruiting news and discussions',
+      color: '#f59e0b',
+      order: 3,
+    },
+  })
+
+  const gameThreadCategory = await prisma.discussionCategory.create({
+    data: {
+      name: 'Game Thread',
+      slug: 'game-thread',
+      description: 'Live game discussions',
+      color: '#10b981',
+      order: 4,
+    },
+  })
+
+  console.log('✓ Created discussion categories')
+
+  // Create Discussion Topics
+  const topic1 = await prisma.discussionTopic.create({
+    data: {
+      title: 'Kevin Park named Player of the Week!',
+      content: 'Huge congratulations to Kevin Park for being named Player of the Week! His performance this season has been absolutely stellar. What do you think about his chances for MVP?',
+      authorId: user1.id,
+      categoryId: newsCategory.id,
+      subjectType: 'entity',
+      subjectId: cardinal2.id,
+      isPinned: true,
+      viewCount: 245,
+      commentCount: 12,
+      lastCommentAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+    },
+  })
+
+  const topic2 = await prisma.discussionTopic.create({
+    data: {
+      title: 'Stanford Cardinals vs UCLA Bruins - Game Thread',
+      content: 'Game starts at 7pm ET. Let\'s go Cardinals! Drop your predictions below.',
+      authorId: user2.id,
+      categoryId: gameThreadCategory.id,
+      subjectType: 'entity',
+      subjectId: cardinals.id,
+      viewCount: 543,
+      commentCount: 87,
+      lastCommentAt: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
+    },
+  })
+
+  const topic3 = await prisma.discussionTopic.create({
+    data: {
+      title: 'Who should be the starting pitcher for next game?',
+      content: 'With Tyler Watson coming off an injury, should we start him or give him another week to recover? What do you all think?',
+      authorId: user3.id,
+      categoryId: generalCategory.id,
+      subjectType: 'entity',
+      subjectId: cardinals.id,
+      viewCount: 178,
+      commentCount: 23,
+      lastCommentAt: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 hours ago
+    },
+  })
+
+  const topic4 = await prisma.discussionTopic.create({
+    data: {
+      title: 'New recruit visiting campus this weekend',
+      content: 'Heard from sources that a 5-star recruit is visiting Stanford this weekend. Anyone have more info?',
+      authorId: user4.id,
+      categoryId: recruitingCategory.id,
+      subjectType: 'entity',
+      subjectId: stanford.id,
+      viewCount: 312,
+      commentCount: 45,
+      lastCommentAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1 hour ago
+    },
+  })
+
+  const topic5 = await prisma.discussionTopic.create({
+    data: {
+      title: 'Lakers playoff chances?',
+      content: 'With the current record, what do you think the Lakers\' playoff chances are? Can they make a deep run this year?',
+      authorId: user1.id,
+      categoryId: generalCategory.id,
+      subjectType: 'entity',
+      subjectId: lakers.id,
+      viewCount: 892,
+      commentCount: 156,
+      lastCommentAt: new Date(Date.now() - 15 * 60 * 1000), // 15 minutes ago
+    },
+  })
+
+  const topic6 = await prisma.discussionTopic.create({
+    data: {
+      title: 'Thoughts on MLB season so far?',
+      content: 'We\'re halfway through the season. What are everyone\'s thoughts on how MLB has been this year? Any surprises?',
+      authorId: user2.id,
+      categoryId: generalCategory.id,
+      subjectType: 'entity',
+      subjectId: mlb.id,
+      isPinned: true,
+      viewCount: 1243,
+      commentCount: 203,
+      lastCommentAt: new Date(Date.now() - 45 * 60 * 1000), // 45 minutes ago
+    },
+  })
+
+  console.log('✓ Created discussion topics')
+
+  // Helper function to create DiscussionTopicEntity entries (bubbling up)
+  async function linkTopicToEntities(topicId: number, originEntityId: number, bubbleUp: boolean) {
+    // Always link to the origin entity
+    await prisma.discussionTopicEntity.create({
+      data: {
+        topicId,
+        entityId: originEntityId,
+      },
+    })
+
+    if (bubbleUp) {
+      // Get the origin entity with its parent chain
+      const entity = await prisma.entity.findUnique({
+        where: { id: originEntityId },
+        include: {
+          parent: {
+            include: {
+              parent: {
+                include: {
+                  parent: true, // Up to 3 levels (player -> team -> league -> sport)
+                },
+              },
+            },
+          },
+        },
+      })
+
+      // Create entries for all parent entities
+      let currentParent = entity?.parent
+      while (currentParent) {
+        await prisma.discussionTopicEntity.create({
+          data: {
+            topicId,
+            entityId: currentParent.id,
+          },
+        })
+        currentParent = currentParent.parent as typeof currentParent | null
+      }
+    }
+  }
+
+  // Link topics to entities (with bubbling)
+  await linkTopicToEntities(topic1.id, cardinal2.id, true) // Player topic bubbles up
+  await linkTopicToEntities(topic2.id, cardinals.id, true) // Team topic bubbles up
+  await linkTopicToEntities(topic3.id, cardinals.id, true) // Team topic bubbles up
+  await linkTopicToEntities(topic4.id, stanford.id, true) // School topic (no parents to bubble to)
+  await linkTopicToEntities(topic5.id, lakers.id, true) // Team topic bubbles up
+  await linkTopicToEntities(topic6.id, mlb.id, true) // League topic bubbles up
+
+  console.log('✓ Created discussion topic entity links')
+
+  // Create Comments
+  const comment1 = await prisma.discussionComment.create({
+    data: {
+      content: 'He absolutely deserves it! That walk-off homer was incredible.',
+      authorId: user2.id,
+      parentType: 'topic',
+      parentId: topic1.id,
+    },
+  })
+
+  const comment2 = await prisma.discussionComment.create({
+    data: {
+      content: 'Agreed! His batting average this season is off the charts.',
+      authorId: user3.id,
+      parentType: 'topic',
+      parentId: topic1.id,
+    },
+  })
+
+  // Reply to comment1
+  const reply1 = await prisma.discussionComment.create({
+    data: {
+      content: 'That homer gave me chills! Best moment of the season so far.',
+      authorId: user4.id,
+      parentType: 'topic',
+      parentId: topic1.id,
+      replyToCommentId: comment1.id,
+      replyToUserId: user2.id,
+    },
+  })
+
+  const comment3 = await prisma.discussionComment.create({
+    data: {
+      content: 'Cardinals are looking strong! I think they take this one 6-3.',
+      authorId: user1.id,
+      parentType: 'topic',
+      parentId: topic2.id,
+    },
+  })
+
+  const comment4 = await prisma.discussionComment.create({
+    data: {
+      content: 'Don\'t sleep on the Bruins! Their pitcher has been dealing lately.',
+      authorId: user3.id,
+      parentType: 'topic',
+      parentId: topic2.id,
+    },
+  })
+
+  const comment5 = await prisma.discussionComment.create({
+    data: {
+      content: 'I say give Tyler another week. No need to rush him back and risk re-injury.',
+      authorId: user4.id,
+      parentType: 'topic',
+      parentId: topic3.id,
+    },
+  })
+
+  const comment6 = await prisma.discussionComment.create({
+    data: {
+      content: 'I heard it\'s a pitcher from Texas! Could be a game changer for the program.',
+      authorId: user1.id,
+      parentType: 'topic',
+      parentId: topic4.id,
+    },
+  })
+
+  const comment7 = await prisma.discussionComment.create({
+    data: {
+      content: 'If they can stay healthy, I think they have a real shot at the championship.',
+      authorId: user2.id,
+      parentType: 'topic',
+      parentId: topic5.id,
+    },
+  })
+
+  const comment8 = await prisma.discussionComment.create({
+    data: {
+      content: 'The level of competition this year has been insane. So many close games!',
+      authorId: user3.id,
+      parentType: 'topic',
+      parentId: topic6.id,
+    },
+  })
+
+  // Update comment counts and reply counts
+  await prisma.discussionComment.update({
+    where: { id: comment1.id },
+    data: { replyCount: 1 },
+  })
+
+  console.log('✓ Created discussion comments')
+
+  // Create some likes
+  await prisma.discussionLike.createMany({
+    data: [
+      { userId: user1.id, likeableType: 'topic', likeableId: topic1.id, topicId: topic1.id },
+      { userId: user2.id, likeableType: 'topic', likeableId: topic1.id, topicId: topic1.id },
+      { userId: user3.id, likeableType: 'topic', likeableId: topic1.id, topicId: topic1.id },
+      { userId: user4.id, likeableType: 'topic', likeableId: topic2.id, topicId: topic2.id },
+      { userId: user1.id, likeableType: 'topic', likeableId: topic5.id, topicId: topic5.id },
+      { userId: user2.id, likeableType: 'comment', likeableId: comment1.id, commentId: comment1.id },
+      { userId: user3.id, likeableType: 'comment', likeableId: comment1.id, commentId: comment1.id },
+      { userId: user4.id, likeableType: 'comment', likeableId: comment3.id, commentId: comment3.id },
+    ],
+  })
+
+  // Update like counts on topics
+  await prisma.discussionTopic.update({
+    where: { id: topic1.id },
+    data: { likeCount: 3 },
+  })
+
+  await prisma.discussionTopic.update({
+    where: { id: topic2.id },
+    data: { likeCount: 1 },
+  })
+
+  await prisma.discussionTopic.update({
+    where: { id: topic5.id },
+    data: { likeCount: 1 },
+  })
+
+  // Update like counts on comments
+  await prisma.discussionComment.update({
+    where: { id: comment1.id },
+    data: { likeCount: 2 },
+  })
+
+  await prisma.discussionComment.update({
+    where: { id: comment3.id },
+    data: { likeCount: 1 },
+  })
+
+  console.log('✓ Created discussion likes')
 
   console.log('✅ Seed completed successfully!')
 }

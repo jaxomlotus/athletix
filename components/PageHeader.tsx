@@ -1,10 +1,18 @@
 "use client";
 
-import { useEffect, useState, ReactNode } from "react";
+import { useEffect, useState, ReactNode, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FaHome } from "react-icons/fa";
-import { FiUserPlus, FiCheck } from "react-icons/fi";
+import {
+  FiUserPlus,
+  FiCheck,
+  FiChevronDown,
+  FiGrid,
+  FiMessageSquare,
+  FiBarChart2,
+  FiVideo,
+} from "react-icons/fi";
 import { EntityType } from "@/lib/entity-utils";
 import { useFollow } from "@/lib/hooks/useFollow";
 import AuthModal from "./AuthModal";
@@ -13,6 +21,12 @@ import ConfirmModal from "./ConfirmModal";
 interface Breadcrumb {
   label: string;
   href?: string;
+}
+
+interface Tab {
+  label: string;
+  href: string;
+  active: boolean;
 }
 
 interface PageHeaderProps {
@@ -28,6 +42,7 @@ interface PageHeaderProps {
   entityType?: EntityType;
   entityId?: number;
   isFollowing?: boolean;
+  tabs?: Tab[];
 }
 
 function getAllBreadcrumbs(
@@ -35,6 +50,22 @@ function getAllBreadcrumbs(
   currentTitle: string
 ): Breadcrumb[] {
   return [...breadcrumbs, { label: currentTitle }];
+}
+
+// Helper function to get icon for each tab
+function getTabIcon(label: string) {
+  switch (label) {
+    case "Overview":
+      return <FiGrid className="w-4 h-4" />;
+    case "Discussions":
+      return <FiMessageSquare className="w-4 h-4" />;
+    case "Stats":
+      return <FiBarChart2 className="w-4 h-4" />;
+    case "Clips":
+      return <FiVideo className="w-4 h-4" />;
+    default:
+      return null;
+  }
 }
 
 export default function PageHeader({
@@ -50,14 +81,20 @@ export default function PageHeader({
   entityType,
   entityId,
   isFollowing: initialFollowStatus = false,
+  tabs,
 }: PageHeaderProps) {
   const [isSticky, setIsSticky] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showMainTabDropdown, setShowMainTabDropdown] = useState(false);
+  const [showStickyTabDropdown, setShowStickyTabDropdown] = useState(false);
+  const mainDropdownRef = useRef<HTMLDivElement>(null);
+  const stickyDropdownRef = useRef<HTMLDivElement>(null);
   const allBreadcrumbs = getAllBreadcrumbs(breadcrumbs, title);
   const defaultBanner =
     "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1200&h=400&fit=crop";
   const isSportIcon = entityType === "sport";
+  const activeTab = tabs?.find((tab) => tab.active);
 
   const {
     isFollowing,
@@ -90,6 +127,31 @@ export default function PageHeader({
       window.removeEventListener("resize", handleScroll);
     };
   }, [showFollowButton]);
+
+  // Handle clicking outside dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        mainDropdownRef.current &&
+        !mainDropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowMainTabDropdown(false);
+      }
+      if (
+        stickyDropdownRef.current &&
+        !stickyDropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowStickyTabDropdown(false);
+      }
+    };
+
+    if (showMainTabDropdown || showStickyTabDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showMainTabDropdown, showStickyTabDropdown]);
 
   return (
     <>
@@ -158,24 +220,16 @@ export default function PageHeader({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div
             className={`relative ${
-              showFollowButton ? "py-13 sm:py-12" : "py-13 sm:py-16"
+              showFollowButton ? "pt-13 sm:pt-12 pb-2" : "pt-13 sm:pt-16 pb-2"
             }`}
           >
-            <div className="flex flex-row items-center gap-4 sm:gap-6 w-full sm:justify-between">
+            <div className="flex flex-row flex-wrap sm:flex-nowrap items-start sm:items-center gap-2 sm:gap-6 w-full sm:justify-between">
               {/* Logo/Avatar */}
               {logo && (
                 <div
-                  className={`relative ${
-                    entityType === "player"
-                      ? "w-24 h-24 sm:w-40 sm:h-40 rounded-full border-4 border-white shadow-xl bg-white"
-                      : `w-24 h-24 sm:w-32 sm:h-32 rounded-lg ${
-                          isSportIcon
-                            ? "bg-white/10 backdrop-blur-sm"
-                            : "bg-white"
-                        }`
-                  } overflow-hidden ${
-                    entityType !== "player" && "p-3 sm:p-4"
-                  } shrink-0`}
+                  className={`relative w-16 h-16 sm:w-24 sm:h-24 rounded-full
+                        bg-white backdrop-blur-sm
+                             overflow-hidden shrink-0 mr-1 sm:pr-0 self-center sm:self-auto`}
                 >
                   <Image
                     src={logo}
@@ -195,16 +249,17 @@ export default function PageHeader({
                 </div>
               )}
 
-              {/* Title and Content */}
+              {/* Title + Subtitle */}
               <div className="flex-1 text-left">
-                <h1 className="text-2xl sm:text-4xl font-bold mb-1 sm:mb-2 text-white">
+                <h1 className="text-lg sm:text-4xl font-semibold sm:font-bold mb-1 sm:mb-2 text-white">
                   {title}
                   {jerseyNumber && (
                     <span className="ml-2 opacity-60">#{jerseyNumber}</span>
                   )}
                 </h1>
+                {/* Subtitle - shown on all screens */}
                 {subtitle && (
-                  <div className="text-base sm:text-xl  mb-1 sm:mb-2 text-white opacity-90">
+                  <div className="text-sm sm:text-xl mb-1 sm:mb-2 text-white opacity-90">
                     {subtitle}
                   </div>
                 )}
@@ -214,44 +269,140 @@ export default function PageHeader({
                   </p>
                 )}
               </div>
-
-              {/* Fans and Add Button - All screens, in header */}
-              {showFollowButton && followerCount !== undefined && (
-                <div className="absolute bottom-4 right-0 sm:relative sm:bottom-auto sm:right-auto flex flex-row items-center gap-3 sm:gap-6">
-                  <div className="text-right sm:text-center">
-                    <p className="text-lg sm:text-2xl font-bold text-white">
-                      {followerCount.toLocaleString()}
-                    </p>
-                    <p className="text-xs sm:text-sm text-white opacity-80">
-                      Fans
-                    </p>
-                  </div>
-                  <button
-                    onClick={toggleFollow}
-                    disabled={isLoading}
-                    className={`flex items-center gap-2 px-3 py-2 sm:px-8 sm:py-3 font-semibold rounded-lg transition-colors text-sm sm:text-base cursor-pointer disabled:opacity-50 ${
-                      isFollowing
-                        ? "bg-white text-green-600 hover:bg-red-50 hover:text-red-600"
-                        : "bg-white text-green-600 hover:bg-gray-100"
-                    }`}
-                  >
-                    {isFollowing ? (
-                      <>
-                        <FiCheck className="w-5 h-5" />
-                        <span className="hidden sm:inline">Added</span>
-                      </>
-                    ) : (
-                      <>
-                        <FiUserPlus className="w-5 h-5" />
-                        <span className="hidden sm:inline">Add</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              )}
             </div>
           </div>
+
+          {/* Tabs Section - Bottom of Header */}
+          {tabs && tabs.length > 0 && (
+            <>
+
+              {/* Mobile Tab Dropdown + Add Button */}
+              <div className="relative z-10 pb-2 sm:hidden bg-black/10 px-4 -mx-4 pt-2">
+                <div className="flex items-center justify-between gap-3">
+                  {/* Tab Dropdown on left */}
+                  <div className="relative" ref={mainDropdownRef}>
+                    <button
+                      onClick={() =>
+                        setShowMainTabDropdown(!showMainTabDropdown)
+                      }
+                      className="flex items-center gap-1.5 px-2 py-1 text-xs font-medium rounded-lg transition-all bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 cursor-pointer"
+                    >
+                      {activeTab && getTabIcon(activeTab.label)}
+                      <span>{activeTab?.label}</span>
+                      <FiChevronDown className="w-3 h-3" />
+                    </button>
+
+                    {/* Dropdown Menu */}
+                    {showMainTabDropdown && (
+                      <div className="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-lg overflow-hidden min-w-[140px] z-50">
+                        {tabs.map((tab) => (
+                          <Link
+                            key={tab.label}
+                            href={tab.href}
+                            className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors ${
+                              tab.active
+                                ? "bg-green-50 text-green-700 font-semibold"
+                                : "text-gray-700 hover:bg-gray-50"
+                            }`}
+                            onClick={() => setShowMainTabDropdown(false)}
+                          >
+                            {getTabIcon(tab.label)}
+                            {tab.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Follower Count + Add Button on right */}
+                  {showFollowButton && followerCount !== undefined && (
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-white text-sm font-semibold">
+                        {followerCount.toLocaleString()}
+                      </span>
+                      <button
+                        onClick={toggleFollow}
+                        disabled={isLoading}
+                        className={`flex items-center gap-1.5 px-2 py-1 text-xs font-medium rounded-lg transition-all cursor-pointer disabled:opacity-50 ${
+                          isFollowing
+                            ? "bg-white/20 backdrop-blur-sm text-white hover:bg-red-500/30"
+                            : "bg-white/20 backdrop-blur-sm text-white hover:bg-white/30"
+                        }`}
+                      >
+                        {isFollowing ? (
+                          <>
+                            <FiCheck className="w-3.5 h-3.5" />
+                            <span>Added</span>
+                          </>
+                        ) : (
+                          <>
+                            <FiUserPlus className="w-3.5 h-3.5" />
+                            <span>Add</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
         </div>
+
+        {/* Desktop Tabs - Full Width */}
+        {tabs && tabs.length > 0 && (
+          <div className="hidden sm:block bg-black/10 relative z-10">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  {tabs.map((tab) => (
+                    <Link
+                      key={tab.label}
+                      href={tab.href}
+                      className={`px-4 py-1 text-sm font-medium rounded-lg transition-all ${
+                        tab.active
+                          ? "bg-white/20 backdrop-blur-sm text-white"
+                          : "text-white/80 hover:text-white hover:bg-white/10"
+                      }`}
+                    >
+                      {tab.label}
+                    </Link>
+                  ))}
+                </div>
+
+                {/* Add Button */}
+                {showFollowButton && followerCount !== undefined && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-white text-sm font-semibold">
+                      {followerCount.toLocaleString()}
+                    </span>
+                    <button
+                      onClick={toggleFollow}
+                      disabled={isLoading}
+                      className={`flex items-center gap-1.5 px-3 py-1 text-sm font-medium rounded-lg transition-all cursor-pointer disabled:opacity-50 bg-white/10 backdrop-blur-sm text-white ${
+                        isFollowing
+                          ? "hover:bg-red-500/30"
+                          : "hover:bg-white/20"
+                      }`}
+                    >
+                      {isFollowing ? (
+                        <>
+                          <FiCheck className="w-4 h-4" />
+                          <span>Added</span>
+                        </>
+                      ) : (
+                        <>
+                          <FiUserPlus className="w-4 h-4" />
+                          <span>Add</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Sticky Breadcrumb Header */}
@@ -277,48 +428,17 @@ export default function PageHeader({
             <div className="absolute inset-0 bg-black/50" />
           </>
         )}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 relative z-10">
-          <div className="flex items-center justify-between">
-            <div>
-              {/* Breadcrumb Trail (without last item) */}
-              <div className="flex items-center text-sm text-white mb-2">
-                {allBreadcrumbs.slice(0, -1).map((crumb, index) => (
-                  <div key={index} className="flex items-center">
-                    {index > 0 && <span className="mx-2 opacity-60">\</span>}
-                    {crumb.href ? (
-                      <Link
-                        href={crumb.href}
-                        className="hover:opacity-80 transition-opacity"
-                      >
-                        {index === 0 && crumb.label === "Home" ? (
-                          <FaHome className="w-4 h-4" />
-                        ) : (
-                          crumb.label
-                        )}
-                      </Link>
-                    ) : (
-                      <span>
-                        {index === 0 && crumb.label === "Home" ? (
-                          <FaHome className="w-4 h-4" />
-                        ) : (
-                          crumb.label
-                        )}
-                      </span>
-                    )}
-                  </div>
-                ))}
-                {/* Trailing slash */}
-                <span className="mx-2 opacity-60">\</span>
-              </div>
-
-              {/* Current Page Title with Logo/Avatar */}
-              <div className="flex items-center gap-2">
-                {logo && (
+        {/* Desktop Layout */}
+        <div className="hidden sm:block">
+          {/* Line 1: Avatar + Title */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-3">
+            <div className="flex items-center gap-2">
+              {logo && (
                   <div
                     className={`relative ${
                       entityType === "player"
                         ? "w-7 h-7 rounded-full border border-white bg-white"
-                        : `w-7 h-7 rounded ${
+                        : `w-7 h-7 rounded-full ${
                             isSportIcon
                               ? "bg-white/10 backdrop-blur-sm"
                               : "bg-white"
@@ -342,41 +462,186 @@ export default function PageHeader({
                           : undefined
                       }
                     />
-                  </div>
+                </div>
+              )}
+              <span className="text-white text-xl font-bold">
+                {allBreadcrumbs[allBreadcrumbs.length - 1].label}
+                {jerseyNumber && (
+                  <span className="ml-2 opacity-60">#{jerseyNumber}</span>
                 )}
-                <span className="text-white text-xl font-bold">
-                  {allBreadcrumbs[allBreadcrumbs.length - 1].label}
-                  {jerseyNumber && (
-                    <span className="ml-2 opacity-60">#{jerseyNumber}</span>
+              </span>
+            </div>
+          </div>
+
+          {/* Line 2: Tab bar + Add Button - Full Width */}
+          {tabs && tabs.length > 0 && (
+            <div className="bg-black/10 relative z-10">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    {tabs.map((tab) => (
+                      <Link
+                        key={tab.label}
+                        href={tab.href}
+                        className={`px-4 py-1 text-sm font-medium rounded-lg transition-all ${
+                          tab.active
+                            ? "bg-white/20 backdrop-blur-sm text-white"
+                            : "text-white/80 hover:text-white hover:bg-white/10"
+                        }`}
+                      >
+                        {tab.label}
+                      </Link>
+                    ))}
+                  </div>
+
+                  {/* Add Button */}
+                  {showFollowButton && followerCount !== undefined && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-white text-sm font-semibold">
+                        {followerCount.toLocaleString()}
+                      </span>
+                      <button
+                        onClick={toggleFollow}
+                        disabled={isLoading}
+                        className={`flex items-center gap-1.5 px-3 py-1 text-sm font-medium rounded-lg transition-all cursor-pointer disabled:opacity-50 bg-white/10 backdrop-blur-sm text-white ${
+                          isFollowing
+                            ? "hover:bg-red-500/30"
+                            : "hover:bg-white/20"
+                        }`}
+                      >
+                        {isFollowing ? (
+                          <>
+                            <FiCheck className="w-4 h-4" />
+                            <span>Added</span>
+                          </>
+                        ) : (
+                          <>
+                            <FiUserPlus className="w-4 h-4" />
+                            <span>Add</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
                   )}
-                </span>
+                </div>
               </div>
             </div>
+          )}
+        </div>
 
-            {/* Added Button (for players) */}
-            {showFollowButton && (
-              <button
-                onClick={toggleFollow}
-                disabled={isLoading}
-                className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 font-semibold rounded-lg transition-colors text-sm cursor-pointer disabled:opacity-50 ${
-                  isFollowing
-                    ? "bg-white text-green-600 hover:bg-red-50 hover:text-red-600"
-                    : "bg-white text-green-600 hover:bg-gray-100"
-                }`}
-              >
-                {isFollowing ? (
-                  <>
-                    <FiCheck className="w-4 h-4" />
-                    <span className="hidden sm:inline">Added</span>
-                  </>
-                ) : (
-                  <>
-                    <FiUserPlus className="w-4 h-4" />
-                    <span className="hidden sm:inline">Add</span>
-                  </>
+        {/* Mobile Layout */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="sm:hidden w-full pt-4">
+            {/* Line 1: Logo + Title */}
+            <div className="flex items-center gap-2 mb-2">
+              {logo && (
+                <div
+                  className={`relative ${
+                    entityType === "player"
+                      ? "w-7 h-7 rounded-full border border-white bg-white"
+                      : `w-7 h-7 rounded-full ${
+                          isSportIcon
+                            ? "bg-white/10 backdrop-blur-sm"
+                            : "bg-white"
+                        }`
+                  } overflow-hidden ${
+                    entityType !== "player" && "p-1"
+                  } shrink-0`}
+                >
+                  <Image
+                    src={logo}
+                    alt={title}
+                    fill
+                    className={
+                      entityType === "player"
+                        ? "object-cover"
+                        : "object-contain"
+                    }
+                    style={
+                      isSportIcon
+                        ? { filter: "brightness(0) invert(1)" }
+                        : undefined
+                    }
+                  />
+                </div>
+              )}
+              <span className="text-white text-base sm:text-xl font-semibold sm:font-bold">
+                {allBreadcrumbs[allBreadcrumbs.length - 1].label}
+                {jerseyNumber && (
+                  <span className="ml-2 opacity-60">#{jerseyNumber}</span>
                 )}
-              </button>
-            )}
+              </span>
+            </div>
+
+            {/* Line 2: Tab Dropdown (left) + Followers + Add Button (right) */}
+            <div className="flex items-center justify-between bg-black/10 px-4 -mx-4 py-1.5 pb-2">
+              {/* Tab Dropdown */}
+              {tabs && tabs.length > 0 && activeTab && (
+                <div className="relative" ref={stickyDropdownRef}>
+                  <button
+                    onClick={() =>
+                      setShowStickyTabDropdown(!showStickyTabDropdown)
+                    }
+                    className="flex items-center gap-1.5 px-2 py-1 text-xs font-medium rounded-lg transition-all bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 cursor-pointer"
+                  >
+                    {getTabIcon(activeTab.label)}
+                    <span>{activeTab.label}</span>
+                    <FiChevronDown className="w-3 h-3" />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {showStickyTabDropdown && (
+                    <div className="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-lg overflow-hidden min-w-[140px] z-50">
+                      {tabs.map((tab) => (
+                        <Link
+                          key={tab.label}
+                          href={tab.href}
+                          className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors ${
+                            tab.active
+                              ? "bg-green-50 text-green-700 font-semibold"
+                              : "text-gray-700 hover:bg-gray-50"
+                          }`}
+                          onClick={() => setShowStickyTabDropdown(false)}
+                        >
+                          {getTabIcon(tab.label)}
+                          {tab.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Followers + Add Button */}
+              {showFollowButton && followerCount !== undefined && (
+                <div className="flex items-center gap-2">
+                  <span className="text-white text-sm font-semibold">
+                    {followerCount.toLocaleString()}
+                  </span>
+                  <button
+                    onClick={toggleFollow}
+                    disabled={isLoading}
+                    className={`flex items-center gap-1.5 px-2 py-1 text-xs font-medium rounded-lg transition-all cursor-pointer disabled:opacity-50 ${
+                      isFollowing
+                        ? "bg-white/20 backdrop-blur-sm text-white hover:bg-red-500/30 hover:text-white"
+                        : "bg-white/20 backdrop-blur-sm text-white hover:bg-white/30"
+                    }`}
+                  >
+                    {isFollowing ? (
+                      <>
+                        <FiCheck className="w-3.5 h-3.5" />
+                        <span>Added</span>
+                      </>
+                    ) : (
+                      <>
+                        <FiUserPlus className="w-3.5 h-3.5" />
+                        <span>Add</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

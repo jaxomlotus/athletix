@@ -29,7 +29,7 @@ export async function PUT(
     const user = authResult.user;
 
     // Check rate limit
-    const rateLimit = checkRateLimit(request, user.id, 'mutations');
+    const rateLimit = checkRateLimit(request, user.id.toString(), 'mutations');
     if (!rateLimit.allowed) {
       return errorResponse('Rate limit exceeded', 429);
     }
@@ -45,7 +45,7 @@ export async function PUT(
     const validatedData = updateMembershipSchema.parse(body);
 
     // Update membership (ownership check is done in data-access)
-    const membership = await updateMembership(membershipId, validatedData, user.id);
+    const membership = await updateMembership(membershipId, validatedData, user.id.toString());
 
     return successResponse(membership, 'Membership updated successfully');
   } catch (error) {
@@ -73,7 +73,7 @@ export async function DELETE(
     const user = authResult.user;
 
     // Check rate limit
-    const rateLimit = checkRateLimit(request, user.id, 'mutations');
+    const rateLimit = checkRateLimit(request, user.id.toString(), 'mutations');
     if (!rateLimit.allowed) {
       return errorResponse('Rate limit exceeded', 429);
     }
@@ -85,7 +85,7 @@ export async function DELETE(
     }
 
     // Delete membership (ownership check is done in data-access)
-    await deleteMembership(membershipId, user.id);
+    await deleteMembership(membershipId, user.id.toString());
 
     return successResponse(null, 'Membership deleted successfully');
   } catch (error) {

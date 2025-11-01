@@ -30,13 +30,13 @@ export async function GET(
     const user = await optionalAuth(request);
 
     // Check rate limit
-    const rateLimit = checkRateLimit(request, user?.id || null, 'general');
+    const rateLimit = checkRateLimit(request, user?.id?.toString() || null, 'general');
     if (!rateLimit.allowed) {
       return errorResponse('Rate limit exceeded', 429);
     }
 
     // Fetch entity with follow status if user is authenticated
-    const entity = await getEntityBySlug(entityType, slug, user?.id);
+    const entity = await getEntityBySlug(entityType, slug, user?.id?.toString());
 
     if (!entity) {
       return errorResponse('Entity not found', 404);
@@ -73,7 +73,7 @@ export async function PUT(
     const user = authResult.user;
 
     // Check rate limit
-    const rateLimit = checkRateLimit(request, user.id, 'mutations');
+    const rateLimit = checkRateLimit(request, user.id.toString(), 'mutations');
     if (!rateLimit.allowed) {
       return errorResponse('Rate limit exceeded', 429);
     }
@@ -83,7 +83,7 @@ export async function PUT(
     const validatedData = updateEntitySchema.parse(body);
 
     // Update entity (ownership check is done in data-access)
-    const entity = await updateEntity(entityType, slug, validatedData, user.id);
+    const entity = await updateEntity(entityType, slug, validatedData, user.id.toString());
 
     return successResponse(entity, 'Entity updated successfully');
   } catch (error) {
@@ -116,13 +116,13 @@ export async function DELETE(
     const user = authResult.user;
 
     // Check rate limit
-    const rateLimit = checkRateLimit(request, user.id, 'mutations');
+    const rateLimit = checkRateLimit(request, user.id.toString(), 'mutations');
     if (!rateLimit.allowed) {
       return errorResponse('Rate limit exceeded', 429);
     }
 
     // Delete entity (ownership check is done in data-access)
-    await deleteEntity(entityType, slug, user.id);
+    await deleteEntity(entityType, slug, user.id.toString());
 
     return successResponse(null, 'Entity deleted successfully');
   } catch (error) {

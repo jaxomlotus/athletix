@@ -9,6 +9,7 @@ import NavigationHeader from "@/components/NavigationHeader";
 import PageHeader from "@/components/PageHeader";
 import ClipsSection from "@/components/ClipsSection";
 import Leaderboard from "@/components/Leaderboard";
+import Discussions from "@/components/Discussions";
 import Footer from "@/components/Footer";
 import RankBadge from "@/components/RankBadge";
 import Filter, { FilterConfig } from "@/components/Filter";
@@ -111,7 +112,76 @@ async function getEntityData(
       });
     }
 
-    return { entity, entityType, entityStats };
+    // Fetch discussion topics for this entity (top 10 for shorthand view)
+    const discussionTopics = await prisma.discussionTopic.findMany({
+      where: {
+        entities: {
+          some: {
+            entityId: entity.id,
+          },
+        },
+        isDeleted: false,
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            displayName: true,
+            image: true,
+          },
+        },
+        category: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            color: true,
+          },
+        },
+      },
+      orderBy: [
+        { isPinned: 'desc' },
+        { lastCommentAt: 'desc' },
+      ],
+      take: 10,
+    });
+
+    // Fetch origin entities for topics (to show "Posted in" tags)
+    const originEntityIds = [...new Set(discussionTopics.map(t => t.subjectId))];
+    const originEntities = await prisma.entity.findMany({
+      where: {
+        id: { in: originEntityIds },
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        type: true,
+      },
+    });
+
+    // Create a map for quick lookup
+    const originEntityMap = new Map(originEntities.map(e => [e.id, e]));
+
+    // Attach origin entity to each topic
+    const topicsWithOrigin = discussionTopics.map(topic => ({
+      ...topic,
+      originEntity: originEntityMap.get(topic.subjectId),
+    }));
+
+    const discussionCount = await prisma.discussionTopic.count({
+      where: {
+        entities: {
+          some: {
+            entityId: entity.id,
+          },
+        },
+        isDeleted: false,
+      },
+    });
+
+    return { entity, entityType, entityStats, discussionTopics: topicsWithOrigin, discussionCount };
   } catch (error) {
     console.error("Error fetching entity:", error);
     return null;
@@ -203,7 +273,7 @@ export default async function EntityDetailPage({
     notFound();
   }
 
-  const { entity, entityType, entityStats } = data;
+  const { entity, entityType, entityStats, discussionTopics, discussionCount } = data;
 
   // Get team IDs for season filtering (for clip filtering by team tags)
   let seasonTeamIds: number[] = [];
@@ -780,6 +850,15 @@ export default async function EntityDetailPage({
 
   const breadcrumbs = buildBreadcrumbs(entity, entityType);
   const displayName = getEntityDisplayName(entityType);
+
+  // Build tabs for navigation
+  const entityPath = `/${pluralizeType(entityType)}/${entity.slug}`;
+  const tabs = [
+    { label: "Overview", href: entityPath, active: true },
+    { label: "Discussions", href: `${entityPath}/discussions`, active: false },
+    { label: "Stats", href: `${entityPath}/stats`, active: false },
+    { label: "Clips", href: `${entityPath}/clips`, active: false },
+  ];
 
   // Build filter configuration
   let filterConfig: FilterConfig = {};
@@ -1419,6 +1498,19 @@ export default async function EntityDetailPage({
           />
         );
 
+      case "Discussions":
+        return (
+          <Discussions
+            key="Discussions"
+            entityId={entity.id}
+            entityType={pluralizeType(entityType)}
+            entitySlug={entity.slug}
+            variant="shorthand"
+            topics={discussionTopics || []}
+            totalCount={discussionCount || 0}
+          />
+        );
+
       default:
         return null;
     }
@@ -1695,6 +1787,7 @@ export default async function EntityDetailPage({
         entityType={entityType}
         entityId={entity.id}
         isFollowing={(entity as any).isFollowing ?? false}
+        tabs={tabs}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 w-full">

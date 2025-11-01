@@ -32,7 +32,7 @@ export async function GET(
     const user = await optionalAuth(request);
 
     // Check rate limit
-    const rateLimit = checkRateLimit(request, user?.id || null, 'general');
+    const rateLimit = checkRateLimit(request, user?.id?.toString() || null, 'general');
     if (!rateLimit.allowed) {
       return errorResponse('Rate limit exceeded', 429);
     }
@@ -59,7 +59,7 @@ export async function GET(
     const result = await getEntitiesByType(entityType, {
       ...validatedFilters,
       ...pagination,
-      userId: user?.id,
+      userId: user?.id?.toString(),
     });
 
     return paginatedResponse(
@@ -100,7 +100,7 @@ export async function POST(
     const user = authResult.user;
 
     // Check rate limit
-    const rateLimit = checkRateLimit(request, user.id, 'mutations');
+    const rateLimit = checkRateLimit(request, user.id.toString(), 'mutations');
     if (!rateLimit.allowed) {
       return errorResponse('Rate limit exceeded', 429);
     }
@@ -113,7 +113,7 @@ export async function POST(
     });
 
     // Create entity
-    const entity = await createEntity(validatedData, user.id);
+    const entity = await createEntity(validatedData, user.id.toString());
 
     return successResponse(entity, 'Entity created successfully', 201);
   } catch (error) {

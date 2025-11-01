@@ -28,7 +28,7 @@ export async function DELETE(
     const user = authResult.user;
 
     // Check rate limit
-    const rateLimit = checkRateLimit(request, user.id, 'mutations');
+    const rateLimit = checkRateLimit(request, user.id.toString(), 'mutations');
     if (!rateLimit.allowed) {
       return errorResponse('Rate limit exceeded', 429);
     }
@@ -40,7 +40,7 @@ export async function DELETE(
     }
 
     // Delete follow
-    await deleteFollow(user.id, entityIdNum);
+    await deleteFollow(user.id.toString(), entityIdNum);
 
     return successResponse(null, 'Successfully unfollowed entity');
   } catch (error) {

@@ -34,9 +34,11 @@ async function getFollowStatusMap(userId: string | null | undefined, entityIds: 
     return new Map();
   }
 
+  const userIdNum = parseInt(userId, 10);
+
   const follows = await prisma.follow.findMany({
     where: {
-      userId,
+      userId: userIdNum,
       entityId: {
         in: entityIds,
       },
@@ -235,6 +237,7 @@ export async function getClipById(id: number) {
  */
 export async function createClip(data: CreateClipInput, userId: string) {
   const { entityIds, ...clipData } = data;
+  const userIdNum = parseInt(userId, 10);
 
   // Create clip
   const clip = await prisma.clip.create({
@@ -242,7 +245,7 @@ export async function createClip(data: CreateClipInput, userId: string) {
       ...clipData,
       userClips: {
         create: {
-          userId,
+          userId: userIdNum,
           order: 0,
         },
       },
@@ -274,10 +277,11 @@ export async function createClip(data: CreateClipInput, userId: string) {
  */
 export async function updateClip(id: number, data: UpdateClipInput, userId: string) {
   const { entityIds, ...clipData } = data;
+  const userIdNum = parseInt(userId, 10);
 
   // Verify ownership
   const userClip = await prisma.userClip.findFirst({
-    where: { clipId: id, userId },
+    where: { clipId: id, userId: userIdNum },
   });
 
   if (!userClip) {
@@ -317,9 +321,11 @@ export async function updateClip(id: number, data: UpdateClipInput, userId: stri
  * Used by: Clips API
  */
 export async function deleteClip(id: number, userId: string) {
+  const userIdNum = parseInt(userId, 10);
+
   // Verify ownership
   const userClip = await prisma.userClip.findFirst({
-    where: { clipId: id, userId },
+    where: { clipId: id, userId: userIdNum },
   });
 
   if (!userClip) {
@@ -1398,10 +1404,12 @@ export async function getEntityBySlug(
  * Used by: Entities API
  */
 export async function createEntity(data: CreateEntityInput, userId: string) {
+  const userIdNum = parseInt(userId, 10);
+
   return prisma.entity.create({
     data: {
       ...data,
-      ownerId: userId,
+      ownerId: userIdNum,
     } as any,
     include: {
       parent: true,
@@ -1420,6 +1428,8 @@ export async function updateEntity(
   data: UpdateEntityInput,
   userId: string
 ) {
+  const userIdNum = parseInt(userId, 10);
+
   // Verify entity exists and user owns it
   const entity = await prisma.entity.findUnique({
     where: { slug, type },
@@ -1430,7 +1440,7 @@ export async function updateEntity(
     throw new Error('Entity not found');
   }
 
-  if (entity.ownerId !== userId) {
+  if (entity.ownerId !== userIdNum) {
     throw new Error('You do not own this entity');
   }
 
@@ -1450,6 +1460,8 @@ export async function updateEntity(
  * Used by: Entities API
  */
 export async function deleteEntity(type: string, slug: string, userId: string) {
+  const userIdNum = parseInt(userId, 10);
+
   // Verify entity exists and user owns it
   const entity = await prisma.entity.findUnique({
     where: { slug, type },
@@ -1460,7 +1472,7 @@ export async function deleteEntity(type: string, slug: string, userId: string) {
     throw new Error('Entity not found');
   }
 
-  if (entity.ownerId !== userId) {
+  if (entity.ownerId !== userIdNum) {
     throw new Error('You do not own this entity');
   }
 
@@ -1479,8 +1491,10 @@ export async function deleteEntity(type: string, slug: string, userId: string) {
  * Used by: Follows API
  */
 export async function getUserFollows(userId: string) {
+  const userIdNum = parseInt(userId, 10);
+
   return prisma.follow.findMany({
-    where: { userId },
+    where: { userId: userIdNum },
     include: {
       entity: {
         select: {
@@ -1503,6 +1517,8 @@ export async function getUserFollows(userId: string) {
  * Used by: Follows API
  */
 export async function createFollow(userId: string, entityId: number) {
+  const userIdNum = parseInt(userId, 10);
+
   // Check if entity exists
   const entity = await prisma.entity.findUnique({
     where: { id: entityId },
@@ -1515,7 +1531,7 @@ export async function createFollow(userId: string, entityId: number) {
   // Create follow (unique constraint prevents duplicates)
   const follow = await prisma.follow.create({
     data: {
-      userId,
+      userId: userIdNum,
       entityId,
     },
     include: {
@@ -1549,10 +1565,12 @@ export async function createFollow(userId: string, entityId: number) {
  * Used by: Follows API
  */
 export async function deleteFollow(userId: string, entityId: number) {
+  const userIdNum = parseInt(userId, 10);
+
   // Delete follow
   const follow = await prisma.follow.deleteMany({
     where: {
-      userId,
+      userId: userIdNum,
       entityId,
     },
   });
@@ -1631,6 +1649,8 @@ export async function getMemberships(filters: MembershipFilters = {}) {
  * Used by: Memberships API
  */
 export async function createMembership(data: CreateMembershipInput, userId: string) {
+  const userIdNum = parseInt(userId, 10);
+
   // Verify user owns either the player or the team
   const [player, team] = await Promise.all([
     prisma.entity.findUnique({
@@ -1651,7 +1671,7 @@ export async function createMembership(data: CreateMembershipInput, userId: stri
     throw new Error('Invalid team');
   }
 
-  if (player.ownerId !== userId && team.ownerId !== userId) {
+  if (player.ownerId !== userIdNum && team.ownerId !== userIdNum) {
     throw new Error('You must own the player or team to create this membership');
   }
 
@@ -1683,6 +1703,8 @@ export async function updateMembership(
   data: UpdateMembershipInput,
   userId: string
 ) {
+  const userIdNum = parseInt(userId, 10);
+
   // Verify membership exists and user owns player or team
   const membership = await prisma.teamMembership.findUnique({
     where: { id },
@@ -1700,8 +1722,8 @@ export async function updateMembership(
     throw new Error('Membership not found');
   }
 
-  const ownsPlayer = membership.player.ownerId === userId;
-  const ownsTeam = membership.team.ownerId === userId;
+  const ownsPlayer = membership.player.ownerId === userIdNum;
+  const ownsTeam = membership.team.ownerId === userIdNum;
 
   if (!ownsPlayer && !ownsTeam) {
     throw new Error('You must own the player or team to update this membership');
@@ -1730,6 +1752,8 @@ export async function updateMembership(
  * Used by: Memberships API
  */
 export async function deleteMembership(id: number, userId: string) {
+  const userIdNum = parseInt(userId, 10);
+
   // Verify membership exists and user owns player or team
   const membership = await prisma.teamMembership.findUnique({
     where: { id },
@@ -1747,8 +1771,8 @@ export async function deleteMembership(id: number, userId: string) {
     throw new Error('Membership not found');
   }
 
-  const ownsPlayer = membership.player.ownerId === userId;
-  const ownsTeam = membership.team.ownerId === userId;
+  const ownsPlayer = membership.player.ownerId === userIdNum;
+  const ownsTeam = membership.team.ownerId === userIdNum;
 
   if (!ownsPlayer && !ownsTeam) {
     throw new Error('You must own the player or team to delete this membership');

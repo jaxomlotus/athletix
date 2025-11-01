@@ -31,32 +31,32 @@ export const DEFAULT_LAYOUTS: Record<EntityType, EntityLayout> = {
   sport: {
     l: [],
     c: ["Leagues", "Clips"],
-    r: ["TopClips"],
+    r: ["TopClips", "Discussions"],
   },
   league: {
     l: [],
     c: ["Teams", "Clips"],
-    r: ["TopClips"],
+    r: ["TopClips", "Discussions"],
   },
   team: {
     l: [],
     c: ["Schools", "Players", "Clips"],
-    r: ["TopClips"],
+    r: ["TopClips", "Discussions"],
   },
   player: {
     l: [],
     c: ["Meta", "Teams", "Clips"],
-    r: ["TopClips"],
+    r: ["TopClips", "Discussions"],
   },
   school: {
     l: [],
     c: ["Teams", "Players", "Clips"],
-    r: ["TopClips"],
+    r: ["TopClips", "Discussions"],
   },
   location: {
     l: [],
     c: ["Schools", "Teams", "Players", "Clips"],
-    r: ["TopClips"],
+    r: ["TopClips", "Discussions"],
   },
 };
 

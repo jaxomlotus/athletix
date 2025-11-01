@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     const user = await optionalAuth(request);
 
     // Check rate limit
-    const rateLimit = checkRateLimit(request, user?.id || null, 'general');
+    const rateLimit = checkRateLimit(request, user?.id?.toString() || null, 'general');
     if (!rateLimit.allowed) {
       return errorResponse('Rate limit exceeded', 429);
     }
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     const user = authResult.user;
 
     // Check rate limit
-    const rateLimit = checkRateLimit(request, user.id, 'mutations');
+    const rateLimit = checkRateLimit(request, user.id.toString(), 'mutations');
     if (!rateLimit.allowed) {
       return errorResponse('Rate limit exceeded', 429);
     }
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
     const validatedData = createMembershipSchema.parse(body);
 
     // Create membership (ownership check is done in data-access)
-    const membership = await createMembership(validatedData, user.id);
+    const membership = await createMembership(validatedData, user.id.toString());
 
     return successResponse(membership, 'Membership created successfully', 201);
   } catch (error) {

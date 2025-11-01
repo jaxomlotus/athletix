@@ -22,8 +22,10 @@ export async function getAuthUser(request: NextRequest): Promise<User | null> {
     }
 
     // Fetch full user from database
+    // session.user.id is a string, convert to number for Prisma query
+    const userId = typeof session.user.id === 'string' ? parseInt(session.user.id, 10) : session.user.id;
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: userId },
     });
 
     return user;
@@ -71,6 +73,8 @@ export async function requireOwnership(
   userId: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    const userIdNum = parseInt(userId, 10);
+
     const entity = await prisma.entity.findUnique({
       where: { id: entityId },
       select: { ownerId: true },
@@ -80,7 +84,7 @@ export async function requireOwnership(
       return { success: false, error: 'Entity not found' };
     }
 
-    if (entity.ownerId !== userId) {
+    if (entity.ownerId !== userIdNum) {
       return { success: false, error: 'You do not own this entity' };
     }
 
@@ -100,11 +104,13 @@ export async function requireClipOwnership(
   userId: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    const userIdNum = parseInt(userId, 10);
+
     // Check if user has a UserClip relationship with this clip
     const userClip = await prisma.userClip.findFirst({
       where: {
         clipId: clipId,
-        userId: userId,
+        userId: userIdNum,
       },
     });
 
@@ -128,6 +134,8 @@ export async function requireMembershipOwnership(
   userId: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    const userIdNum = parseInt(userId, 10);
+
     const membership = await prisma.teamMembership.findUnique({
       where: { id: membershipId },
       include: {
@@ -145,8 +153,8 @@ export async function requireMembershipOwnership(
     }
 
     // User must own either the player or the team
-    const ownsPlayer = membership.player.ownerId === userId;
-    const ownsTeam = membership.team.ownerId === userId;
+    const ownsPlayer = membership.player.ownerId === userIdNum;
+    const ownsTeam = membership.team.ownerId === userIdNum;
 
     if (!ownsPlayer && !ownsTeam) {
       return {

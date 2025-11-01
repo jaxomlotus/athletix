@@ -24,7 +24,7 @@ export async function GET(
     const user = await optionalAuth(request);
 
     // Check rate limit
-    const rateLimit = checkRateLimit(request, user?.id || null, 'general');
+    const rateLimit = checkRateLimit(request, user?.id?.toString() || null, 'general');
     if (!rateLimit.allowed) {
       return errorResponse('Rate limit exceeded', 429);
     }
@@ -58,7 +58,7 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    
+
     // Require authentication
     const authResult = await requireAuth(request);
     if (!authResult.success) {
@@ -68,7 +68,7 @@ export async function PUT(
     const user = authResult.user;
 
     // Check rate limit
-    const rateLimit = checkRateLimit(request, user.id, 'mutations');
+    const rateLimit = checkRateLimit(request, user.id.toString(), 'mutations');
     if (!rateLimit.allowed) {
       return errorResponse('Rate limit exceeded', 429);
     }
@@ -84,7 +84,7 @@ export async function PUT(
     const validatedData = updateClipSchema.parse(body);
 
     // Update clip (ownership check is done in data-access)
-    const clip = await updateClip(clipId, validatedData, user.id);
+    const clip = await updateClip(clipId, validatedData, user.id.toString());
 
     return successResponse(clip, 'Clip updated successfully');
   } catch (error) {
@@ -112,7 +112,7 @@ export async function DELETE(
     const user = authResult.user;
 
     // Check rate limit
-    const rateLimit = checkRateLimit(request, user.id, 'mutations');
+    const rateLimit = checkRateLimit(request, user.id.toString(), 'mutations');
     if (!rateLimit.allowed) {
       return errorResponse('Rate limit exceeded', 429);
     }
@@ -124,7 +124,7 @@ export async function DELETE(
     }
 
     // Delete clip (ownership check is done in data-access)
-    await deleteClip(clipId, user.id);
+    await deleteClip(clipId, user.id.toString());
 
     return successResponse(null, 'Clip deleted successfully');
   } catch (error) {

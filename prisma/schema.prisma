@@ -17,7 +17,7 @@ datasource db {
 
 // Better Auth models
 model User {
-  id             String    @id @default(cuid())
+  id             Int       @id @default(autoincrement())
   name           String?
   email          String    @unique
   emailVerified  Boolean   @default(false)
@@ -49,12 +49,18 @@ model User {
   follows        Follow[]
   userClips      UserClip[]
 
+  // Discussion system
+  discussionTopics     DiscussionTopic[]
+  discussionComments   DiscussionComment[]   @relation("AuthoredComments")
+  commentMentions      DiscussionComment[]   @relation("CommentMentions")
+  discussionLikes      DiscussionLike[]
+
   @@map("Users")
 }
 
 model Session {
-  id        String   @id @default(cuid())
-  userId    String
+  id        Int      @id @default(autoincrement())
+  userId    Int
   token     String   @unique
   expiresAt DateTime
   ipAddress String?
@@ -69,8 +75,8 @@ model Session {
 }
 
 model Account {
-  id                     String    @id @default(cuid())
-  userId                 String
+  id                     Int       @id @default(autoincrement())
+  userId                 Int
   accountId              String
   providerId             String
   accessToken            String?   @db.Text
@@ -120,13 +126,15 @@ model Entity {
   childEntities  String?  @db.VarChar(100) // e.g., "Leagues", "Teams", "Players" - used for UI labels
 
   // Ownership & Moderation
-  ownerId        String?
+  ownerId        Int?
   owner          User?    @relation("EntityOwner", fields: [ownerId], references: [id], onDelete: SetNull)
   modsJson       Json?    // Array of { userId: number, permissions: string[] }
 
   // Social
-  followerCount  Int      @default(0)
-  clipsCount     Int      @default(0)
+  followerCount    Int      @default(0)
+  clipsCount       Int      @default(0)
+  discussionCount  Int      @default(0)  // Count of discussion topics about this entity
+  commentCount     Int      @default(0)  // Count of all comments on this entity's discussions
 
   // Type-specific data stored as JSON
   metadata       Json?    // Flexible field for type-specific data
@@ -139,6 +147,7 @@ model Entity {
 
   follows        Follow[]
   clips          EntityClip[]
+  discussionTopics DiscussionTopicEntity[] @relation("DiscussionTopics")
 
   // Team memberships (for players)
   playerMemberships  TeamMembership[] @relation("PlayerMemberships")
@@ -159,7 +168,7 @@ model Entity {
 // Unified Follow System
 model Follow {
   id         Int      @id @default(autoincrement())
-  userId     String
+  userId     Int
   entityId   Int
   followedAt DateTime @default(now())
 
@@ -192,7 +201,7 @@ model Clip {
 
 model UserClip {
   id        Int      @id @default(autoincrement())
-  userId    String
+  userId    Int
   clipId    Int
   order     Int      @default(0)
   addedAt   DateTime @default(now())
@@ -285,4 +294,143 @@ model EntityStats {
   @@index([templateId])
   @@index([parentId])
   @@map("EntityStats")
+}
+
+// Discussion System
+
+// Discussion Category/Tags
+model DiscussionCategory {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(100)  // "General", "News", "Game Discussion", etc.
+  slug        String    @unique
+  description String?   @db.Text
+  color       String?   @db.VarChar(20)   // Hex color for UI
+  icon        String?   @db.VarChar(50)   // Icon name
+  order       Int       @default(0)       // Display order
+  createdAt   DateTime  @default(now())
+
+  topics      DiscussionTopic[]
+
+  @@map("DiscussionCategories")
+}
+
+// Discussion Topic (the main thread)
+model DiscussionTopic {
+  id                Int       @id @default(autoincrement())
+  title             String    @db.VarChar(256)
+  content           String    @db.Text
+  authorId          Int
+  categoryId        Int?
+
+  // Polymorphic relationship - what this topic is about
+  subjectType       String    @db.VarChar(50)  // "entity", "clip", "post", etc.
+  subjectId         Int       // ID of the subject
+
+  // Engagement metrics
+  viewCount         Int       @default(0)
+  commentCount      Int       @default(0)
+  likeCount         Int       @default(0)
+
+  // Bubbling behavior - whether this topic should appear on parent entities
+  bubbleUp          Boolean   @default(true)
+
+  // Moderation
+  isPinned          Boolean   @default(false)
+  isLocked          Boolean   @default(false)
+  isDeleted         Boolean   @default(false)
+
+  // Timestamps
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  lastCommentAt     DateTime  @default(now())  // Updated only when TOP-LEVEL comment is added
+
+  author            User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  category          DiscussionCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  likes             DiscussionLike[]
+  entities          DiscussionTopicEntity[]  // Many-to-many with entities
+
+  @@index([subjectType, subjectId])
+  @@index([categoryId])
+  @@index([authorId])
+  @@index([isPinned, lastCommentAt])  // For sorting: pinned first, then by recent top-level activity
+  @@index([isDeleted])
+  @@map("DiscussionTopics")
+}
+
+// Comments - can be attached to Topics, Clips, Posts, with limited nesting (1 level)
+model DiscussionComment {
+  id                Int       @id @default(autoincrement())
+  authorId          Int
+  content           String    @db.Text
+
+  // Polymorphic parent - what this comment is attached to
+  parentType        String    @db.VarChar(50)  // "topic", "clip", "post"
+  parentId          Int       // ID of the parent (topic, clip, post)
+
+  // Limited nesting (1 level only)
+  replyToCommentId  Int?      // Direct parent comment (if this is a reply)
+  replyToUserId     Int?      // The user being replied to (for @mentions)
+
+  // Engagement
+  likeCount         Int       @default(0)
+  replyCount        Int       @default(0)  // Count of direct replies
+
+  // Moderation
+  isDeleted         Boolean   @default(false)
+  isEdited          Boolean   @default(false)
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  author            User                @relation("AuthoredComments", fields: [authorId], references: [id], onDelete: Cascade)
+  replyToComment    DiscussionComment?  @relation("CommentReplies", fields: [replyToCommentId], references: [id], onDelete: Cascade)
+  replies           DiscussionComment[] @relation("CommentReplies")
+  replyToUser       User?               @relation("CommentMentions", fields: [replyToUserId], references: [id], onDelete: SetNull)
+  likes             DiscussionLike[]
+
+  @@index([parentType, parentId, replyToCommentId])
+  @@index([authorId])
+  @@index([createdAt])
+  @@map("DiscussionComments")
+}
+
+// Likes for topics and comments
+model DiscussionLike {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+
+  // Polymorphic - can like topics or comments
+  likeableType String   @db.VarChar(50)  // "topic" or "comment"
+  likeableId   Int      // ID of topic or comment
+
+  // For direct relations (helps with queries)
+  topicId      Int?
+  commentId    Int?
+
+  createdAt    DateTime @default(now())
+
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic        DiscussionTopic?    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  comment      DiscussionComment?  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, likeableType, likeableId])
+  @@index([userId])
+  @@index([likeableType, likeableId])
+  @@map("DiscussionLikes")
+}
+
+// Join table for topics appearing on multiple entities (bubbling)
+model DiscussionTopicEntity {
+  id        Int             @id @default(autoincrement())
+  topicId   Int
+  entityId  Int
+  createdAt DateTime        @default(now())
+
+  topic     DiscussionTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  entity    Entity          @relation("DiscussionTopics", fields: [entityId], references: [id], onDelete: Cascade)
+
+  @@unique([topicId, entityId])
+  @@index([entityId])
+  @@index([topicId])
+  @@map("DiscussionTopicEntities")
 }

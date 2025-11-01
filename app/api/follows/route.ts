@@ -24,13 +24,13 @@ export async function GET(request: NextRequest) {
     const user = authResult.user;
 
     // Check rate limit
-    const rateLimit = checkRateLimit(request, user.id, 'general');
+    const rateLimit = checkRateLimit(request, user.id.toString(), 'general');
     if (!rateLimit.allowed) {
       return errorResponse('Rate limit exceeded', 429);
     }
 
     // Fetch follows
-    const follows = await getUserFollows(user.id);
+    const follows = await getUserFollows(user.id.toString());
 
     return successResponse(follows);
   } catch (error) {
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     const user = authResult.user;
 
     // Check rate limit
-    const rateLimit = checkRateLimit(request, user.id, 'mutations');
+    const rateLimit = checkRateLimit(request, user.id.toString(), 'mutations');
     if (!rateLimit.allowed) {
       return errorResponse('Rate limit exceeded', 429);
     }
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     const validatedData = createFollowSchema.parse(body);
 
     // Create follow
-    const follow = await createFollow(user.id, validatedData.entityId);
+    const follow = await createFollow(user.id.toString(), validatedData.entityId);
 
     return successResponse(follow, 'Successfully followed entity', 201);
   } catch (error) {
